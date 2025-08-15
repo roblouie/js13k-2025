@@ -3,13 +3,21 @@ import { Camera } from "@/engine/renderer/camera";
 
 import { Scene } from '@/engine/renderer/scene';
 import {
-  lightPovMvp, lightWorldPosition,
+  lightPovMvp,
+  lightWorldPosition,
   modelviewProjection,
-  normalMatrix, pointLightAttenuation, spotlightDirection, spotlightPosition, worldMatrix,
+  normalMatrix,
+  pointLightAttenuation,
+  spotlightDirection,
+  spotlightPosition,
+  u_skybox,
+  u_viewDirectionProjectionInverse,
+  worldMatrix,
 } from '@/engine/shaders/shaders';
 import { EnhancedDOMPoint } from '@/engine/enhanced-dom-point';
 import { ShadowCubeMapFbo } from '@/engine/renderer/cube-buffer-2';
 import { lightInfo } from '@/light-info';
+import {Skybox} from "@/engine/skybox";
 
 // IMPORTANT! The index of a given buffer in the buffer array must match it's respective data location in the shader.
 // This allows us to use the index while looping through buffers to bind the attributes. So setting a buffer
@@ -44,6 +52,10 @@ const worldMatrixMain = gl.getUniformLocation(lilgl.program, worldMatrix);
 const lightPositionMain = gl.getUniformLocation(lilgl.program, lightWorldPosition);
 // const shadowCubeMapMain = gl.getUniformLocation(lilgl.program, shadowCubeMap);
 
+const skyboxLocation = gl.getUniformLocation(lilgl.skyboxProgram, u_skybox)!;
+const viewDirectionProjectionInverseLocation = gl.getUniformLocation(lilgl.skyboxProgram, u_viewDirectionProjectionInverse)!;
+
+
 
 gl.useProgram(lilgl.program);
 
@@ -69,6 +81,7 @@ const cubeMap = new ShadowCubeMapFbo(1024);
 
 export function render(camera: Camera, scene: Scene) {
   const viewMatrix = camera.worldMatrix.inverse();
+  const viewMatrixCopy = viewMatrix.scale(1, 1, 1);
   const viewProjectionMatrix = camera.projection.multiply(viewMatrix);
 
   // Render shadow map to depth texture
@@ -92,6 +105,18 @@ export function render(camera: Camera, scene: Scene) {
       gl.drawElements(gl.TRIANGLES, mesh.geometry.getIndices()!.length, gl.UNSIGNED_SHORT, 0);
     });
   });
+
+  const renderSkybox = (skybox: Skybox) => {
+    gl.useProgram(lilgl.skyboxProgram);
+    gl.uniform1i(skyboxLocation, 0);
+    viewMatrixCopy.m41 = 0;
+    viewMatrixCopy.m42 = 0;
+    viewMatrixCopy.m43 = 0;
+    const inverseViewProjection = camera.projection.multiply(viewMatrixCopy).inverse();
+    gl.uniformMatrix4fv(viewDirectionProjectionInverseLocation, false, inverseViewProjection.toFloat32Array());
+    gl.bindVertexArray(skybox.vao);
+    gl.drawArrays(gl.TRIANGLES, 0, 6);
+  };
 
   gl.useProgram(lilgl.program);
   gl.enable(gl.BLEND);
@@ -125,6 +150,12 @@ export function render(camera: Camera, scene: Scene) {
     gl.uniformMatrix4fv(modelviewProjectionLocation, false, modelViewProjectionMatrix.toFloat32Array());
     gl.drawElements(gl.TRIANGLES, mesh.geometry.getIndices()!.length, gl.UNSIGNED_SHORT, 0);
   });
+
+  if (scene.skybox) {
+    gl.depthFunc(gl.LEQUAL);
+    renderSkybox(scene.skybox!);
+    gl.depthFunc(gl.LESS);
+  }
 
   // Unbinding the vertex array being used to make sure the last item drawn isn't still bound on the next draw call.
   // In theory this isn't necessary but avoids bugs.

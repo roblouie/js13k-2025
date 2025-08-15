@@ -2,7 +2,7 @@ import { State } from '@/core/state';
 import { FirstPersonPlayer } from '@/core/first-person-player';
 import { Scene } from '@/engine/renderer/scene';
 import { Camera } from '@/engine/renderer/camera';
-import {heightMap, materials, metals} from '@/textures';
+import {heightMap, materials, metals, skyboxes} from '@/textures';
 import { Mesh } from '@/engine/renderer/mesh';
 import { meshToFaces } from '@/engine/physics/parse-faces';
 import { render } from '@/engine/renderer/renderer';
@@ -11,6 +11,7 @@ import { audioContext, biquadFilter, SimplestMidiRev2 } from '@/engine/audio/sim
 import {elevatorDoor1, elevatorDoorTest, elevatorMotionRev1, footstep, hideSound} from '@/sounds';
 import {computeSceneBounds, OctreeNode} from "@/engine/physics/octree";
 import {ThirdPersonPlayer} from "@/core/third-person-player";
+import {Skybox} from "@/engine/skybox";
 
 export class GameState implements State {
   player: ThirdPersonPlayer;
@@ -36,6 +37,9 @@ export class GameState implements State {
     const floor = new Mesh(new MoldableCubeGeometry(1024, 1, 1024, 255, 1, 255, 1)
       .modifyEachVertex((vert, index) => vert.y = heightmap[index])
       .spreadTextureCoords(5, 5).translate_(0, -3, 0).done_(), materials.redCarpet);
+
+    this.scene.skybox = new Skybox(...skyboxes.test);
+    this.scene.skybox.bindGeometry();
 
     this.scene.add_(floor, this.player.mesh);
     const faces = meshToFaces([floor]);

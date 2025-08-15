@@ -2,7 +2,11 @@ import { Material } from '@/engine/renderer/material';
 import { textureLoader } from '@/engine/renderer/texture-loader';
 import {toHeightmap, toImage} from '@/engine/svg-maker/svg-string-converters';
 
+const skyboxSize = 2048;
+
+
 export const materials: {[key: string]: Material} = {};
+export const skyboxes: {[key: string]: TexImageSource[]} = {};
 
 export async function initTextures() {
   materials.wood = new Material({ texture: textureLoader.load_(await wood())});
@@ -21,6 +25,20 @@ export async function initTextures() {
   for (let i = 1; i <= 13; i++) {
     materials[i] = new Material({ texture: textureLoader.load_(await roomSign(`13${i.toString().padStart(2, '0')}`))});
   }
+
+
+
+
+  const testSlicer = drawSkyboxHor();
+  const horSlices = [await testSlicer(), await testSlicer(), await testSlicer(), await testSlicer()];
+  skyboxes.test = [
+    horSlices[3],
+    horSlices[1],
+    await toImage(drawSkyboxTop()),
+    horSlices[0], // Floor
+    horSlices[2],
+    horSlices[0],
+  ];
 
   textureLoader.bindTextures();
 }
@@ -89,4 +107,84 @@ function roomSign(roomNumber: string) {
 
 function color(color: string | number) {
   return toImage(`<svg width="512" height="512" xmlns="http://www.w3.org/2000/svg"><rect x="0" y="0" width="100%" height="100%" fill="${color}"/></svg>`)
+}
+
+function drawSkyboxHor() {
+  return horizontalSkyboxSlice(drawBetterClouds(skyboxSize * 4), `
+    <filter height="150%" id="f" width="100%" x="0" >
+        <feTurbulence baseFrequency="0.008,0" numOctaves="4" seed="15" stitchTiles="stitch" type="fractalNoise" />
+        <feDisplacementMap in="SourceGraphic" scale="100"/>
+    </filter>
+    <filter id="g" width="100%" x="0" >
+      <feTurbulence baseFrequency="0.02,0.01" numOctaves="4" result="n" seed="15" stitchTiles="stitch" type="fractalNoise"/>
+      <feDiffuseLighting in="n" lighting-color="#1c1d2d" surfaceScale="22">
+        <feDistantLight azimuth="45" elevation="60"/>
+      </feDiffuseLighting>
+      <feComposite in2="SourceGraphic" operator="in" />
+    </filter>
+    <g filter="url(#g)"><rect filter="url(#f)" height="50%" width="8192" x="0" y="1000"/></g>`);
+}
+
+function drawSkyboxTop() {
+  return `<svg width="${skyboxSize}" height="${skyboxSize}" style="background: #000" xmlns="http://www.w3.org/2000/svg">${drawClouds()}</svg>`;
+}
+
+function horizontalSkyboxSlice(...elements: string[]) {
+  let xPos = 0;
+  const context = new OffscreenCanvas(skyboxSize, skyboxSize).getContext('2d')!;
+
+  return async (): Promise<ImageData> => {
+    // @ts-ignore
+    context.drawImage(await toImage(`<svg width="${skyboxSize * 4}" height="${skyboxSize}" style="background: #000"  xmlns="http://www.w3.org/2000/svg">${elements.join('')}</svg>`), xPos, 0);
+    xPos -= skyboxSize;
+    // @ts-ignore
+    return context.getImageData(0, 0, skyboxSize, skyboxSize);
+  };
+}
+
+function drawBetterClouds(width_: number) {
+  const seeds = [2, 4];
+  const numOctaves = [6, 6];
+  const baseFrequencies = [0.005, 0.003];
+  const heights = [160, 820];
+  const yPositions = [800, 0];
+  const alphaTableValues = [
+    [0, 0, 0.6],
+    [0, 0, 1.5]
+  ];
+
+  const cloudMaker = (index: number) => {
+    return `
+        <filter id="f${index}">
+            <feTurbulence seed="${seeds[index]}" type="fractalNoise" numOctaves="${numOctaves[index]}" baseFrequency="${baseFrequencies[index]}" stitchTiles="stitch" />
+            <feComponentTransfer>
+            <feFuncR type="table" tableValues="0.2, 0.2"/>
+            <feFuncG type="table" tableValues="0.2, 0.2"/>
+            <feFuncB type="table" tableValues="0.25 0.25"/>
+            <feFuncA type="table" tableValues="${alphaTableValues[index]}"/>
+            </feComponentTransfer>
+            </filter>
+            <linearGradient id="g${index}" gradientTransform="rotate(90)">
+              <stop offset="0" stop-color="black" />
+              <stop offset="0.3" stop-color="white"/>
+              <stop offset="0.7" stop-color="white"/>
+              <stop offset="1" stop-color="black"/>
+            </linearGradient>
+            <mask id="m${index}">
+                <rect fill="url(#g${index})" height="${heights[index]}" width="${width_}" x="0" y="${yPositions[index]}"/>
+            </mask>
+            <rect filter="url(#f${index})" height="${heights[index]}" mask="url(#m${index})" width="${width_}" x="0" y="${yPositions[index]}"/>`;
+  };
+
+  const clouds = cloudMaker(0) + cloudMaker(1);
+
+  return stars() + '<rect x="0" y="0" width="100%" height="100%" filter="url(#s)" />' + clouds;
+}
+
+function stars() {
+  return `<filter x="0" y="0" width="100%" height="100%" id="s"><feTurbulence baseFrequency="0.2" stitchTiles="stitch" /><feColorMatrix values="0, 0, 0, 9, -5.5, 0, 0, 0, 9, -5.5, 0, 0, 0, 9, -5.5, 0, 0, 0, 0, 1"/></filter>`;
+}
+
+function drawClouds() {
+  return stars() + `<filter height="100%" id="f" width="100%" x="0" y="0"> <feTurbulence baseFrequency="0.003" numOctaves="6" seed="2" stitchTiles="stitch" type="fractalNoise"/><feComponentTransfer color-interpolation-filters="sRGB"><feFuncR type="table" tableValues="0.8,0.8"/><feFuncG type="table" tableValues="0.8,0.8"/><feFuncB type="table" tableValues="1,1"/><feFuncA type="table" tableValues="0,0,1"/></feComponentTransfer></filter><mask id="mask"><radialGradient id="g"><stop offset="20%" stop-color="white"/><stop offset="30%" stop-color="#666"/><stop offset="100%" stop-color="black"/></radialGradient><ellipse cx="1000" cy="1000" fill="url(#g)" rx="50%" ry="50%" /></mask><radialGradient id="l"><stop offset="10%" stop-color="#fff"/><stop offset="30%" stop-color="#0000"/></radialGradient><rect filter="url(#s)" height="100%" width="100%" x="0" y="0"/><ellipse cx="1000" cy="1000" fill="url(#l)" rx="200" ry="200"/><rect filter="url(#f)" height="100%" mask="url(#mask)" width="100%" x="0" y="0"/>`;
 }

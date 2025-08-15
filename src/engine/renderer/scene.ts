@@ -1,7 +1,9 @@
 import { Object3d } from '@/engine/renderer/object-3d';
 import { Mesh } from '@/engine/renderer/mesh';
+import {Skybox} from "@/engine/skybox";
 
 export class Scene extends Object3d {
+  skybox?: Skybox;
   solidMeshes: Mesh[] = [];
 
   add_(...object3ds: Object3d[]) {
