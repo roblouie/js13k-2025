@@ -90,12 +90,7 @@ export function metals(content = '', brightnessModifier = 1) {
 }
 
 export function heightMap() {
-  return toHeightmap(`<svg width="256" height="256" xmlns="http://www.w3.org/2000/svg">
-    <filter id="b">
-        <feTurbulence baseFrequency="0.02,0.02" numOctaves="1" seed="23" type="fractalNoise" />
-    </filter>
-    <rect x="0" y="0" width="100%" height="100%" filter="url(#b)"/>
-    </svg>`, 30)
+  return toHeightmap(`<svg           height="256"                       width="256"   xmlns="http://www.w3.org/2000/svg"><filter            id="noise"                        ><feTurbulence baseFrequency="0.03571428571428571"                 numOctaves="2"        seed="5" stitchTiles="stitch"    type="fractalNoise"      /><feColorMatrix  color-interpolation-filters="sRGB"                              values="0,0,0,1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1,0"    /><feComponentTransfer color-interpolation-filters="sRGB"><feFuncR type="table" tableValues="0,1"/><feFuncG type="table" tableValues="0,1"/><feFuncB type="table" tableValues="0,1"/><feFuncA type="table" tableValues="1,1"/></feComponentTransfer></filter><rect      filter="url(#noise)"     height="100%"                       width="100%" x="0" y="0"/></svg>`, 30)
 }
 
 function roomSign(roomNumber: string) {

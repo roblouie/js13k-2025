@@ -25,9 +25,11 @@ export class ThirdPersonPlayer {
 
 
   constructor(camera: Camera) {
-    this.mesh = new Mesh(new MoldableCubeGeometry(1, 3, 1), materials.marble);
+    this.mesh = new Mesh(new MoldableCubeGeometry(1, 3, 1, 2, 2, 2).selectBy(vert => vert.x === 0).translate_(0, 0, 1).done_(), materials.marble);
     this.chassisCenter.y = 10;
     this.camera = camera;
+    this.camera.position.set(this.chassisCenter);
+    this.camera.position.z -=3;
     this.listener = audioContext.listener;
   }
 
@@ -41,21 +43,12 @@ export class ThirdPersonPlayer {
   speedCounter = 0;
   angle = 0;
 
-  private dragRate = 0;
-  private jumpTimer = 0;
-  private lastIntervalJumpTimer = 0;
-
   nearbyFaces = new Set<Face>();
   collisionSphere = new Sphere(this.chassisCenter, 2);
 
   update(octreeNode: OctreeNode) {
-    this.dragRate = 0.99;
-
-    if (this.jumpTimer - this.lastIntervalJumpTimer > 20) {
-      this.lastIntervalJumpTimer = this.jumpTimer;
-    }
-
     this.updateVelocityFromControls();  // set x / z velocity based on input
+
     this.velocity.y -= 0.01; // gravity
     this.chassisCenter.add_(this.velocity);  // move the player position by the velocity
 
@@ -74,7 +67,6 @@ export class ThirdPersonPlayer {
     const cameraPositionTarget = this.mesh.position.clone_();
     cameraPositionTarget.y += 4;
     this.camera.position.lerp(cameraPositionTarget, 0.1);
-    // this.camera.position.y += 2;
 
     // Keep camera away regardless of lerp
     const distanceToKeep = 15;
@@ -107,18 +99,22 @@ export class ThirdPersonPlayer {
 
     const mag = controls.inputDirection.magnitude;
 
-    const inputAngle = Math.atan2(-controls.inputDirection.x, -controls.inputDirection.y);
-    const playerCameraDiff = this.mesh.position.clone_().subtract(this.camera.position);
-    const playerCameraAngle = Math.atan2(playerCameraDiff.x, playerCameraDiff.z);
+    if (mag > 0.01) {
+      const camDir = new EnhancedDOMPoint().set(this.camera.rotationMatrix.transformPoint(new EnhancedDOMPoint(0, 0, -1)));
+      camDir.y = 0;
+      camDir.normalize_();
 
-    if (controls.inputDirection.x !== 0 || controls.inputDirection.z !== 0) {
-      this.angle = inputAngle + playerCameraAngle;
+      const camRight = new EnhancedDOMPoint(camDir.z, 0, -camDir.x);
+      this.velocity.x = (camDir.x * -controls.inputDirection.y + camRight.x * -controls.inputDirection.x) * speedMultiplier;
+      this.velocity.z = (camDir.z * -controls.inputDirection.y + camRight.z * -controls.inputDirection.x) * speedMultiplier;
+
+      // Face direction of movement
+      this.angle = Math.atan2(this.velocity.x, this.velocity.z);
+      this.mesh.setRotation_(0, this.angle, 0);
+    } else {
+      this.velocity.x = 0;
+      this.velocity.z = 0;
     }
-
-    this.velocity.z = Math.cos(this.angle) * mag * speedMultiplier;
-    this.velocity.x = Math.sin(this.angle) * mag * speedMultiplier;
-
-    this.mesh.setRotation_(0, this.angle, 0);
 
     if (controls.isJump) {
       if (!this.isJumping) {

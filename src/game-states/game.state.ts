@@ -34,9 +34,10 @@ export class GameState implements State {
 
   async onEnter() {
     const heightmap = await heightMap();
-    const floor = new Mesh(new MoldableCubeGeometry(1024, 1, 1024, 255, 1, 255, 1)
-      .modifyEachVertex((vert, index) => vert.y = heightmap[index])
-      .spreadTextureCoords(5, 5).translate_(0, -30, 0).computeNormals().done_(), materials.redCarpet);
+    const floor = new Mesh(
+      new MoldableCubeGeometry(511, 1, 511, 255, 1, 255, 1)
+        .modifyEachVertex((vert, index) => vert.y = heightmap[index])
+      .spreadTextureCoords(5, 5).computeNormals().done_(), materials.redCarpet);
 
     this.scene.skybox = new Skybox(...skyboxes.test);
     this.scene.skybox.bindGeometry();
