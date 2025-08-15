@@ -1,51 +1,44 @@
 // Generated with Shader Minifier 1.3.4 (https://github.com/laurentlb/Shader_Minifier/)
-export const aCoords = 'N';
-export const aDepth = 'K';
-export const aNormal = 'H';
-export const aPosition = 'e';
-export const aTexCoord = 'I';
-export const fragDepth = 'm';
-export const fragPos = 'f';
-export const lightPovMvp = 'i';
-export const lightWorldPosition = 'v';
-export const modelviewProjection = 'S';
-export const normalMatrix = 'M';
+export const aCoords = 'J';
+export const aDepth = 'G';
+export const aNormal = 'I';
+export const aPosition = 'm';
+export const aTexCoord = 'H';
+export const fragDepth = 'v';
+export const lightPovMvp = 'f';
+export const modelviewProjection = 'E';
+export const normalMatrix = 'B';
 export const outColor = 'g';
-export const pointLightAttenuation = 'd';
-export const positionFromLightPov = 'T';
-export const shadowCubeMap = 'x';
-export const spotlightDirection = 'y';
-export const spotlightPosition = 'c';
-export const uSampler = 'z';
-export const u_skybox = 'L';
-export const u_viewDirectionProjectionInverse = 'B';
+export const positionFromLightPov = 'e';
+export const shadowMap = 't';
+export const uSampler = 'h';
+export const u_skybox = 'd';
+export const u_viewDirectionProjectionInverse = 'D';
 export const vDepth = 'n';
-export const vNormal = 'u';
-export const vNormalMatrix = 'h';
-export const vTexCoord = 'o';
+export const vNormal = 'o';
+export const vNormalMatrix = 'l';
+export const vTexCoord = 'i';
 export const v_position = 'F';
-export const worldMatrix = 'l';
-export const worldPosition = 't';
 
 export const depth_fragment_glsl = `#version 300 es
 precision highp float;
-uniform vec3 v;in vec3 f;out float m;void main(){m=length(f-v)/40.;}`;
+out float v;void main(){v=gl_FragCoord.z;}`;
 
 export const depth_vertex_glsl = `#version 300 es
 precision highp float;
-layout(location=0) in vec4 e;uniform mat4 i,l;out vec3 f;void main(){gl_Position=i*e;f=vec3(l*vec4(e.xyz,1));}`;
+layout(location=0) in vec4 m;uniform mat4 f;void main(){gl_Position=f*m;}`;
 
 export const fragment_glsl = `#version 300 es
 precision highp float;
-in vec2 o;in float n;in vec3 u;in mat4 h;in vec3 t;uniform vec3 v,d;vec4 s=vec4(1);uniform mediump sampler2DArray z;uniform mediump samplerCube x;uniform vec3 c,y;vec4 A=vec4(1,1,.8,1);float C=1.,D=.85;vec4 G=vec4(.7,.7,.7,1);out vec4 g;float p(float v,float m,float f,float e){return 1./(v*v*m+v*f+e);}void main(){vec3 m=t-v,l=v-t;float f=length(m);vec3 e=normalize(m),i=normalize(l);float B=texture(x,e).x*40.,E=.015,F=0.;F=B+E<f?0.:1.;vec3 H=normalize(mat3(h)*u);float I=max(0.,dot(i,H)),J=p(f,d.x,d.y,d.z);vec4 K=s*I*J*F;vec3 L=c-t,M=normalize(L);float N=length(L),O=max(0.,dot(M,H)),P=dot(y,-M),Q=smoothstep(D,C,P),R=p(N,.005,.001,.4);vec4 S=A*O*Q*R,T=clamp(G+K+S,G,vec4(1));g=texture(z,vec3(o,n))*T;}`;
+in vec2 i;in float n;in vec3 o;in mat4 l;in vec4 e;uniform mediump sampler2DArray h;uniform mediump sampler2DShadow t;vec3 s=vec3(-1,1.5,-1);float z=.2f;vec2 A[5]=vec2[](vec2(0),vec2(-1,0),vec2(1,0),vec2(0,1),vec2(0,-1));float u=1.,C=4200.;out vec4 g;void main(){for(int v=0;v<5;v++){vec3 m=vec3(e.xy+A[v]/C,e.z-.001);float f=texture(t,m);u*=max(f,.87);}vec3 v=normalize(mat3(l)*o),f=normalize(s);float m=max(dot(f,v)*u,z);vec3 d=m*vec3(1);vec4 D=vec4(d.xyz,1);g=texture(h,vec3(i,n))*D;}`;
 
 export const skybox_fragment_glsl = `#version 300 es
 precision highp float;
-uniform samplerCube L;uniform mat4 B;in vec4 F;out vec4 g;void main(){vec4 v=B*F;g=texture(L,v.xyz);}`;
+uniform samplerCube d;uniform mat4 D;in vec4 F;out vec4 g;void main(){vec4 v=D*F;g=texture(d,v.xyz);}`;
 
 export const skybox_vertex_glsl = `#version 300 es
-layout(location=0) in vec4 N;out vec4 F;void main(){F=N;gl_Position=N;gl_Position.z=1.;}`;
+layout(location=0) in vec4 J;out vec4 F;void main(){F=J;gl_Position=J;gl_Position.z=1.;}`;
 
 export const vertex_glsl = `#version 300 es
-layout(location=0) in vec3 N;layout(location=1) in vec3 H;layout(location=2) in vec2 I;layout(location=3) in float K;uniform mat4 S,M,i,l;out vec2 o;out float n;out vec3 u;out mat4 h;out vec4 T;out vec3 t;void main(){vec4 v=vec4(N,1);gl_Position=S*v;o=I;n=K;u=H;h=M;T=i*v;t=(l*v).xyz;}`;
+layout(location=0) in vec3 J;layout(location=1) in vec3 I;layout(location=2) in vec2 H;layout(location=3) in float G;uniform mat4 E,B,f;out vec2 i;out float n;out vec3 o;out mat4 l;out vec4 e;void main(){vec4 v=vec4(J,1);gl_Position=E*v;i=H;n=G;o=I;l=B;e=f*v;}`;
 

@@ -18,6 +18,7 @@ import { EnhancedDOMPoint } from '@/engine/enhanced-dom-point';
 import { ShadowCubeMapFbo } from '@/engine/renderer/cube-buffer-2';
 import { lightInfo } from '@/light-info';
 import {Skybox} from "@/engine/skybox";
+import {createOrtho, Object3d} from "@/engine/renderer/object-3d";
 
 // IMPORTANT! The index of a given buffer in the buffer array must match it's respective data location in the shader.
 // This allows us to use the index while looping through buffers to bind the attributes. So setting a buffer
@@ -36,94 +37,80 @@ gl.enable(gl.DEPTH_TEST);
 // gl.enable(gl.BLEND);
 gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
-gl.getExtension('EXT_color_buffer_float');
-gl.getExtension('OES_texture_float_linear');
+
 const modelviewProjectionLocation = gl.getUniformLocation(lilgl.program, modelviewProjection)!;
 const normalMatrixLocation =  gl.getUniformLocation(lilgl.program, normalMatrix)!;
-const pointLightAttenuationLocation = gl.getUniformLocation(lilgl.program, pointLightAttenuation);
-const spotlightPositionLocation = gl.getUniformLocation(lilgl.program, spotlightPosition)!;
-const spotlightDirectionLocation = gl.getUniformLocation(lilgl.program, spotlightDirection)!;
-
-const worldMatrixDepth = gl.getUniformLocation(lilgl.depthProgram, worldMatrix);
-const lightPositionDepth = gl.getUniformLocation(lilgl.depthProgram, lightWorldPosition);
-const lightPovMvpDepthLocation = gl.getUniformLocation(lilgl.depthProgram, lightPovMvp);
-
-const worldMatrixMain = gl.getUniformLocation(lilgl.program, worldMatrix);
-const lightPositionMain = gl.getUniformLocation(lilgl.program, lightWorldPosition);
-// const shadowCubeMapMain = gl.getUniformLocation(lilgl.program, shadowCubeMap);
-
 const skyboxLocation = gl.getUniformLocation(lilgl.skyboxProgram, u_skybox)!;
 const viewDirectionProjectionInverseLocation = gl.getUniformLocation(lilgl.skyboxProgram, u_viewDirectionProjectionInverse)!;
 
+const origin = new EnhancedDOMPoint(0, 0, 0);
 
+const lightPovProjection = createOrtho(-105,105,-105,105,-400,400);
+
+const inverseLightDirection = new EnhancedDOMPoint(-0.8, 1.5, -1).normalize_();
+const lightPovView = new Object3d();
+lightPovView.position.set(inverseLightDirection);
+lightPovView.lookAt(origin);
+lightPovView.rotationMatrix.invertSelf();
+
+const lightPovMvpMatrix = lightPovProjection.multiply(lightPovView.rotationMatrix);
+
+const lightPovMvpDepthLocation = gl.getUniformLocation(lilgl.depthProgram, lightPovMvp);
+gl.useProgram(lilgl.depthProgram);
+gl.uniformMatrix4fv(lightPovMvpDepthLocation, false, lightPovMvpMatrix.toFloat32Array());
+
+const textureSpaceConversion = new DOMMatrix([
+  0.5, 0.0, 0.0, 0.0,
+  0.0, 0.5, 0.0, 0.0,
+  0.0, 0.0, 0.5, 0.0,
+  0.5, 0.5, 0.5, 1.0
+]);
+
+const textureSpaceMvp = textureSpaceConversion.multiplySelf(lightPovMvpMatrix);
+const lightPovMvpRenderLocation = gl.getUniformLocation(lilgl.program, lightPovMvp);
 
 gl.useProgram(lilgl.program);
+gl.uniformMatrix4fv(lightPovMvpRenderLocation, false, textureSpaceMvp.toFloat32Array());
 
+const depthTextureSize = new DOMPoint(4096, 4096);
+const depthTexture = gl.createTexture();
+gl.activeTexture(gl.TEXTURE1);
+gl.bindTexture(gl.TEXTURE_2D, depthTexture);
+gl.texStorage2D(gl.TEXTURE_2D, 1, gl.DEPTH_COMPONENT32F, depthTextureSize.x, depthTextureSize.y);
+gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_COMPARE_MODE, gl.COMPARE_REF_TO_TEXTURE);
+gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
 
-const lightPerspective = new Camera(Math.PI / 2, 1, 0.1, 60);
-
-export function createLookAt(position: EnhancedDOMPoint, target: EnhancedDOMPoint, up: EnhancedDOMPoint) {
-  const zAxis = new EnhancedDOMPoint().subtractVectors(target, position).normalize_(); //normalize(subtractVectors(target, position));
-  const xAxis = new EnhancedDOMPoint().crossVectors(zAxis, up).normalize_(); //normalize(crossVectors(zAxis, up));
-  const yAxis = new EnhancedDOMPoint().crossVectors(xAxis, zAxis); //crossVectors(xAxis, zAxis);
-
-  const invertedZ = new EnhancedDOMPoint(zAxis.x * -1, zAxis.y * -1, zAxis.z * -1);
-
-  return new DOMMatrix([
-    xAxis.x, yAxis.x, invertedZ.x, 0,
-    xAxis.y, yAxis.y, invertedZ.y, 0,
-    xAxis.z, yAxis.z, invertedZ.z, 0,
-    -xAxis.dot(position), -yAxis.dot(position), -invertedZ.dot(position), 1,
-  ]);
-}
-
-const cubeMap = new ShadowCubeMapFbo(1024);
+const depthFramebuffer = gl.createFramebuffer();
+gl.bindFramebuffer(gl.FRAMEBUFFER, depthFramebuffer);
+gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.TEXTURE_2D, depthTexture, 0);
 
 export function render(camera: Camera, scene: Scene) {
   const viewMatrix = camera.worldMatrix.inverse();
   const viewMatrixCopy = viewMatrix.scale(1, 1, 1);
   const viewProjectionMatrix = camera.projection.multiply(viewMatrix);
 
+  // ---------------------------------------------------
   // Render shadow map to depth texture
+  // ---------------------------------------------------
   gl.useProgram(lilgl.depthProgram);
-  gl.disable(gl.BLEND);
-  gl.uniform3fv(lightPositionDepth, lightInfo.pointLightPosition.toArray());
+  // gl.cullFace(gl.FRONT);
+  gl.bindFramebuffer(gl.FRAMEBUFFER, depthFramebuffer);
+  gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+  gl.viewport(0, 0, depthTextureSize.x, depthTextureSize.y);
 
-  cubeMap.getSides().forEach((side, i) => {
-    cubeMap.bindForWriting(i);
-
-    gl.clearColor(1.0, 1.0, 1.0, 1.0);
-    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-
-    const lightView = createLookAt(lightInfo.pointLightPosition, new EnhancedDOMPoint().addVectors(lightInfo.pointLightPosition, side.target), side.up);
-    const lightViewProjectionMatrix = lightPerspective.projection.multiply(lightView);
-
-    scene.solidMeshes.forEach((mesh, index) => {
+  scene.solidMeshes.forEach((mesh, index) => {
+    if (index > 0) {
       gl.bindVertexArray(mesh.geometry.vao!);
-      gl.uniformMatrix4fv(worldMatrixDepth, false, mesh.worldMatrix.toFloat32Array());
-      gl.uniformMatrix4fv(lightPovMvpDepthLocation, false, lightViewProjectionMatrix.multiply(mesh.worldMatrix).toFloat32Array());
+      gl.uniformMatrix4fv(lightPovMvpDepthLocation, false, lightPovMvpMatrix.multiply(mesh.worldMatrix).toFloat32Array());
       gl.drawElements(gl.TRIANGLES, mesh.geometry.getIndices()!.length, gl.UNSIGNED_SHORT, 0);
-    });
+    }
   });
+  // End render shadow map
 
-  const renderSkybox = (skybox: Skybox) => {
-    gl.useProgram(lilgl.skyboxProgram);
-    gl.uniform1i(skyboxLocation, 0);
-    viewMatrixCopy.m41 = 0;
-    viewMatrixCopy.m42 = 0;
-    viewMatrixCopy.m43 = 0;
-    const inverseViewProjection = camera.projection.multiply(viewMatrixCopy).inverse();
-    gl.uniformMatrix4fv(viewDirectionProjectionInverseLocation, false, inverseViewProjection.toFloat32Array());
-    gl.bindVertexArray(skybox.vao);
-    gl.drawArrays(gl.TRIANGLES, 0, 6);
-  };
 
   gl.useProgram(lilgl.program);
   gl.enable(gl.BLEND);
-  gl.uniform3fv(lightPositionMain, lightInfo.pointLightPosition.toArray());
-  gl.uniform3fv(spotlightPositionLocation, lightInfo.spotLightPosition.toArray());
-  gl.uniform3fv(spotlightDirectionLocation, lightInfo.spotLightDirection.toArray());
-  gl.uniform3fv(pointLightAttenuationLocation, lightInfo.pointLightAttenuation.toArray());
 
   // Render solid meshes first
   gl.activeTexture(gl.TEXTURE0);
@@ -137,23 +124,28 @@ export function render(camera: Camera, scene: Scene) {
   // gl.uniform1i(shadowCubeMapMain, 2);
 
   scene.solidMeshes.forEach(mesh => {
-    // @ts-ignore
-    gl.useProgram(lilgl.program);
     const modelViewProjectionMatrix = viewProjectionMatrix.multiply(mesh.worldMatrix);
 
-    gl.vertexAttrib1f(AttributeLocation.TextureDepth, mesh.material.texture?.id ?? -1.0);
+    gl.vertexAttrib1f(AttributeLocation.TextureDepth, mesh.material?.texture?.id ?? -1.0);
     gl.bindVertexArray(mesh.geometry.vao!);
 
     // @ts-ignore
     gl.uniformMatrix4fv(normalMatrixLocation, true, mesh.color ? mesh.cachedMatrixData : mesh.worldMatrix.inverse().toFloat32Array());
-    gl.uniformMatrix4fv(worldMatrixMain, false, mesh.worldMatrix.toFloat32Array());
     gl.uniformMatrix4fv(modelviewProjectionLocation, false, modelViewProjectionMatrix.toFloat32Array());
     gl.drawElements(gl.TRIANGLES, mesh.geometry.getIndices()!.length, gl.UNSIGNED_SHORT, 0);
   });
 
   if (scene.skybox) {
     gl.depthFunc(gl.LEQUAL);
-    renderSkybox(scene.skybox!);
+    gl.useProgram(lilgl.skyboxProgram);
+    gl.uniform1i(skyboxLocation, 0);
+    viewMatrixCopy.m41 = 0;
+    viewMatrixCopy.m42 = 0;
+    viewMatrixCopy.m43 = 0;
+    const inverseViewProjection = camera.projection.multiply(viewMatrixCopy).inverse();
+    gl.uniformMatrix4fv(viewDirectionProjectionInverseLocation, false, inverseViewProjection.toFloat32Array());
+    gl.bindVertexArray(scene.skybox.vao);
+    gl.drawArrays(gl.TRIANGLES, 0, 6);
     gl.depthFunc(gl.LESS);
   }
 

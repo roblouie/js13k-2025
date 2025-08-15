@@ -27,6 +27,7 @@ class Controls {
   isConfirm = false;
   isEscape = false;
   inputDirection: EnhancedDOMPoint;
+  isJump? = false;
 
   keyMap: Map<string, boolean> = new Map();
   previousState = { isUp: this.isUp, isDown: this.isDown, isConfirm: this.isConfirm, isEscape: this.isEscape };
@@ -51,6 +52,7 @@ class Controls {
     const downVal = (this.keyMap.get('KeyS') || this.keyMap.get('ArrowDown') || isButtonPressed(XboxControllerButton.DpadDown)) ? 1 : 0;
     this.inputDirection.x = (leftVal + rightVal) || gamepad?.axes[0] || 0;
     this.inputDirection.y = (upVal + downVal) || gamepad?.axes[1] || 0;
+    this.isJump = this.keyMap.get('Space') || isButtonPressed(XboxControllerButton.A);
 
     const deadzone = 0.1;
     if (this.inputDirection.magnitude < deadzone) {

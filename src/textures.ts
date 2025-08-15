@@ -2,8 +2,7 @@ import { Material } from '@/engine/renderer/material';
 import { textureLoader } from '@/engine/renderer/texture-loader';
 import {toHeightmap, toImage} from '@/engine/svg-maker/svg-string-converters';
 
-const skyboxSize = 2048;
-
+const skyboxSize = 1024;
 
 export const materials: {[key: string]: Material} = {};
 export const skyboxes: {[key: string]: TexImageSource[]} = {};
@@ -26,11 +25,9 @@ export async function initTextures() {
     materials[i] = new Material({ texture: textureLoader.load_(await roomSign(`13${i.toString().padStart(2, '0')}`))});
   }
 
-
-
-
-  const testSlicer = drawSkyboxHor();
-  const horSlices = [await testSlicer(), await testSlicer(), await testSlicer(), await testSlicer()];
+  const box = await drawSkyboxHor();
+  const slicer = horizontalSkyboxSlice(box);
+  const horSlices = [await slicer(), await slicer(), await slicer(), await slicer()];
   skyboxes.test = [
     horSlices[3],
     horSlices[1],
@@ -95,10 +92,10 @@ export function metals(content = '', brightnessModifier = 1) {
 export function heightMap() {
   return toHeightmap(`<svg width="256" height="256" xmlns="http://www.w3.org/2000/svg">
     <filter id="b">
-    <feTurbulence baseFrequency="0.01,0.01" numOctaves="2" seed="23" type="fractalNoise" stitchTiles="stitch" />
+        <feTurbulence baseFrequency="0.02,0.02" numOctaves="1" seed="23" type="fractalNoise" />
     </filter>
     <rect x="0" y="0" width="100%" height="100%" filter="url(#b)"/>
-    </svg>`, 113)
+    </svg>`, 30)
 }
 
 function roomSign(roomNumber: string) {
@@ -110,7 +107,7 @@ function color(color: string | number) {
 }
 
 function drawSkyboxHor() {
-  return horizontalSkyboxSlice(drawBetterClouds(skyboxSize * 4), `
+  const element = drawBetterClouds(skyboxSize * 4) + `
     <filter height="150%" id="f" width="100%" x="0" >
         <feTurbulence baseFrequency="0.008,0" numOctaves="4" seed="15" stitchTiles="stitch" type="fractalNoise" />
         <feDisplacementMap in="SourceGraphic" scale="100"/>
@@ -122,20 +119,22 @@ function drawSkyboxHor() {
       </feDiffuseLighting>
       <feComposite in2="SourceGraphic" operator="in" />
     </filter>
-    <g filter="url(#g)"><rect filter="url(#f)" height="50%" width="8192" x="0" y="1000"/></g>`);
+    <g filter="url(#g)"><rect filter="url(#f)" height="50%" width="8192" x="0" y="1000"/></g>`
+
+  return toImage(`<svg width="${skyboxSize * 4}" height="${skyboxSize}" style="background: #000"  xmlns="http://www.w3.org/2000/svg">${element}</svg>`)
 }
 
 function drawSkyboxTop() {
   return `<svg width="${skyboxSize}" height="${skyboxSize}" style="background: #000" xmlns="http://www.w3.org/2000/svg">${drawClouds()}</svg>`;
 }
 
-function horizontalSkyboxSlice(...elements: string[]) {
+function horizontalSkyboxSlice(image: CanvasImageSource) {
   let xPos = 0;
   const context = new OffscreenCanvas(skyboxSize, skyboxSize).getContext('2d')!;
 
   return async (): Promise<ImageData> => {
     // @ts-ignore
-    context.drawImage(await toImage(`<svg width="${skyboxSize * 4}" height="${skyboxSize}" style="background: #000"  xmlns="http://www.w3.org/2000/svg">${elements.join('')}</svg>`), xPos, 0);
+    context.drawImage(image, xPos, 0);
     xPos -= skyboxSize;
     // @ts-ignore
     return context.getImageData(0, 0, skyboxSize, skyboxSize);

@@ -69,12 +69,12 @@ export class ThirdPersonPlayer {
     this.collideWithLevel(octreeNode); // do collision detection, if collision is found, feetCenter gets pushed out of the collision
 
     this.mesh.position.set(this.chassisCenter); // at this point, feetCenter is in the correct spot, so draw the mesh there
-    this.mesh.position.y += 2; // move up by half height so mesh ends at feet position
+    this.mesh.position.y -= 0.5; // move up by half height so mesh ends at feet position
 
-    this.camera.position.lerp(this.transformIdeal(this.idealPosition), 0.07);
+    this.camera.position.lerp(this.transformIdeal(this.idealPosition), 0.04);
 
     // Keep camera away regardless of lerp
-    const distanceToKeep = 17;
+    const distanceToKeep = 15;
     const {x, z} = this.camera.position.clone_()
       .subtract(this.mesh.position) // distance from camera to player
       .normalize_() // direction of camera to player
@@ -112,17 +112,17 @@ export class ThirdPersonPlayer {
       this.angle = inputAngle + playerCameraAngle;
     }
 
-    this.velocity.z = Math.cos(this.angle) * mag;
-    this.velocity.x = Math.sin(this.angle) * mag;
+    this.velocity.z = Math.cos(this.angle) * mag * speedMultiplier;
+    this.velocity.x = Math.sin(this.angle) * mag * speedMultiplier;
 
     this.mesh.setRotation_(0, this.angle, 0);
 
-    // if (controls.isJumpPressed) {
-    //   if (!this.isJumping) {
-    //     this.velocity.y = 0.4;
-    //     this.isJumping = true;
-    //   }
-    // }
+    if (controls.isJump) {
+      if (!this.isJumping) {
+        this.velocity.y = 0.4;
+        this.isJumping = true;
+      }
+    }
   }
 
   private updateAudio() {

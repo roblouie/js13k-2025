@@ -3,7 +3,7 @@ import { EnhancedDOMPoint } from "@/engine/enhanced-dom-point";
 import { FirstPersonPlayer } from '@/core/first-person-player';
 import {ThirdPersonPlayer} from "@/core/third-person-player";
 
-export function findWallCollisionsFromList(walls: Set<Face>, player: FirstPersonPlayer | ThirdPersonPlayer) {
+export function findWallCollisionsFromList(walls: Set<Face>, player: ThirdPersonPlayer) {
   for (const wall of walls) {
 
     const newWallHit = testSphereTriangle(player.collisionSphere, wall);
@@ -18,6 +18,7 @@ export function findWallCollisionsFromList(walls: Set<Face>, player: FirstPerson
       // Slightly sketch way of dealing with gravity on a sloped surface, but it does work
       if (wall.normal.y >= 0.6 && player.velocity.y < 0) {
         player.velocity.y = 0;
+        player.isJumping = false;
       } else if (wall.normal.y <= -0.6 && player.velocity.y > 0) {
         player.velocity.y = 0;
       }
