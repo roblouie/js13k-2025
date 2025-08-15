@@ -1,8 +1,9 @@
 import { Face } from './face';
 import { EnhancedDOMPoint } from "@/engine/enhanced-dom-point";
 import { FirstPersonPlayer } from '@/core/first-person-player';
+import {ThirdPersonPlayer} from "@/core/third-person-player";
 
-export function findWallCollisionsFromList(walls: Set<Face>, player: FirstPersonPlayer) {
+export function findWallCollisionsFromList(walls: Set<Face>, player: FirstPersonPlayer | ThirdPersonPlayer) {
   for (const wall of walls) {
 
     const newWallHit = testSphereTriangle(player.collisionSphere, wall);

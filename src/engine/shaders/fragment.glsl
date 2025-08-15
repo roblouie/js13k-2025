@@ -21,7 +21,7 @@ vec4 spotlightColor = vec4(1.0, 1.0, 0.8, 1.0);
 float lightInnerCutoff = 1.0;
 float lightOuterCutoff = 0.85;
 
-vec4 ambientLight = vec4(0.4, 0.5, 0.5, 1.0);
+vec4 ambientLight = vec4(0.7, 0.7, 0.7, 1.0);
 
 out vec4 outColor;
 

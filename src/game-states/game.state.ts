@@ -10,9 +10,10 @@ import { MoldableCubeGeometry } from '@/engine/moldable-cube-geometry';
 import { audioContext, biquadFilter, SimplestMidiRev2 } from '@/engine/audio/simplest-midi';
 import {elevatorDoor1, elevatorDoorTest, elevatorMotionRev1, footstep, hideSound} from '@/sounds';
 import {computeSceneBounds, OctreeNode} from "@/engine/physics/octree";
+import {ThirdPersonPlayer} from "@/core/third-person-player";
 
 export class GameState implements State {
-  player: FirstPersonPlayer;
+  player: ThirdPersonPlayer;
   scene: Scene;
 
   sfxPlayer = new SimplestMidiRev2();
@@ -22,7 +23,7 @@ export class GameState implements State {
     this.scene = new Scene();
     //this.player = new FreeCam(new Camera(Math.PI / 3, 16 / 9, 1, 500));
 
-    this.player = new FirstPersonPlayer(new Camera(Math.PI / 3, 16 / 9, 1, 500));
+    this.player = new ThirdPersonPlayer(new Camera(Math.PI / 3, 16 / 9, 1, 500));
   }
 
   octree = new OctreeNode({
@@ -36,16 +37,13 @@ export class GameState implements State {
       .modifyEachVertex((vert, index) => vert.y = heightmap[index])
       .spreadTextureCoords(5, 5).translate_(0, -3, 0).done_(), materials.redCarpet);
 
-    this.scene.add_(floor);
+    this.scene.add_(floor, this.player.mesh);
     const faces = meshToFaces([floor]);
 
     // precomputed world bounds, so not needed at runtime
     const worldBounds = computeSceneBounds(faces);
     this.octree = new OctreeNode(worldBounds, 0);
     faces.forEach(face => this.octree.insert(face));
-
-    this.player.cameraRotation.set(0, Math.PI, 0);
-    this.player.sfxPlayer.playNote(audioContext.currentTime, 60, 70, elevatorMotionRev1, audioContext.currentTime + 6);
   }
 
   onUpdate() {

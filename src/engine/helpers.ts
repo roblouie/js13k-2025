@@ -13,3 +13,7 @@ export function unormalizedNormal(points: EnhancedDOMPoint[]): EnhancedDOMPoint 
 export function calculateFaceNormal(points: EnhancedDOMPoint[]): EnhancedDOMPoint {
   return unormalizedNormal(points).normalize_();
 }
+
+export function clamp(value: number, min: number, max: number): number {
+  return Math.min(Math.max(value, min), max);
+}
