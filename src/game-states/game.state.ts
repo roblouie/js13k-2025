@@ -2,14 +2,14 @@ import { State } from '@/core/state';
 import { FirstPersonPlayer } from '@/core/first-person-player';
 import { Scene } from '@/engine/renderer/scene';
 import { Camera } from '@/engine/renderer/camera';
-import { materials } from '@/textures';
+import {heightMap, materials, metals} from '@/textures';
 import { Mesh } from '@/engine/renderer/mesh';
 import { meshToFaces } from '@/engine/physics/parse-faces';
 import { render } from '@/engine/renderer/renderer';
 import { MoldableCubeGeometry } from '@/engine/moldable-cube-geometry';
 import { audioContext, biquadFilter, SimplestMidiRev2 } from '@/engine/audio/simplest-midi';
 import {elevatorDoor1, elevatorDoorTest, elevatorMotionRev1, footstep, hideSound} from '@/sounds';
-import {OctreeNode} from "@/engine/physics/octree";
+import {computeSceneBounds, OctreeNode} from "@/engine/physics/octree";
 
 export class GameState implements State {
   player: FirstPersonPlayer;
@@ -26,18 +26,22 @@ export class GameState implements State {
   }
 
   octree = new OctreeNode({
-    max: {x: 90, y: 12, z: 154, w: 1},
-    min: { x: -90, y: -3, z: -26 }
+    max: {x: 1024, y: 12, z: 1024, w: 1},
+    min: { x: -1024, y: -3, z: -1024 }
   }, 0);
 
-  onEnter() {
-    const floor = new Mesh(new MoldableCubeGeometry(180, 1, 180).spreadTextureCoords(5, 5).translate_(0, 0, 64).done_(), materials.redCarpet);
+  async onEnter() {
+    const heightmap = await heightMap();
+    const floor = new Mesh(new MoldableCubeGeometry(1024, 1, 1024, 255, 1, 255, 1)
+      .modifyEachVertex((vert, index) => vert.y = heightmap[index])
+      .spreadTextureCoords(5, 5).translate_(0, -3, 0).done_(), materials.redCarpet);
 
     this.scene.add_(floor);
     const faces = meshToFaces([floor]);
 
     // precomputed world bounds, so not needed at runtime
-    // const worldBounds = computeSceneBounds(faces);
+    const worldBounds = computeSceneBounds(faces);
+    this.octree = new OctreeNode(worldBounds, 0);
     faces.forEach(face => this.octree.insert(face));
 
     this.player.cameraRotation.set(0, Math.PI, 0);

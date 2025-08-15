@@ -1,6 +1,6 @@
 import { Material } from '@/engine/renderer/material';
 import { textureLoader } from '@/engine/renderer/texture-loader';
-import { toImage } from '@/engine/svg-maker/svg-string-converters';
+import {toHeightmap, toImage} from '@/engine/svg-maker/svg-string-converters';
 
 export const materials: {[key: string]: Material} = {};
 
@@ -72,6 +72,15 @@ export function face() {
 export function metals(content = '', brightnessModifier = 1) {
   const value = 0.01 * brightnessModifier;
   return toImage(`<svg width="512" height="512" xmlns="http://www.w3.org/2000/svg"><filter id="b"><feTurbulence baseFrequency="0.01,0.0008" numOctaves="2" seed="23" type="fractalNoise" stitchTiles="stitch" /><feColorMatrix values="${value}, ${value}, ${value}, 0, 0,${value}, ${value}, ${value}, 0, 0,${value}, ${value}, ${value}, 0, 0,1, 1, 1, 1, 1"/></filter><rect x="0" y="0" width="100%" height="100%" filter="url(#b)"/>${ content }</svg>`);
+}
+
+export function heightMap() {
+  return toHeightmap(`<svg width="256" height="256" xmlns="http://www.w3.org/2000/svg">
+    <filter id="b">
+    <feTurbulence baseFrequency="0.01,0.01" numOctaves="2" seed="23" type="fractalNoise" stitchTiles="stitch" />
+    </filter>
+    <rect x="0" y="0" width="100%" height="100%" filter="url(#b)"/>
+    </svg>`, 113)
 }
 
 function roomSign(roomNumber: string) {

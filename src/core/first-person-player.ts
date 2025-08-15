@@ -35,7 +35,7 @@ export class FirstPersonPlayer {
   constructor(camera: Camera) {
     this.sfxPlayer = new SimplestMidiRev2();
     this.sfxPlayer.volume_.connect(compressor);
-    this.feetCenter.set(2, 2.5, -2);
+    this.feetCenter.set(2, 50, -2);
     this.collisionSphere = new Sphere(this.feetCenter, 2);
     this.camera = camera;
     this.listener = audioContext.listener;
@@ -57,7 +57,7 @@ export class FirstPersonPlayer {
 
     this.updateVelocityFromControls();
 
-      // this.velocity.y -= 0.008; // gravity
+      this.velocity.y -= 0.008; // gravity
 
       this.nearbyFaces.clear();
       querySphere(octreeNode, this.collisionSphere, this.nearbyFaces);
@@ -65,7 +65,6 @@ export class FirstPersonPlayer {
       findWallCollisionsFromList(this.nearbyFaces, this);
 
       this.feetCenter.add_(this.velocity);
-      this.feetCenter.y = 2.5;
 
       this.camera.position.set(this.feetCenter);
       this.camera.position.y += 3.5;
