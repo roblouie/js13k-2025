@@ -20,6 +20,9 @@ export async function initTextures() {
   materials.greenPlasterWall = new Material({ texture: textureLoader.load_(await wallpaper())});
   materials.white = new Material({ texture: textureLoader.load_(await color('#bbb'))});
   materials.red = new Material({ texture: textureLoader.load_(await color('#b00'))});
+  materials.catEye = new Material({ texture: textureLoader.load_(await catEye())});
+  materials.catMouth = new Material({ texture: textureLoader.load_(await catMouth())});
+  materials.nothing = new Material({ texture: textureLoader.load_(await nothing())});
 
   for (let i = 1; i <= 13; i++) {
     materials[i] = new Material({ texture: textureLoader.load_(await roomSign(`13${i.toString().padStart(2, '0')}`))});
@@ -42,6 +45,10 @@ export async function initTextures() {
 
 function wallpaper(isPattern = false) {
   return toImage(`<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512"><pattern id="b" width="128" height="128" patternUnits="userSpaceOnUse"><path fill="#687A5E" d="M0 0h128v128H0z"/>${isPattern ? '<text x="64" y="64" style="font-size:64px" stroke="#506546" fill="#506546">❀</text><text y="128" style="font-size:50px" stroke="#506546" fill="#506546">✦</text>' : ''}</pattern><filter id="a"><feTurbulence baseFrequency=".4" stitchTiles="stitch"/><feDiffuseLighting color-interpolation-filters="sRGB" lighting-color="#687A5E"><feDistantLight azimuth="120" elevation="45"/></feDiffuseLighting><feBlend in="SourceGraphic" mode="difference"/></filter><rect width="100%" height="100%" filter="url(#a)" fill="url(#b)"/></svg>`);
+}
+
+function nothing() {
+  return toImage('<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"></svg>');
 }
 
 async function elevatorPanel() {
@@ -154,4 +161,53 @@ function stars() {
 
 function drawClouds() {
   return `<filter height="100%" id="f" width="100%" x="0" y="0"> <feTurbulence baseFrequency="0.003" numOctaves="6" seed="2" stitchTiles="stitch" type="fractalNoise"/><feComponentTransfer color-interpolation-filters="sRGB"><feFuncR type="table" tableValues="0.8,0.8"/><feFuncG type="table" tableValues="0.8,0.8"/><feFuncB type="table" tableValues="1,1"/><feFuncA type="table" tableValues="0,0,1"/></feComponentTransfer></filter><mask id="mask"><radialGradient id="g"><stop offset="20%" stop-color="white"/><stop offset="30%" stop-color="#666"/><stop offset="100%" stop-color="black"/></radialGradient><ellipse cx="1000" cy="1000" fill="url(#g)" rx="50%" ry="50%" /></mask><radialGradient id="l"><stop offset="10%" stop-color="#fff"/><stop offset="30%" stop-color="#0000"/></radialGradient><rect filter="url(#s)" height="100%" width="100%" x="0" y="0"/><ellipse cx="1000" cy="1000" fill="url(#l)" rx="200" ry="200"/><rect filter="url(#f)" height="100%" mask="url(#mask)" width="100%" x="0" y="0"/>`;
+}
+
+function catMouth() {
+  return toImage(`<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <!-- Nose -->
+  <path d="M256 210
+           Q236 220 226 240
+           Q256 250 286 240
+           Q276 220 256 210 Z"
+        fill="pink" stroke="black" stroke-width="4" />
+
+  <!-- Mouth - smiling -->
+  <path d="M256 250
+           Q256 270 240 280
+           Q220 290 200 280
+           Q180 270 170 260"
+        fill="none" stroke="pink" stroke-width="4" />
+        
+  <path d="M256 250
+           Q256 270 272 280
+           Q292 290 312 280
+           Q332 270 342 260"
+        fill="none" stroke="pink" stroke-width="4" />
+
+  <!-- Whiskers left -->
+  <line x1="200" y1="250" x2="120" y2="240" stroke="white" stroke-width="4"/>
+  <line x1="200" y1="260" x2="120" y2="260" stroke="white" stroke-width="4"/>
+  <line x1="200" y1="270" x2="120" y2="280" stroke="white" stroke-width="4"/>
+
+  <!-- Whiskers right -->
+  <line x1="312" y1="250" x2="392" y2="240" stroke="white" stroke-width="4"/>
+  <line x1="312" y1="260" x2="392" y2="260" stroke="white" stroke-width="4"/>
+  <line x1="312" y1="270" x2="392" y2="280" stroke="white" stroke-width="4"/>
+</svg>
+`);
+}
+
+function catEye() {
+  return toImage(`<svg width="512" height="512" viewBox="0 0 512 512" style="transform: scaleY(2)" xmlns="http://www.w3.org/2000/svg">
+  <!-- Left eye -->
+  <path d="M80 256 Q80 180 160 180 Q240 180 240 256 Q240 332 160 332 Q80 332 80 256 Z"
+        fill="limegreen" stroke="black" stroke-width="8"/>
+  <ellipse cx="160" cy="256" rx="25" ry="70" fill="black"/>
+  
+  <!-- Right eye -->
+  <path d="M272 256 Q272 180 352 180 Q432 180 432 256 Q432 332 352 332 Q272 332 272 256 Z"
+        fill="limegreen" stroke="black" stroke-width="8"/>
+  <ellipse cx="352" cy="256" rx="25" ry="70" fill="black"/>
+</svg>`);
 }

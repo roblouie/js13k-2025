@@ -43,4 +43,8 @@ void main() {
 //    vec4 vColor = clamp(litPercent * ambientLight, ambientLight, vec4(1.0, 1.0, 1.0, 1.0));
 
     outColor = texture(uSampler, vec3(vTexCoord, vDepth)) * vColor;
+
+    if (outColor.a < 0.5) {
+        discard;
+    }
 }

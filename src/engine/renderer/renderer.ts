@@ -99,13 +99,13 @@ export function render(camera: Camera, scene: Scene) {
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
   gl.viewport(0, 0, depthTextureSize.x, depthTextureSize.y);
 
-  scene.solidMeshes.forEach((mesh, index) => {
-    if (index > 0) {
-      gl.bindVertexArray(mesh.geometry.vao!);
-      gl.uniformMatrix4fv(lightPovMvpDepthLocation, false, lightPovMvpMatrix.multiply(mesh.worldMatrix).toFloat32Array());
-      gl.drawElements(gl.TRIANGLES, mesh.geometry.getIndices()!.length, gl.UNSIGNED_SHORT, 0);
-    }
-  });
+  // scene.solidMeshes.forEach((mesh, index) => {
+  //   if (index > 0) {
+  //     gl.bindVertexArray(mesh.geometry.vao!);
+  //     gl.uniformMatrix4fv(lightPovMvpDepthLocation, false, lightPovMvpMatrix.multiply(mesh.worldMatrix).toFloat32Array());
+  //     gl.drawElements(gl.TRIANGLES, mesh.geometry.getIndices()!.length, gl.UNSIGNED_SHORT, 0);
+  //   }
+  // });
   // End render shadow map
 
 
@@ -138,6 +138,7 @@ export function render(camera: Camera, scene: Scene) {
   if (scene.skybox) {
     gl.depthFunc(gl.LEQUAL);
     gl.useProgram(lilgl.skyboxProgram);
+    gl.enable(gl.BLEND);
     gl.uniform1i(skyboxLocation, 0);
     viewMatrixCopy.m41 = 0;
     viewMatrixCopy.m42 = 0;

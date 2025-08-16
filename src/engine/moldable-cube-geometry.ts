@@ -286,6 +286,11 @@ export class MoldableCubeGeometry {
     return this.indices;
   }
 
+  addFrame(frameNum: number, vertices: EnhancedDOMPoint[]) {
+    this.setAttribute_(AttributeLocation.Positions + frameNum, new Float32Array(vertices.flatMap(point => point.toArray())), 3);
+    return this;
+  }
+
   bindGeometry() {
     const fullSize = [...this.buffers.values()].reduce((total, current) => total += current.data.length , 0);
     const fullBuffer = new Float32Array(fullSize);

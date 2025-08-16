@@ -11,6 +11,7 @@ import {audioContext} from "@/engine/audio/simplest-midi";
 import {MoldableCubeGeometry} from "@/engine/moldable-cube-geometry";
 import {materials} from "@/textures";
 import {Object3d} from "@/engine/renderer/object-3d";
+import {makeCat} from "@/modeling/cat";
 
 export class ThirdPersonPlayer {
   isJumping = false;
@@ -29,7 +30,7 @@ export class ThirdPersonPlayer {
 
 
   constructor(camera: Camera) {
-    this.mesh = new Object3d(new Mesh(new MoldableCubeGeometry(1, 3, 1, 2, 2, 2).selectBy(vert => vert.x === 0).translate_(0, 0, 1).done_(), materials.marble));
+    this.mesh = new Object3d(makeCat());
     this.chassisCenter.y = 10;
     this.camera = camera;
     this.camera.position.set(this.chassisCenter);
