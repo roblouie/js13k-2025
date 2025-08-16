@@ -24,7 +24,7 @@ vec2 adjacentPixels[5] = vec2[](
 );
 
 float visibility = 1.0;
-float shadowSpread = 4200.0;
+float shadowSpread = 3200.0;
 
 out vec4 outColor;
 
@@ -32,7 +32,7 @@ void main() {
     for (int i = 0; i < 5; i++) {
         vec3 samplePosition = vec3(positionFromLightPov.xy + adjacentPixels[i]/shadowSpread, positionFromLightPov.z - 0.001);
         float hitByLight = texture(shadowMap, samplePosition);
-        visibility *= max(hitByLight, 0.87);
+        visibility *= max(hitByLight, 0.7);
     }
 
     vec3 correctedNormals = normalize(mat3(vNormalMatrix) * vNormal);
