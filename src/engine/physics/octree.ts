@@ -1,7 +1,6 @@
 import {Face} from "@/engine/physics/face";
-import {AABB, isAABBOverlapping, isSphereOverlappingAABB} from "@/engine/physics/aabb";
+import {AABB, isAABBOverlapping, isSphereOverlappingAABB, Sphere} from "@/engine/physics/aabb";
 import {EnhancedDOMPoint} from "@/engine/enhanced-dom-point";
-import {Sphere} from "@/core/first-person-player";
 
 // TODO: In full js13k release, precomupte this and just put in the hard bounds in the base
 // octree, and delete th is function

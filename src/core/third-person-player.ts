@@ -4,14 +4,11 @@ import { Face } from '@/engine/physics/face';
 import { findWallCollisionsFromList } from '@/engine/physics/surface-collision';
 import {clamp, radsToDegrees} from '@/engine/helpers';
 import {OctreeNode, querySphere} from "@/engine/physics/octree";
-import {Sphere} from "@/core/first-person-player";
 import {controls} from "@/core/controls";
-import {Mesh} from "@/engine/renderer/mesh";
 import {audioContext} from "@/engine/audio/simplest-midi";
-import {MoldableCubeGeometry} from "@/engine/moldable-cube-geometry";
-import {materials} from "@/textures";
 import {Object3d} from "@/engine/renderer/object-3d";
 import {makeCat} from "@/modeling/cat";
+import {Sphere} from "@/engine/physics/aabb";
 
 export class ThirdPersonPlayer {
   isJumping = false;
@@ -23,11 +20,8 @@ export class ThirdPersonPlayer {
 
   mesh: Object3d;
   camera: Camera;
-  idealPosition = new EnhancedDOMPoint(0, 8, -17);
-  idealLookAt = new EnhancedDOMPoint(0, 2, 0);
 
   listener: AudioListener;
-
 
   constructor(camera: Camera) {
     this.mesh = new Object3d(makeCat());
@@ -38,14 +32,7 @@ export class ThirdPersonPlayer {
     this.listener = audioContext.listener;
   }
 
-  private transformIdeal(ideal: EnhancedDOMPoint): EnhancedDOMPoint {
-    return new EnhancedDOMPoint()
-      // .set(this.mesh.rotationMatrix.transformPoint(ideal))
-      .add_(this.mesh.position);
-  }
-
   speed = 1;
-  speedCounter = 0;
   angle = 0;
 
   nearbyFaces = new Set<Face>();
@@ -117,7 +104,6 @@ export class ThirdPersonPlayer {
       this.groundedTimer++;
       if (this.groundedTimer > 10) {
         this.smoothedNormal = this.smoothedNormal.lerp(new EnhancedDOMPoint(0,1,0), 0.1).normalize_();
-        tmpl.innerHTML += `${this.smoothedNormal.y}`;
         this.mesh.rotationMatrix = new DOMMatrix();
         const axis = new EnhancedDOMPoint().crossVectors(this.mesh.up, this.smoothedNormal);
         const radians = Math.acos(this.smoothedNormal.dot(this.mesh.up));

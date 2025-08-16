@@ -1,6 +1,5 @@
 import { Face } from './face';
 import { EnhancedDOMPoint } from "@/engine/enhanced-dom-point";
-import { FirstPersonPlayer } from '@/core/first-person-player';
 import {ThirdPersonPlayer} from "@/core/third-person-player";
 import {radsToDegrees} from "@/engine/helpers";
 

@@ -1,5 +1,14 @@
 import {EnhancedDOMPoint, VectorLike} from "@/engine/enhanced-dom-point";
-import {Sphere} from "@/core/first-person-player";
+
+export class Sphere {
+  center: EnhancedDOMPoint;
+  radius: number;
+
+  constructor(center: EnhancedDOMPoint, radius: number) {
+    this.center = center;
+    this.radius = radius;
+  }
+}
 
 export type AABB = { min: VectorLike, max: VectorLike };
 

@@ -1,5 +1,4 @@
 import { State } from '@/core/state';
-import { FirstPersonPlayer } from '@/core/first-person-player';
 import { Scene } from '@/engine/renderer/scene';
 import { Camera } from '@/engine/renderer/camera';
 import {heightMap, materials, metals, skyboxes} from '@/textures';
