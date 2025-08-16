@@ -4,6 +4,8 @@ import { FirstPersonPlayer } from '@/core/first-person-player';
 import {ThirdPersonPlayer} from "@/core/third-person-player";
 import {radsToDegrees} from "@/engine/helpers";
 
+let smoothedNormal: EnhancedDOMPoint | undefined;
+
 export function findWallCollisionsFromList(walls: Set<Face>, player: ThirdPersonPlayer) {
   for (const wall of walls) {
 
@@ -11,18 +13,18 @@ export function findWallCollisionsFromList(walls: Set<Face>, player: ThirdPerson
 
     if (newWallHit) {
       const depth = newWallHit.penetrationDepth + 0.00000001;
-
+      smoothedNormal ??= wall.normal.clone_();
+      smoothedNormal = smoothedNormal.lerp(wall.normal, 0.1).normalize_();
 
       if (wall.normal.y >= 0.6 && player.velocity.y < 0) {
         player.collisionSphere.center.y += depth;
         player.velocity.y = 0;
         player.isJumping = false;
-        // TODO: Sort angle stuff, maybe refactor to move this into player, where it probably should be
-        // player.mesh.isUsingLookAt = true;
-        // player.mesh.rotationMatrix = new DOMMatrix();
-        // const axis = new EnhancedDOMPoint().crossVectors(player.mesh.up, wall.normal);
-        // const radians = Math.acos(wall.normal.dot(player.mesh.up));
-        // player.mesh.rotationMatrix.rotateAxisAngleSelf(axis.x, axis.y, axis.z, radsToDegrees(radians));
+        player.mesh.isUsingLookAt = true;
+        player.mesh.rotationMatrix = new DOMMatrix();
+        const axis = new EnhancedDOMPoint().crossVectors(player.mesh.up, smoothedNormal);
+        const radians = Math.acos(smoothedNormal.dot(player.mesh.up));
+        player.mesh.rotationMatrix.rotateAxisAngleSelf(axis.x, axis.y, axis.z, radsToDegrees(radians));
       } else {
         const correctionVector = newWallHit.penetrationNormal.scale_(depth);
         player.collisionSphere.center.add_(correctionVector);

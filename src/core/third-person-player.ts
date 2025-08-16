@@ -10,13 +10,14 @@ import {Mesh} from "@/engine/renderer/mesh";
 import {audioContext} from "@/engine/audio/simplest-midi";
 import {MoldableCubeGeometry} from "@/engine/moldable-cube-geometry";
 import {materials} from "@/textures";
+import {Object3d} from "@/engine/renderer/object-3d";
 
 export class ThirdPersonPlayer {
   isJumping = false;
   chassisCenter = new EnhancedDOMPoint(0, 0, 0);
   velocity = new EnhancedDOMPoint(0, 0, 0);
 
-  mesh: Mesh;
+  mesh: Object3d;
   camera: Camera;
   idealPosition = new EnhancedDOMPoint(0, 8, -17);
   idealLookAt = new EnhancedDOMPoint(0, 2, 0);
@@ -25,7 +26,7 @@ export class ThirdPersonPlayer {
 
 
   constructor(camera: Camera) {
-    this.mesh = new Mesh(new MoldableCubeGeometry(1, 3, 1, 2, 2, 2).selectBy(vert => vert.x === 0).translate_(0, 0, 1).done_(), materials.marble);
+    this.mesh = new Object3d(new Mesh(new MoldableCubeGeometry(1, 3, 1, 2, 2, 2).selectBy(vert => vert.x === 0).translate_(0, 0, 1).done_(), materials.marble));
     this.chassisCenter.y = 10;
     this.camera = camera;
     this.camera.position.set(this.chassisCenter);
@@ -113,7 +114,7 @@ export class ThirdPersonPlayer {
 
       // Face direction of movement
       this.angle = Math.atan2(this.velocity.x, this.velocity.z);
-      this.mesh.setRotation_(0, this.angle, 0);
+      this.mesh.children_[0].setRotation_(0, this.angle, 0);
     } else {
       this.velocity.x = 0;
       this.velocity.z = 0;
