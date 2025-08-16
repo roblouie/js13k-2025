@@ -132,8 +132,11 @@ export function makeCat() {
   body.addFrame(1, frame2.vertices);
 
 
-  return new Mesh(
+  const mesh = new Mesh(
     body
     , materials.parquetFloor
-  )
+  );
+  mesh.isAnimated = true;
+
+  return mesh;
 }

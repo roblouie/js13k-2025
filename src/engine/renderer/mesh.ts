@@ -5,6 +5,7 @@ import { MoldableCubeGeometry } from '@/engine/moldable-cube-geometry';
 export class Mesh extends Object3d {
   geometry: MoldableCubeGeometry;
   material: Material;
+  isAnimated = false;
 
   constructor(geometry: MoldableCubeGeometry, material: Material) {
     super();

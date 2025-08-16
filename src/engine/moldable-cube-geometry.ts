@@ -301,7 +301,7 @@ export class MoldableCubeGeometry {
 
     let byteOffset = 0;
     let lengthOffset = 0;
-    this.buffers.forEach((buffer, position) => {
+    new Map([...this.buffers.entries()].sort()).forEach((buffer, position) => {
       gl.vertexAttribPointer(position, buffer.size, gl.FLOAT, false, 0, byteOffset);
       gl.enableVertexAttribArray(position);
       fullBuffer.set(buffer.data, lengthOffset);

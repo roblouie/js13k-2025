@@ -3,6 +3,7 @@ import { Camera } from "@/engine/renderer/camera";
 
 import { Scene } from '@/engine/renderer/scene';
 import {
+  alpha, frameA, frameB,
   lightPovMvp,
   lightWorldPosition,
   modelviewProjection,
@@ -24,12 +25,11 @@ import {createOrtho, Object3d} from "@/engine/renderer/object-3d";
 // This allows us to use the index while looping through buffers to bind the attributes. So setting a buffer
 // happens by placing
 export const enum AttributeLocation {
-  Positions,
   Normals,
   TextureCoords,
   TextureDepth,
-  LocalMatrix,
-  NormalMatrix = 8,
+  Positions,
+  Positions2,
 }
 
 gl.enable(gl.CULL_FACE);
@@ -85,6 +85,17 @@ const depthFramebuffer = gl.createFramebuffer();
 gl.bindFramebuffer(gl.FRAMEBUFFER, depthFramebuffer);
 gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.TEXTURE_2D, depthTexture, 0);
 
+const alphaLocation = gl.getUniformLocation(lilgl.program, alpha);
+const frameALocation = gl.getUniformLocation(lilgl.program, frameA);
+const frameBLocation = gl.getUniformLocation(lilgl.program, frameB);
+
+// TEMP ANIMATION TEST
+let frameTime = 0;
+let frameATemp = 0;
+let frameBTemp = 1;
+gl.uniform1i(frameALocation, frameATemp);
+gl.uniform1i(frameBLocation, frameBTemp);
+
 export function render(camera: Camera, scene: Scene) {
   const viewMatrix = camera.worldMatrix.inverse();
   const viewMatrixCopy = viewMatrix.scale(1, 1, 1);
@@ -94,18 +105,18 @@ export function render(camera: Camera, scene: Scene) {
   // Render shadow map to depth texture
   // ---------------------------------------------------
   gl.useProgram(lilgl.depthProgram);
-  // gl.cullFace(gl.FRONT);
+  gl.cullFace(gl.BACK);
   gl.bindFramebuffer(gl.FRAMEBUFFER, depthFramebuffer);
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
   gl.viewport(0, 0, depthTextureSize.x, depthTextureSize.y);
 
-  // scene.solidMeshes.forEach((mesh, index) => {
-  //   if (index > 0) {
-  //     gl.bindVertexArray(mesh.geometry.vao!);
-  //     gl.uniformMatrix4fv(lightPovMvpDepthLocation, false, lightPovMvpMatrix.multiply(mesh.worldMatrix).toFloat32Array());
-  //     gl.drawElements(gl.TRIANGLES, mesh.geometry.getIndices()!.length, gl.UNSIGNED_SHORT, 0);
-  //   }
-  // });
+  scene.solidMeshes.forEach((mesh, index) => {
+    if (index > 0) {
+      gl.bindVertexArray(mesh.geometry.vao!);
+      gl.uniformMatrix4fv(lightPovMvpDepthLocation, false, lightPovMvpMatrix.multiply(mesh.worldMatrix).toFloat32Array());
+      gl.drawElements(gl.TRIANGLES, mesh.geometry.getIndices()!.length, gl.UNSIGNED_SHORT, 0);
+    }
+  });
   // End render shadow map
 
 
@@ -126,12 +137,32 @@ export function render(camera: Camera, scene: Scene) {
   scene.solidMeshes.forEach(mesh => {
     const modelViewProjectionMatrix = viewProjectionMatrix.multiply(mesh.worldMatrix);
 
+    if (mesh.isAnimated) {
+      // MORE ANIMATION TEST
+      frameTime += 0.01;
+
+      if (frameTime >= 1) {
+        frameTime = 0;
+        frameATemp = frameATemp === 0 ? 1 : 0;
+        frameBTemp = frameBTemp === 0 ? 1 : 0;
+      }
+      gl.uniform1i(frameALocation, frameATemp);
+      gl.uniform1i(frameBLocation, frameBTemp);
+      gl.uniform1f(alphaLocation, frameTime);
+      // END MORE ANIMATION TEST
+    } else {
+      gl.uniform1i(frameALocation, 0);
+      gl.uniform1i(frameBLocation, 0);
+      gl.uniform1f(alphaLocation, 0);
+    }
+
     gl.vertexAttrib1f(AttributeLocation.TextureDepth, mesh.material?.texture?.id ?? -1.0);
     gl.bindVertexArray(mesh.geometry.vao!);
 
     // @ts-ignore
-    gl.uniformMatrix4fv(normalMatrixLocation, true, mesh.color ? mesh.cachedMatrixData : mesh.worldMatrix.inverse().toFloat32Array());
+    gl.uniformMatrix4fv(normalMatrixLocation, true, mesh.worldMatrix.inverse().toFloat32Array());
     gl.uniformMatrix4fv(modelviewProjectionLocation, false, modelViewProjectionMatrix.toFloat32Array());
+
     gl.drawElements(gl.TRIANGLES, mesh.geometry.getIndices()!.length, gl.UNSIGNED_SHORT, 0);
   });
 
