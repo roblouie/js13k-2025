@@ -12,7 +12,7 @@ export class Skybox extends MoldableCubeGeometry {
     });
     gl.generateMipmap(gl.TEXTURE_CUBE_MAP);
     gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
-    this.setAttribute_(AttributeLocation.Positions, new Float32Array([
+    this.setAttribute_(0, new Float32Array([
       -1, -1,
       1, -1,
       -1, 1,

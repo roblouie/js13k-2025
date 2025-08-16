@@ -3,8 +3,13 @@ import { Mesh } from '@/engine/renderer/mesh';
 import {Skybox} from "@/engine/skybox";
 
 export class Scene extends Object3d {
-  skybox?: Skybox;
+  skybox: Skybox;
   solidMeshes: Mesh[] = [];
+
+  constructor(skybox: Skybox) {
+    super();
+    this.skybox = skybox;
+  }
 
   add_(...object3ds: Object3d[]) {
     super.add_(...object3ds);

@@ -1,6 +1,15 @@
-const { exec } = require('node:child_process');
-const readline = require('readline');
-const fs = require('fs');
+// const { exec } = require('node:child_process');
+// const readline = require('readline');
+// const fs = require('fs');
+
+import {exec} from "node:child_process";
+import * as readline from "node:readline";
+import fs from "fs";
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 const rl = readline.createInterface({
   input: process.stdin,

@@ -75,7 +75,7 @@ function catButt(leftRot = 0, rightRot = 0) {
   [...new Set(tail.vertices.map(vert => vert.y))].sort((a, b) => a-b).forEach((val, index) => {
     if (index > 0) {
       tail.selectBy(vert => vert.y === val)
-        .translate_(Math.sin(val), 0, Math.sin(index * 1.5) * rightRot)
+        .translate_(Math.sin(val) * 0.5, 0, Math.sin(index * -1.5) * rightRot)
     }
   });
 
@@ -102,8 +102,8 @@ function catButt(leftRot = 0, rightRot = 0) {
 
     // Tail
     .selectBy(vert => vert.y > bodyRadius / 2 && vert.x < -1 && Math.abs(vert.z) < 0.3)
-    .translate_(-0.5, 0.5)
-    .merge(tail.all_().rotate_(0, 0, 0.5).translate_(-1.9, 2.8))
+    .translate_(-0.3, 0.2)
+    .merge(tail.all_().rotate_(0, 0, 0.5).translate_(-2.3, 2.8))
 
 }
 

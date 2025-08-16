@@ -5,15 +5,10 @@ import { Scene } from '@/engine/renderer/scene';
 import {
   alpha, frameA, frameB,
   lightPovMvp,
-  lightWorldPosition,
   modelviewProjection,
   normalMatrix,
-  pointLightAttenuation,
-  spotlightDirection,
-  spotlightPosition,
   u_skybox,
   u_viewDirectionProjectionInverse,
-  worldMatrix,
 } from '@/engine/shaders/shaders';
 import { EnhancedDOMPoint } from '@/engine/enhanced-dom-point';
 import { ShadowCubeMapFbo } from '@/engine/renderer/cube-buffer-2';
@@ -89,13 +84,6 @@ const alphaLocation = gl.getUniformLocation(lilgl.program, alpha);
 const frameALocation = gl.getUniformLocation(lilgl.program, frameA);
 const frameBLocation = gl.getUniformLocation(lilgl.program, frameB);
 
-// TEMP ANIMATION TEST
-let frameTime = 0;
-let frameATemp = 0;
-let frameBTemp = 1;
-gl.uniform1i(frameALocation, frameATemp);
-gl.uniform1i(frameBLocation, frameBTemp);
-
 export function render(camera: Camera, scene: Scene) {
   const viewMatrix = camera.worldMatrix.inverse();
   const viewMatrixCopy = viewMatrix.scale(1, 1, 1);
@@ -132,7 +120,6 @@ export function render(camera: Camera, scene: Scene) {
   gl.cullFace(gl.BACK);
   gl.clearColor(0.0, 0.0, 0.0, 0.0);
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-  // gl.uniform1i(shadowCubeMapMain, 2);
 
   scene.solidMeshes.forEach(mesh => {
     const modelViewProjectionMatrix = viewProjectionMatrix.multiply(mesh.worldMatrix);
@@ -151,20 +138,18 @@ export function render(camera: Camera, scene: Scene) {
     gl.drawElements(gl.TRIANGLES, mesh.geometry.getIndices()!.length, gl.UNSIGNED_SHORT, 0);
   });
 
-  if (scene.skybox) {
-    gl.depthFunc(gl.LEQUAL);
-    gl.useProgram(lilgl.skyboxProgram);
-    gl.enable(gl.BLEND);
-    gl.uniform1i(skyboxLocation, 0);
-    viewMatrixCopy.m41 = 0;
-    viewMatrixCopy.m42 = 0;
-    viewMatrixCopy.m43 = 0;
-    const inverseViewProjection = camera.projection.multiply(viewMatrixCopy).inverse();
-    gl.uniformMatrix4fv(viewDirectionProjectionInverseLocation, false, inverseViewProjection.toFloat32Array());
-    gl.bindVertexArray(scene.skybox.vao);
-    gl.drawArrays(gl.TRIANGLES, 0, 6);
-    gl.depthFunc(gl.LESS);
-  }
+  gl.depthFunc(gl.LEQUAL);
+  gl.useProgram(lilgl.skyboxProgram);
+  gl.enable(gl.BLEND);
+  gl.uniform1i(skyboxLocation, 0);
+  viewMatrixCopy.m41 = 0;
+  viewMatrixCopy.m42 = 0;
+  viewMatrixCopy.m43 = 0;
+  const inverseViewProjection = camera.projection.multiply(viewMatrixCopy).inverse();
+  gl.uniformMatrix4fv(viewDirectionProjectionInverseLocation, false, inverseViewProjection.toFloat32Array());
+  gl.bindVertexArray(scene.skybox.vao);
+  gl.drawArrays(gl.TRIANGLES, 0, 6);
+  gl.depthFunc(gl.LESS);
 
   // Unbinding the vertex array being used to make sure the last item drawn isn't still bound on the next draw call.
   // In theory this isn't necessary but avoids bugs.

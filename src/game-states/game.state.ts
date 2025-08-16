@@ -20,7 +20,9 @@ export class GameState implements State {
 
   constructor() {
     this.sfxPlayer.volume_.connect(biquadFilter);
-    this.scene = new Scene();
+    const skybox = new Skybox(...skyboxes.test);
+    skybox.bindGeometry();
+    this.scene = new Scene(skybox);
     //this.player = new FreeCam(new Camera(Math.PI / 3, 16 / 9, 1, 500));
 
     this.player = new ThirdPersonPlayer(new Camera(Math.PI / 3, 16 / 9, 1, 500));
@@ -37,9 +39,6 @@ export class GameState implements State {
       new MoldableCubeGeometry(511, 1, 511, 255, 1, 255, 1)
         .modifyEachVertex((vert, index) => vert.y = heightmap[index])
       .spreadTextureCoords(5, 5).computeNormals().done_(), materials.redCarpet);
-
-    this.scene.skybox = new Skybox(...skyboxes.test);
-    this.scene.skybox.bindGeometry();
 
     this.scene.add_(floor, this.player.mesh);
     const faces = meshToFaces([floor]);
