@@ -2,7 +2,7 @@ import { Camera } from '@/engine/renderer/camera';
 import { EnhancedDOMPoint } from '@/engine/enhanced-dom-point';
 import { Face } from '@/engine/physics/face';
 import { findWallCollisionsFromList } from '@/engine/physics/surface-collision';
-import { clamp } from '@/engine/helpers';
+import {clamp, radsToDegrees} from '@/engine/helpers';
 import {OctreeNode, querySphere} from "@/engine/physics/octree";
 import {Sphere} from "@/core/first-person-player";
 import {controls} from "@/core/controls";
@@ -14,6 +14,9 @@ import {Object3d} from "@/engine/renderer/object-3d";
 
 export class ThirdPersonPlayer {
   isJumping = false;
+  isGrounded = false;
+  groundedTimer = 0;
+  smoothedNormal = new EnhancedDOMPoint(0, 1, 0);
   chassisCenter = new EnhancedDOMPoint(0, 0, 0);
   velocity = new EnhancedDOMPoint(0, 0, 0);
 
@@ -94,6 +97,20 @@ export class ThirdPersonPlayer {
     querySphere(octreeNode, this.collisionSphere, this.nearbyFaces);
 
     findWallCollisionsFromList(this.nearbyFaces, this);
+
+    if (this.isGrounded) {
+      this.groundedTimer = 0;
+    } else {
+      this.groundedTimer++;
+      if (this.groundedTimer > 10) {
+        this.smoothedNormal = this.smoothedNormal.lerp(new EnhancedDOMPoint(0,1,0), 0.1).normalize_();
+        tmpl.innerHTML += `${this.smoothedNormal.y}`;
+        this.mesh.rotationMatrix = new DOMMatrix();
+        const axis = new EnhancedDOMPoint().crossVectors(this.mesh.up, this.smoothedNormal);
+        const radians = Math.acos(this.smoothedNormal.dot(this.mesh.up));
+        this.mesh.rotationMatrix.rotateAxisAngleSelf(axis.x, axis.y, axis.z, radsToDegrees(radians));
+      }
+    }
 
     this.chassisCenter.add_(this.velocity);
   }
