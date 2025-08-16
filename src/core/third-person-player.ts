@@ -77,7 +77,7 @@ export class ThirdPersonPlayer {
 
     cameraPositionTarget.x = x;
     cameraPositionTarget.z = z;
-    this.camera.position.lerp(cameraPositionTarget, 0.08);
+    this.camera.position.lerp(cameraPositionTarget, 0.1);
 
 
     // Potentially the look at itself should be lerped, by having like a "meshTarget" that is updated to lerp towards mesh.position
