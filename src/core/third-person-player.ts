@@ -66,7 +66,6 @@ export class ThirdPersonPlayer {
 
     const cameraPositionTarget = this.mesh.position.clone_();
     cameraPositionTarget.y += 4;
-    this.camera.position.lerp(cameraPositionTarget, 0.1);
 
     // Keep camera away regardless of lerp
     const distanceToKeep = 15;
@@ -76,9 +75,13 @@ export class ThirdPersonPlayer {
       .scale_(distanceToKeep) // scale direction out by distance, giving us a lerp direction but constant distance
       .add_(this.mesh.position); // move back relative to player
 
-    this.camera.position.x = x;
-    this.camera.position.z = z;
+    cameraPositionTarget.x = x;
+    cameraPositionTarget.z = z;
+    this.camera.position.lerp(cameraPositionTarget, 0.08);
 
+
+    // Potentially the look at itself should be lerped, by having like a "meshTarget" that is updated to lerp towards mesh.position
+    // This would smooth out some of the abrupt movements when the model goes over bumpy surfaces
     this.camera.lookAt(this.mesh.position);
     this.camera.updateWorldMatrix();
 
