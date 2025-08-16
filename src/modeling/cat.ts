@@ -65,6 +65,7 @@ function catFront(leftRot = 0, rightRot = 0) {
 }
 
 function catButt(leftRot = 0, rightRot = 0) {
+  debugger;
   const tail = new MoldableCubeGeometry(1, 3, 1, 4, 5, 4)
     .texturePerSide(materials.iron)
     .cylindrify(0.3)

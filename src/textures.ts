@@ -18,12 +18,13 @@ export async function initTextures() {
   materials.greenPlasterWall = new Material({ texture: textureLoader.load_(await wallpaper())});
   materials.white = new Material({ texture: textureLoader.load_(await color('#bbb'))});
   materials.red = new Material({ texture: textureLoader.load_(await color('#b00'))});
+
+  // NOTE: Right now in the fragment shader the texture depth is checked to determine
+  // shadows, so that these don't cast shadows. That is currently set to depth >= 10.0f.
+  // If any materials before this are removed, this number will be wrong, so adjust as needed.
+  // If any materials are added after this, anythign using them won't cast shadows
   materials.catEye = new Material({ texture: textureLoader.load_(await catEye())});
   materials.catMouth = new Material({ texture: textureLoader.load_(await catMouth())});
-
-  for (let i = 1; i <= 13; i++) {
-    materials[i] = new Material({ texture: textureLoader.load_(await roomSign(`13${i.toString().padStart(2, '0')}`))});
-  }
 
   const box = await drawSkyboxHor();
   const slicer = horizontalSkyboxSlice(box);
@@ -68,10 +69,6 @@ export function metals(content = '', brightnessModifier = 1) {
 
 export function heightMap() {
   return toHeightmap(`<svg           height="256"                       width="256"   xmlns="http://www.w3.org/2000/svg"><filter            id="noise"                        ><feTurbulence baseFrequency="0.03571428571428571"                 numOctaves="2"        seed="5" stitchTiles="stitch"    type="fractalNoise"      /><feColorMatrix  color-interpolation-filters="sRGB"                              values="0,0,0,1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1,0"    /><feComponentTransfer color-interpolation-filters="sRGB"><feFuncR type="table" tableValues="0,1"/><feFuncG type="table" tableValues="0,1"/><feFuncB type="table" tableValues="0,1"/><feFuncA type="table" tableValues="1,1"/></feComponentTransfer></filter><rect      filter="url(#noise)"     height="100%"                       width="100%" x="0" y="0"/></svg>`, 30)
-}
-
-function roomSign(roomNumber: string) {
-  return metals(`<text x="21%" y="42%" font-size="150px" style="transform: scaleY(1.5)">${roomNumber}</text>`, 30)
 }
 
 function color(color: string | number) {
