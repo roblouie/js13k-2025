@@ -136,7 +136,8 @@ export function makeCat() {
     body
     , materials.parquetFloor
   );
-  mesh.isAnimated = true;
+  mesh.frameA = 0;
+  mesh.frameB = 1;
 
   return mesh;
 }

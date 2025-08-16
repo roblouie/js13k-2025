@@ -69,6 +69,18 @@ export class ThirdPersonPlayer {
     this.mesh.position.set(this.chassisCenter); // at this point, feetCenter is in the correct spot, so draw the mesh there
     this.mesh.position.y -= 0.5; // move up by half height so mesh ends at feet position
 
+    if (this.groundedTimer < 10 && !this.isJumping) {
+      const mesh = this.mesh.children_[0] as Mesh;
+      mesh.alpha += this.velocity.magnitude;
+
+      if (mesh.alpha >= 1) {
+        mesh.alpha = 0;
+        mesh.frameA = mesh.frameA === 0 ? 1 : 0;
+        mesh.frameB = mesh.frameB === 0 ? 1 : 0;
+      }
+    }
+
+
     const cameraPositionTarget = this.mesh.position.clone_();
     cameraPositionTarget.y += 4;
 

@@ -137,24 +137,9 @@ export function render(camera: Camera, scene: Scene) {
   scene.solidMeshes.forEach(mesh => {
     const modelViewProjectionMatrix = viewProjectionMatrix.multiply(mesh.worldMatrix);
 
-    if (mesh.isAnimated) {
-      // MORE ANIMATION TEST
-      frameTime += 0.01;
-
-      if (frameTime >= 1) {
-        frameTime = 0;
-        frameATemp = frameATemp === 0 ? 1 : 0;
-        frameBTemp = frameBTemp === 0 ? 1 : 0;
-      }
-      gl.uniform1i(frameALocation, frameATemp);
-      gl.uniform1i(frameBLocation, frameBTemp);
-      gl.uniform1f(alphaLocation, frameTime);
-      // END MORE ANIMATION TEST
-    } else {
-      gl.uniform1i(frameALocation, 0);
-      gl.uniform1i(frameBLocation, 0);
-      gl.uniform1f(alphaLocation, 0);
-    }
+    gl.uniform1i(frameALocation, mesh.frameA);
+    gl.uniform1i(frameBLocation, mesh.frameB);
+    gl.uniform1f(alphaLocation, mesh.alpha);
 
     gl.vertexAttrib1f(AttributeLocation.TextureDepth, mesh.material?.texture?.id ?? -1.0);
     gl.bindVertexArray(mesh.geometry.vao!);
