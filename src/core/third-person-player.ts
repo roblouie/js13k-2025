@@ -84,8 +84,8 @@ export class ThirdPersonPlayer {
       const toCam = this.camera.position.clone_().subtract(this.mesh.position).normalize_();
 
       // recover spherical angles from vector
-      const idlePitch = Math.atan2(4, distanceToKeep); // target pitch
-      this.pitch += (idlePitch - this.pitch) * 0.01;   // smooth drift
+      const idlePitch = Math.atan2(this.isGrounded ? 4 : 14, distanceToKeep); // target pitch
+      this.pitch += (idlePitch - this.pitch) * 0.03;   // smooth drift
 
       this.yaw   = Math.atan2(toCam.x, toCam.z);
     }

@@ -27,6 +27,7 @@ class Controls {
   inputDirection = new EnhancedDOMPoint();
   cameraDirection = new EnhancedDOMPoint();
   mouseSensitivity = 0.5;
+  mouseMovement = new EnhancedDOMPoint();
   isJump? = false;
 
   keyMap: Map<string, boolean> = new Map();
@@ -36,14 +37,13 @@ class Controls {
     document.addEventListener('keydown', event => this.toggleKey(event, true));
     document.addEventListener('keyup', event => this.toggleKey(event, false));
 
-    document.addEventListener('mousemove', event => {
-      this.cameraDirection.x += event.movementX * this.mouseSensitivity;
-      this.cameraDirection.y += event.movementY * this.mouseSensitivity;
+    window.addEventListener("mousemove", (e) => {
+      this.mouseMovement.x += e.movementX * 0.1;
+      this.mouseMovement.y += e.movementY * 0.1;
     });
   }
 
   queryController() {
-    this.cameraDirection.set(0, 0, 0);
     this.previousState.isUp = this.isUp;
     this.previousState.isDown = this.isDown;
     const gamepad = navigator.getGamepads()[0];
@@ -55,8 +55,8 @@ class Controls {
     const downVal = (this.keyMap.get('KeyS') || this.keyMap.get('ArrowDown') || isButtonPressed(XboxControllerButton.DpadDown)) ? 1 : 0;
     this.inputDirection.x = (leftVal + rightVal) || gamepad?.axes[0] || 0;
     this.inputDirection.y = (upVal + downVal) || gamepad?.axes[1] || 0;
-    this.cameraDirection.x = gamepad?.axes[2] || 0;
-    this.cameraDirection.y = gamepad?.axes[3] || 0;
+    this.cameraDirection.x = gamepad?.axes[2] || this.mouseMovement.x;
+    this.cameraDirection.y = gamepad?.axes[3] || this.mouseMovement.y;
     this.isJump = this.keyMap.get('Space') || isButtonPressed(XboxControllerButton.A);
 
     const deadzone = 0.15;
@@ -73,6 +73,8 @@ class Controls {
     this.isDown = this.inputDirection.y > 0;
     this.isLeft = this.inputDirection.x < 0;
     this.isRight = this.inputDirection.x > 0;
+
+    this.mouseMovement.set(0, 0);
   }
 
   private toggleKey(event: KeyboardEvent, isPressed: boolean) {
