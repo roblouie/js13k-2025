@@ -38,6 +38,11 @@ export class ThirdPersonPlayer {
   nearbyFaces = new Set<Face>();
   collisionSphere = new Sphere(this.chassisCenter, 2);
 
+  yaw = 0;
+  pitch = 0;
+  cameraSpeed = 0.05;
+  maxPitch = Math.PI / 2;
+
   update(octreeNode: OctreeNode) {
     this.updateVelocityFromControls();  // set x / z velocity based on input
 
@@ -67,22 +72,22 @@ export class ThirdPersonPlayer {
       }
     }
 
-
-    const cameraPositionTarget = this.mesh.position.clone_();
-    cameraPositionTarget.y += 4;
-
-    // Keep camera away regardless of lerp
+    this.yaw += controls.cameraDirection.x * this.cameraSpeed;
+    this.pitch += controls.cameraDirection.y * this.cameraSpeed;
+    tmpl.innerHTML += `${controls.cameraDirection.x}, ${controls.cameraDirection.y}`;
+    this.pitch = clamp(this.pitch, -this.maxPitch, this.maxPitch);
     const distanceToKeep = 15;
-    const {x, z} = this.camera.position.clone_()
-      .subtract(this.mesh.position) // distance from camera to player
-      .normalize_() // direction of camera to player
-      .scale_(distanceToKeep) // scale direction out by distance, giving us a lerp direction but constant distance
-      .add_(this.mesh.position); // move back relative to player
+    const offsetX = distanceToKeep * Math.cos(this.pitch) * Math.sin(this.yaw);
+    const offsetY = distanceToKeep * Math.sin(this.pitch);
+    const offsetZ = distanceToKeep * Math.cos(this.pitch) * Math.cos(this.yaw);
 
-    cameraPositionTarget.x = x;
-    cameraPositionTarget.z = z;
-    this.camera.position.lerp(cameraPositionTarget, 0.1);
+    const desiredPosition = this.mesh.position.clone_().add_({
+      x: offsetX,
+      y: offsetY,
+      z: offsetZ
+    });
 
+    this.camera.position.lerp(desiredPosition, 0.1);
 
     // Potentially the look at itself should be lerped, by having like a "meshTarget" that is updated to lerp towards mesh.position
     // This would smooth out some of the abrupt movements when the model goes over bumpy surfaces
