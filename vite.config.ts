@@ -187,7 +187,6 @@ function minifyShaders(config: { shouldMinify: boolean, shaderDirectory: string,
       const fileArgs = shaderFiles.map(filename => {
         return config.shaderDirectory.endsWith('/') ? `${config.shaderDirectory}${filename}` : `${config.shaderDirectory}/${filename}`;
       }).join(' ');
-      debugger;
       const monoRunner = process.platform === 'win32' ? '' : 'wine ';
       exec(`${monoRunner}shader_minifier.exe --format js ${fileArgs} -o ${config.output}`);
     }, config.debounce);

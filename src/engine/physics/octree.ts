@@ -41,7 +41,7 @@ export class OctreeNode {
 
   static MAX_TRIANGLES = 10;
   static MAX_DEPTH = 6;
-  static MIN_HEIGHT = 2;
+  static MIN_HEIGHT = 0.3;
 
   constructor(bounds: AABB, depth = 0) {
     this.bounds = bounds;
@@ -49,7 +49,9 @@ export class OctreeNode {
   }
 
   private isBigEnough() {
-    return (this.bounds.max.y - this.bounds.min.y) >= OctreeNode.MIN_HEIGHT;
+    return (this.bounds.max.y - this.bounds.min.y) >= OctreeNode.MIN_HEIGHT
+      && (this.bounds.max.z - this.bounds.min.z) >= OctreeNode.MIN_HEIGHT
+      && (this.bounds.max.x - this.bounds.min.x) >= OctreeNode.MIN_HEIGHT;
   }
 
   insert(face: Face) {

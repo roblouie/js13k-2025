@@ -1,6 +1,6 @@
 import { Material } from '@/engine/renderer/material';
 import { textureLoader } from '@/engine/renderer/texture-loader';
-import {toHeightmap, toImage} from '@/engine/svg-maker/svg-string-converters';
+import {toHeightmap, toImage, toImageData} from '@/engine/svg-maker/svg-string-converters';
 
 const skyboxSize = 1024;
 
@@ -13,8 +13,8 @@ export async function initTextures() {
   materials.iron = new Material({ texture: textureLoader.load_(await metals()) });
   materials.marble = new Material({ texture: textureLoader.load_(await marbleFloor())});
   materials.ceilingTiles = new Material({ texture: textureLoader.load_(await ceilingTiles())});
-  materials.redCarpet = new Material({ texture: textureLoader.load_(await redCarpet())});
-  materials.wallpaper = new Material({ texture: textureLoader.load_(await wallpaper(true))});
+  materials.cartoonGrass = new Material({ texture: textureLoader.load_(await cartoonGrass())});
+  materials.cobblestone = new Material({ texture: textureLoader.load_(await cobblestonePath())});
   materials.greenPlasterWall = new Material({ texture: textureLoader.load_(await wallpaper())});
   materials.white = new Material({ texture: textureLoader.load_(await color('#bbb'))});
   materials.red = new Material({ texture: textureLoader.load_(await color('#b00'))});
@@ -68,7 +68,7 @@ export function metals(content = '', brightnessModifier = 1) {
 }
 
 export function heightMap() {
-  return toHeightmap(`<svg           height="256"                       width="256"   xmlns="http://www.w3.org/2000/svg"><filter            id="noise"                        ><feTurbulence baseFrequency="0.03571428571428571"                 numOctaves="2"        seed="5" stitchTiles="stitch"    type="fractalNoise"      /><feColorMatrix  color-interpolation-filters="sRGB"                              values="0,0,0,1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1,0"    /><feComponentTransfer color-interpolation-filters="sRGB"><feFuncR type="table" tableValues="0,1"/><feFuncG type="table" tableValues="0,1"/><feFuncB type="table" tableValues="0,1"/><feFuncA type="table" tableValues="1,1"/></feComponentTransfer></filter><rect      filter="url(#noise)"     height="100%"                       width="100%" x="0" y="0"/></svg>`, 30)
+  return toHeightmap(`<svg           height="256"                       width="256"   xmlns="http://www.w3.org/2000/svg"><filter            id="noise"                        ><feTurbulence baseFrequency="0.02"                 numOctaves="1"        seed="5" stitchTiles="stitch"    type="fractalNoise"      /><feColorMatrix  color-interpolation-filters="sRGB"                              values="0,0,0,1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1,0"    /><feComponentTransfer color-interpolation-filters="sRGB"><feFuncR type="table" tableValues="0,1"/><feFuncG type="table" tableValues="0,1"/><feFuncB type="table" tableValues="0,1"/><feFuncA type="table" tableValues="1,1"/></feComponentTransfer></filter><rect      filter="url(#noise)"     height="100%"                       width="100%" x="0" y="0"/></svg>`, 10)
 }
 
 function color(color: string | number) {
@@ -173,4 +173,60 @@ function catEye() {
         fill="limegreen" stroke="black" stroke-width="8"/>
   <ellipse cx="352" cy="256" rx="25" ry="70" fill="black"/>
 </svg>`);
+}
+
+export function cartoonGrass() {
+  return toImage(`<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512">
+    <filter id="filter">
+        <feTurbulence type="fractalNoise" baseFrequency=".01" numOctaves="8"/>
+        
+        <feDiffuseLighting color-interpolation-filters="sRGB" lighting-color="#0a0" surfaceScale="-3" result="d">
+            <feDistantLight azimuth="40" elevation="60"/>
+        </feDiffuseLighting>
+        
+
+    </filter>
+    <rect width="100%" height="100%" filter="url(#filter)" />
+</svg>`)
+}
+
+function cobblestonePath() {
+  return toImage(`<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512">
+  <filter id="blurMe">
+    <feGaussianBlur in="SourceGraphic" stdDeviation="3" />
+  </filter>
+  <filter id="shadow">
+      <feDropShadow dx="1" dy="1" stdDeviation="2" />
+    </filter>
+    <pattern id="pattern" width="86.6" height="50" patternUnits="userSpaceOnUse">
+        <circle r="100" fill="#333"/>
+<!--          <path d="M0 25a20 20 0 1 1 0 1M43.3 0a20 20 0 1 0 40 0m0 50a20 20 0 1 0 -40 0" fill="#825130"/> -->
+              <circle cx="20" cy="25" r="23" fill="#6A6473" filter="url(#shadow)" />
+              <circle cx="63" cy="0" r="23" fill="#696472" filter="url(#shadow)"/>
+              <circle cx="63" cy="50" r="23" fill="#696472" filter="url(#shadow)" />
+      
+              <circle cx="20" cy="23" r="14" fill="#7f7d88" filter="url(#blurMe)"/>
+              <circle cx="60" cy="-2" r="14" fill="#807d86" filter="url(#blurMe)"/>
+              <circle cx="60" cy="48" r="14" fill="#807d86" filter="url(#blurMe)"/>
+    </pattern>
+    <filter id="filter">
+        <feTurbulence type="fractalNoise" baseFrequency="0.017" numOctaves="1" stitchTiles="stitch"/>
+        <feDisplacementMap in="SourceGraphic" xChannelSelector="R" scale="40"/>
+    </filter>
+    <rect x="-10%" y="-10%" width="120%" height="120%" fill="url(#pattern)" filter="url(#filter)" />
+</svg>`);
+}
+
+export function pathTest() {
+  return toImageData(`<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" style="filter: blur(2px)">
+<filter id="blurMe">
+    <feGaussianBlur in="SourceGraphic" stdDeviation="6" />
+  </filter>
+   
+  <path
+    d="M 10 80 Q 52.5 10, 95 80 T 180 80"
+    stroke="white"
+        stroke-width="10px"
+    fill="transparent" />
+</svg>`)
 }

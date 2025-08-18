@@ -1,10 +1,10 @@
 import { State } from '@/core/state';
 import { Scene } from '@/engine/renderer/scene';
 import { Camera } from '@/engine/renderer/camera';
-import {heightMap, materials, metals, skyboxes} from '@/textures';
+import {heightMap, materials, metals, pathTest, skyboxes} from '@/textures';
 import { Mesh } from '@/engine/renderer/mesh';
 import { meshToFaces } from '@/engine/physics/parse-faces';
-import { render } from '@/engine/renderer/renderer';
+import {AttributeLocation, render} from '@/engine/renderer/renderer';
 import { MoldableCubeGeometry } from '@/engine/moldable-cube-geometry';
 import { audioContext, biquadFilter, SimplestMidiRev2 } from '@/engine/audio/simplest-midi';
 import {elevatorDoor1, elevatorDoorTest, elevatorMotionRev1, footstep, hideSound} from '@/sounds';
@@ -36,9 +36,17 @@ export class GameState implements State {
   async onEnter() {
     const heightmap = await heightMap();
     const floor = new Mesh(
-      new MoldableCubeGeometry(511, 1, 511, 255, 1, 255, 1)
+      new MoldableCubeGeometry(350, 1, 350, 255, 1, 255, 1)
         .modifyEachVertex((vert, index) => vert.y = heightmap[index])
-      .spreadTextureCoords(5, 5).computeNormals().done_(), materials.redCarpet);
+      .spreadTextureCoords(5, 5).computeNormals().done_(), materials.cartoonGrass);
+
+    const path = await pathTest();
+    const pathValues = [];
+    for (let i = 3; i < path.data.length; i+=4) {
+      pathValues.push(5 + path.data[i] / 255);
+    }
+
+    floor.geometry.setAttribute_(AttributeLocation.TextureDepth, new Float32Array(pathValues), 1);
 
     this.scene.add_(floor, this.player.mesh);
     const faces = meshToFaces([floor]);

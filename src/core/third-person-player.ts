@@ -96,6 +96,8 @@ export class ThirdPersonPlayer {
     this.nearbyFaces.clear();
     querySphere(octreeNode, this.collisionSphere, this.nearbyFaces);
 
+    tmpl.innerHTML += this.nearbyFaces.size;
+
     findWallCollisionsFromList(this.nearbyFaces, this);
 
     if (this.isGrounded) {
