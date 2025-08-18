@@ -59,7 +59,7 @@ class Controls {
     this.cameraDirection.y = gamepad?.axes[3] || 0;
     this.isJump = this.keyMap.get('Space') || isButtonPressed(XboxControllerButton.A);
 
-    const deadzone = 0.1;
+    const deadzone = 0.15;
     if (this.inputDirection.magnitude < deadzone) {
       this.inputDirection.x = 0;
       this.inputDirection.y = 0;

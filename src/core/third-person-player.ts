@@ -9,6 +9,7 @@ import {audioContext} from "@/engine/audio/simplest-midi";
 import {Object3d} from "@/engine/renderer/object-3d";
 import {makeCat} from "@/modeling/cat";
 import {Sphere} from "@/engine/physics/aabb";
+import {Mesh} from "@/engine/renderer/mesh";
 
 export class ThirdPersonPlayer {
   isJumping = false;
@@ -63,7 +64,7 @@ export class ThirdPersonPlayer {
 
     if (this.groundedTimer < 10 && !this.isJumping) {
       const mesh = this.mesh.children_[0] as Mesh;
-      mesh.alpha += this.velocity.magnitude;
+      mesh.alpha += this.velocity.magnitude / 2;
 
       if (mesh.alpha >= 1) {
         mesh.alpha = 0;
@@ -72,11 +73,23 @@ export class ThirdPersonPlayer {
       }
     }
 
-    this.yaw += controls.cameraDirection.x * this.cameraSpeed;
-    this.pitch += controls.cameraDirection.y * this.cameraSpeed;
-    tmpl.innerHTML += `${controls.cameraDirection.x}, ${controls.cameraDirection.y}`;
-    this.pitch = clamp(this.pitch, -this.maxPitch, this.maxPitch);
     const distanceToKeep = 15;
+
+    if (controls.cameraDirection.magnitude) {
+      this.yaw += controls.cameraDirection.x * -this.cameraSpeed;
+      this.pitch += controls.cameraDirection.y * this.cameraSpeed;
+      tmpl.innerHTML += `${controls.cameraDirection.x}, ${controls.cameraDirection.y}`;
+      this.pitch = clamp(this.pitch, -this.maxPitch, this.maxPitch);
+    } else {
+      const toCam = this.camera.position.clone_().subtract(this.mesh.position).normalize_();
+
+      // recover spherical angles from vector
+      const idlePitch = Math.atan2(4, distanceToKeep); // target pitch
+      this.pitch += (idlePitch - this.pitch) * 0.01;   // smooth drift
+
+      this.yaw   = Math.atan2(toCam.x, toCam.z);
+    }
+
     const offsetX = distanceToKeep * Math.cos(this.pitch) * Math.sin(this.yaw);
     const offsetY = distanceToKeep * Math.sin(this.pitch);
     const offsetZ = distanceToKeep * Math.cos(this.pitch) * Math.cos(this.yaw);
@@ -122,7 +135,7 @@ export class ThirdPersonPlayer {
   }
 
   protected updateVelocityFromControls() {
-    const speedMultiplier = 0.1;
+    const speedMultiplier = 0.2;
 
     const mag = controls.inputDirection.magnitude;
 
