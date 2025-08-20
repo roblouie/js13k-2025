@@ -11,9 +11,9 @@ export function findWallCollisionsFromList(walls: Set<Face>, player: ThirdPerson
 
     if (newWallHit) {
       const depth = newWallHit.penetrationDepth + 0.00000001;
-      player.smoothedNormal = player.smoothedNormal.lerp(wall.normal, 0.1).normalize_();
 
       if (wall.normal.y >= 0.6 && player.velocity.y < 0) {
+        player.smoothedNormal = player.smoothedNormal.lerp(wall.normal, 0.1).normalize_();
         player.collisionSphere.center.y += depth;
         player.velocity.y = 0;
         player.isJumping = false;

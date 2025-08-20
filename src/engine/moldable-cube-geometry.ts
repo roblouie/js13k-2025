@@ -25,9 +25,9 @@ export class MoldableCubeGeometry {
 
   texturePerSide(leftOrAll: Material, right?: Material, top?: Material, bottom?: Material, back?: Material, front?: Material) {
     const allSides = [
-        ...getTextureForSide(this.depthSegments, this.heightSegments, leftOrAll),
+      ...getTextureForSide(this.widthSegments, this.depthSegments, top ?? leftOrAll),
+      ...getTextureForSide(this.depthSegments, this.heightSegments, leftOrAll),
         ...getTextureForSide(this.depthSegments, this.heightSegments, right ?? leftOrAll),
-        ...getTextureForSide(this.widthSegments, this.depthSegments, top ?? leftOrAll),
         ...getTextureForSide(this.widthSegments, this.depthSegments, bottom ?? leftOrAll),
         ...getTextureForSide(this.widthSegments, this.heightSegments, back ?? leftOrAll),
         ...getTextureForSide(this.widthSegments, this.heightSegments, front ?? leftOrAll),

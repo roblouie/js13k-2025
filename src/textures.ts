@@ -68,7 +68,17 @@ export function metals(content = '', brightnessModifier = 1) {
 }
 
 export function heightMap() {
-  return toHeightmap(`<svg           height="256"                       width="256"   xmlns="http://www.w3.org/2000/svg"><filter            id="noise"                        ><feTurbulence baseFrequency="0.02"                 numOctaves="1"        seed="5" stitchTiles="stitch"    type="fractalNoise"      /><feColorMatrix  color-interpolation-filters="sRGB"                              values="0,0,0,1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1,0"    /><feComponentTransfer color-interpolation-filters="sRGB"><feFuncR type="table" tableValues="0,1"/><feFuncG type="table" tableValues="0,1"/><feFuncB type="table" tableValues="0,1"/><feFuncA type="table" tableValues="1,1"/></feComponentTransfer></filter><rect      filter="url(#noise)"     height="100%"                       width="100%" x="0" y="0"/></svg>`, 10)
+  return toHeightmap(`<svg width="64" height="64" xmlns="http://www.w3.org/2000/svg">
+  <filter id="noise">
+<!--    <feTurbulence type="fractalNoise" baseFrequency="0.05" numOctaves="1" seed="5" stitchTiles="stitch"/>-->
+<!--    <feColorMatrix values="1 0 0 0 0-->
+<!--                               1 0 0 0 0-->
+<!--                               1 0 0 0 0-->
+<!--                               0 0 0 0 1"/>-->
+  </filter>
+  <rect width="100%" height="100%" filter="url(#noise)"/>
+</svg>
+`, 80)
 }
 
 function color(color: string | number) {

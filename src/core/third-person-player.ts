@@ -78,16 +78,15 @@ export class ThirdPersonPlayer {
     if (controls.cameraDirection.magnitude) {
       this.yaw += controls.cameraDirection.x * -this.cameraSpeed;
       this.pitch += controls.cameraDirection.y * this.cameraSpeed;
-      tmpl.innerHTML += `${controls.cameraDirection.x}, ${controls.cameraDirection.y}`;
       this.pitch = clamp(this.pitch, -this.maxPitch, this.maxPitch);
     } else {
       const toCam = this.camera.position.clone_().subtract(this.mesh.position).normalize_();
-
       // recover spherical angles from vector
-      const idlePitch = Math.atan2(this.isGrounded ? 4 : 14, distanceToKeep); // target pitch
-      this.pitch += (idlePitch - this.pitch) * 0.03;   // smooth drift
-
-      this.yaw   = Math.atan2(toCam.x, toCam.z);
+      const onGround = this.groundedTimer < 10;
+      // const idlePitch = Math.atan2(onGround ? 4 : 14, distanceToKeep); // target pitch
+      // this.pitch += (idlePitch - this.pitch) * (onGround ? 0.02 : 0.05);   // smooth drift
+      //
+      // this.yaw   = Math.atan2(toCam.x, toCam.z);
     }
 
     const offsetX = distanceToKeep * Math.cos(this.pitch) * Math.sin(this.yaw);
@@ -100,7 +99,7 @@ export class ThirdPersonPlayer {
       z: offsetZ
     });
 
-    this.camera.position.lerp(desiredPosition, 0.1);
+    this.camera.position.lerp(desiredPosition, 0.2);
 
     // Potentially the look at itself should be lerped, by having like a "meshTarget" that is updated to lerp towards mesh.position
     // This would smooth out some of the abrupt movements when the model goes over bumpy surfaces
@@ -114,7 +113,6 @@ export class ThirdPersonPlayer {
     this.nearbyFaces.clear();
     querySphere(octreeNode, this.collisionSphere, this.nearbyFaces);
 
-    tmpl.innerHTML += this.nearbyFaces.size;
 
     findWallCollisionsFromList(this.nearbyFaces, this);
 

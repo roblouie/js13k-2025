@@ -40,7 +40,7 @@ const viewDirectionProjectionInverseLocation = gl.getUniformLocation(lilgl.skybo
 
 const origin = new EnhancedDOMPoint(0, 0, 0);
 
-const lightPovProjection = createOrtho(-105,105,-105,105,-400,400);
+const lightPovProjection = createOrtho(-205,205,-205,205,-400,400);
 
 const inverseLightDirection = new EnhancedDOMPoint(-0.8, 1.5, -1).normalize_();
 const lightPovView = new Object3d();
@@ -65,7 +65,6 @@ const textureSpaceMvp = textureSpaceConversion.multiplySelf(lightPovMvpMatrix);
 const lightPovMvpRenderLocation = gl.getUniformLocation(lilgl.program, lightPovMvp);
 
 gl.useProgram(lilgl.program);
-gl.uniformMatrix4fv(lightPovMvpRenderLocation, false, textureSpaceMvp.toFloat32Array());
 
 const depthTextureSize = new DOMPoint(4096, 4096);
 const depthTexture = gl.createTexture();
@@ -123,6 +122,7 @@ export function render(camera: Camera, scene: Scene) {
 
   scene.solidMeshes.forEach(mesh => {
     const modelViewProjectionMatrix = viewProjectionMatrix.multiply(mesh.worldMatrix);
+    gl.uniformMatrix4fv(lightPovMvpRenderLocation, false, textureSpaceMvp.multiply(mesh.worldMatrix).toFloat32Array());
 
     gl.uniform1i(frameALocation, mesh.frameA);
     gl.uniform1i(frameBLocation, mesh.frameB);

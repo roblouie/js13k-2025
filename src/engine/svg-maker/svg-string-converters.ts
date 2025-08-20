@@ -16,9 +16,10 @@ export async function toImageData(svgString: string): Promise<ImageData> {
 
 export async function toHeightmap(svgString: string, scale_: number): Promise<number[]> {
   const imageData = await toImageData(svgString);
-  return [...imageData.data]
-    .filter((value, index) => !(index % 4))
-    .map(value => {
-      return (value / 255 - 0.5) * scale_;
-    });
+  const map = [];
+  for (let i = 0; i < imageData.data.length; i+= 4) {
+    //map.push((imageData.data[i] / 255 - 0.5) * scale_);
+    map.push(0)
+  }
+  return map;
 }
