@@ -12,6 +12,8 @@ import {computeSceneBounds, OctreeNode} from "@/engine/physics/octree";
 import {ThirdPersonPlayer} from "@/core/third-person-player";
 import {Skybox} from "@/engine/skybox";
 import {hedgeMazeAndTube, tunnel} from "@/modeling/hedge-maze-and-tube";
+import {floatingPath} from "@/modeling/floating-path";
+import {floatingPlatforms} from "@/modeling/floating-platforms";
 
 export class GameState implements State {
   player: ThirdPersonPlayer;
@@ -80,7 +82,7 @@ export class GameState implements State {
 
 
 
-    const features = tunnel();
+    const features = floatingPlatforms();
 
     const path = await pathTest();
 

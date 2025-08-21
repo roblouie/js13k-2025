@@ -2,6 +2,9 @@ import { MoldableCubeGeometry } from '@/engine/moldable-cube-geometry';
 import { Texture } from '@/engine/renderer/texture';
 import { materials } from '@/textures';
 import { Material } from '@/engine/renderer/material';
+import {EnhancedDOMPoint} from "@/engine/enhanced-dom-point";
+
+export const cylinderSelector2 = (vert: EnhancedDOMPoint) => Math.abs(vert.x) === 2 || Math.abs(vert.z) === 2
 
 export const DoubleDoorWidth = 8;
 export const WallHeight = 12;
