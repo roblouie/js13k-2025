@@ -14,6 +14,7 @@ import {Skybox} from "@/engine/skybox";
 import {hedgeMazeAndTube, tunnel} from "@/modeling/hedge-maze-and-tube";
 import {floatingPath} from "@/modeling/floating-path";
 import {floatingPlatforms} from "@/modeling/floating-platforms";
+import {rampToJump} from "@/modeling/ramp-to-jump";
 
 export class GameState implements State {
   player: ThirdPersonPlayer;
@@ -82,7 +83,7 @@ export class GameState implements State {
 
 
 
-    const features = floatingPlatforms();
+    const features = rampToJump();
 
     const path = await pathTest();
 
