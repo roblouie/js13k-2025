@@ -5,8 +5,8 @@ import {materials} from "@/textures";
 
 // TODO: Finish landing area
 export function rampToJump() {
-  return new Mesh(new MoldableCubeGeometry(4,6,4,6,1,6).selectBy(cylinderSelector2).cylindrify(14).all_().translate_(0, 3)
-      .merge(new MoldableCubeGeometry(4,14,4,6,1,6).cylindrify(8).all_().translate_(8, 11))
+  return new Mesh(new MoldableCubeGeometry(4,6,4,6,1,6).selectBy(cylinderSelector2).cylindrify(14).all_().translate_(5, 3, 40)
+      .merge(new MoldableCubeGeometry(4,18,4,6,1,6).cylindrify(8).all_().translate_(7, 9))
       .merge(new MoldableCubeGeometry(12, 20, 12, 4, 1, 6)
         .selectBy(vert => vert.x <= -4)
         .cylindrify(6, 'y', { x: 1, y: 0, z: 0})
@@ -22,12 +22,12 @@ export function rampToJump() {
         .modifyEachVertex(vert => vert.y = -14)
         .all_()
         .translate_(18, 14, 0)
-        .computeNormals()
         .spreadTextureCoords()
         .done_())
 
       .merge(new MoldableCubeGeometry(4, 40, 4, 6, 1, 6).selectBy(cylinderSelector2).cylindrify(8).all_().translate_(80, 20, 70).done_())
       .merge(new MoldableCubeGeometry(4, 40, 4, 6, 1, 6).selectBy(cylinderSelector2).cylindrify(8).all_().translate_(40, 20, 60).done_())
+      .computeNormals()
 
       .done_(),
     materials.white

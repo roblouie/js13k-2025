@@ -15,31 +15,30 @@ uniform mediump sampler2DShadow shadowMap;
 vec3 lightDirection = vec3(-1, 1.5, -1);
 vec4 ambientLight = vec4(0.2, 0.2, 0.2, 1.0);
 
-vec2 adjacentPixels[5] = vec2[](
-    vec2(0, 0),
-    vec2(-1, 0),
-    vec2(1, 0),
-    vec2(0, 1),
-    vec2(0, -1)
-);
-
-float visibility = 1.0;
-float shadowSpread = 3200.0;
-
 out vec4 outColor;
 
+float sampleShadowPCF(mediump sampler2DShadow shadowMap, vec4 shadowCoord) {
+    float shadow = 0.0;
+    float texelSize = 1.0 / 4096.0; // match your shadow map resolution
+
+    // 3x3 PCF kernel
+    for (int x = -1; x <= 1; x++) {
+        for (int y = -1; y <= 1; y++) {
+            vec2 offset = vec2(x, y) * texelSize;
+            shadow += texture(shadowMap, vec3(shadowCoord.xy + offset, shadowCoord.z - 0.002));
+        }
+    }
+
+    return shadow / 9.0; // average result
+}
+
 void main() {
-//    for (int i = 0; i < 5; i++) {
-        vec3 samplePosition = vec3(positionFromLightPov.xy, positionFromLightPov.z - 0.001);
-        float hitByLight = texture(shadowMap, samplePosition);
-//        visibility *= max(hitByLight, 0.7);
-//    }
+    float hitByLight = sampleShadowPCF(shadowMap, positionFromLightPov);
 
     vec3 correctedNormals = normalize(mat3(vNormalMatrix) * vNormal);
     vec3 normalizedLightPosition = normalize(lightDirection);
     float litPercent = dot(normalizedLightPosition, correctedNormals) * hitByLight;
     vec3 litColor = litPercent * vec3(1.0, 1.0, 1.0);
-//    vec4 vColor = vec4(litColor.rgb, 1.0);
     vec4 vColor = clamp(vec4(litColor, 1.0) + ambientLight, ambientLight, vec4(1.0, 1.0, 1.0, 1.0));
 
     outColor = texture(uSampler, vec3(vTexCoord, vDepth)) * vColor;
@@ -48,3 +47,4 @@ void main() {
         discard;
     }
 }
+
