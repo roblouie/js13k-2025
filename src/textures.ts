@@ -70,15 +70,15 @@ export function metals(content = '', brightnessModifier = 1) {
 export function heightMap() {
   return toHeightmap(`<svg width="64" height="64" xmlns="http://www.w3.org/2000/svg">
   <filter id="noise">
-<!--    <feTurbulence type="fractalNoise" baseFrequency="0.05" numOctaves="1" seed="5" stitchTiles="stitch"/>-->
-<!--    <feColorMatrix values="1 0 0 0 0-->
-<!--                               1 0 0 0 0-->
-<!--                               1 0 0 0 0-->
-<!--                               0 0 0 0 1"/>-->
+    <feTurbulence type="fractalNoise" baseFrequency="0.03" numOctaves="2" seed="5" stitchTiles="stitch"/>
+    <feColorMatrix values="1 0 0 0 0
+                               1 0 0 0 0
+                               1 0 0 0 0
+                               0 0 0 0 1"/>
   </filter>
   <rect width="100%" height="100%" filter="url(#noise)"/>
 </svg>
-`, 80)
+`, 30)
 }
 
 function color(color: string | number) {

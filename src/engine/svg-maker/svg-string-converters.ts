@@ -18,8 +18,8 @@ export async function toHeightmap(svgString: string, scale_: number): Promise<nu
   const imageData = await toImageData(svgString);
   const map = [];
   for (let i = 0; i < imageData.data.length; i+= 4) {
-    //map.push((imageData.data[i] / 255 - 0.5) * scale_);
-    map.push(0)
+    map.push((imageData.data[i] / 255 - 0.5) * scale_);
+    //map.push(0)
   }
   return map;
 }

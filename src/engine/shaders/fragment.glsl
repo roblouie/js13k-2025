@@ -12,7 +12,7 @@ in vec4 positionFromLightPov;
 uniform mediump sampler2DArray uSampler;
 uniform mediump sampler2DShadow shadowMap;
 
-vec3 lightDirection = vec3(-1, 1.5, -1);
+vec3 lightDirection = vec3(0.05, 0.6, 0.2);
 vec4 ambientLight = vec4(0.2, 0.2, 0.2, 1.0);
 
 out vec4 outColor;
@@ -32,6 +32,10 @@ float sampleShadowPCF(mediump sampler2DShadow shadowMap, vec4 shadowCoord) {
     return shadow / 9.0; // average result
 }
 
+float linearizeDepth(float z, float near, float far) {
+    return (2.0 * near) / (far + near - z * (far - near));
+}
+
 void main() {
     float hitByLight = sampleShadowPCF(shadowMap, positionFromLightPov);
 
@@ -41,7 +45,14 @@ void main() {
     vec3 litColor = litPercent * vec3(1.0, 1.0, 1.0);
     vec4 vColor = clamp(vec4(litColor, 1.0) + ambientLight, ambientLight, vec4(1.0, 1.0, 1.0, 1.0));
 
-    outColor = texture(uSampler, vec3(vTexCoord, vDepth)) * vColor;
+    float depth = linearizeDepth(gl_FragCoord.z, 1.0, 700.0);
+    float fogFactor = smoothstep(0.5, 1.0, depth);
+    fogFactor = min(fogFactor, 0.5);
+
+    vec4 tempCol = texture(uSampler, vec3(vTexCoord, vDepth)) * vColor;
+
+    vec3 foggedColor = mix(tempCol.rgb, vec3(0.3, 0.3, 0.5), fogFactor);
+    outColor = vec4(foggedColor, tempCol.a);
 
     if (outColor.a < 0.5) {
         discard;

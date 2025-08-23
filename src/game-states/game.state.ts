@@ -11,10 +11,11 @@ import {elevatorDoor1, elevatorDoorTest, footstep} from '@/sounds';
 import {computeSceneBounds, OctreeNode} from "@/engine/physics/octree";
 import {ThirdPersonPlayer} from "@/core/third-person-player";
 import {Skybox} from "@/engine/skybox";
-import {hedgeMazeAndTube, tunnel} from "@/modeling/hedge-maze-and-tube";
-import {floatingPath} from "@/modeling/floating-path";
-import {floatingPlatforms} from "@/modeling/floating-platforms";
-import {rampToJump} from "@/modeling/ramp-to-jump";
+import {hedgeMazeAndTube, tunnel} from "@/js13k-shared-modeling/hedge-maze-and-tube";
+import {floatingPath} from "@/js13k-shared-modeling/floating-path";
+import {floatingPlatforms} from "@/js13k-shared-modeling/floating-platforms";
+import {rampToJump} from "@/js13k-shared-modeling/ramp-to-jump";
+import {mountain} from "@/js13k-shared-modeling/mountain";
 
 export class GameState implements State {
   player: ThirdPersonPlayer;
@@ -40,18 +41,18 @@ export class GameState implements State {
   async onEnter() {
     const heightmap = await heightMap();
     const floorGeo = new MoldableCubeGeometry(512, 1, 512, 63, 1, 63, 1)
-    // const texDepths = new Array(256 * 256).fill(materials.cartoonGrass.texture.id);
+    //const texDepths = new Array(256 * 256).fill(materials.cartoonGrass.texture.id);
 
 
-    for (let y = 0; y < 64; y++) {
-      for (let x = 0; x < 64; x++) {
-        if (y === 0 || y === 63 || x === 0 || x === 63) {
-          const index = y * 64 + x;
-          heightmap[index] = Math.min(heightmap[index] + 40, 50);
-          // texDepths[index] = 3;
-        }
-      }
-    }
+    // for (let y = 0; y < 64; y++) {
+    //   for (let x = 0; x < 64; x++) {
+    //     if (y === 0 || y === 63 || x === 0 || x === 63) {
+    //       const index = y * 64 + x;
+    //       heightmap[index] = Math.min(heightmap[index] + 40, 50);
+    //       //texDepths[index] = 3;
+    //     }
+    //   }
+    // }
 
     // texDepths.data[0] = materials.marble.texture.id;
     // texDepths.data[1] = materials.marble.texture.id;
@@ -61,7 +62,7 @@ export class GameState implements State {
 
     const floor = new Mesh(
       floorGeo
-        .modifyEachVertex((vert, index) => vert.y = heightmap[index])
+        // .modifyEachVertex((vert, index) => vert.y = heightmap[index])
       .spreadTextureCoords(5, 5).computeNormals().done_(), materials.cartoonGrass);
 
     const raisedSideArea = new MoldableCubeGeometry(100, 16, 100)
@@ -83,7 +84,7 @@ export class GameState implements State {
 
 
 
-    const features = rampToJump();
+    // const features = rampToJump();
 
     const path = await pathTest();
 
@@ -99,8 +100,15 @@ export class GameState implements State {
 
     // floor.geometry.merge(new MoldableCubeGeometry(20, 10, 20).texturePerSide(materials.cartoonGrass)).done_();
 
-    this.scene.add_(floor, features, this.player.mesh);
-    const faces = meshToFaces([floor, features]);
+    const hedgeMaze = hedgeMazeAndTube();
+    const tnl = tunnel();
+    const floating = floatingPlatforms();
+    const path2 = floatingPath();
+    const rampToJmp = rampToJump();
+    const mntn = mountain();
+
+    this.scene.add_(floor, this.player.mesh, hedgeMaze, tnl, floating, path2, rampToJmp, mntn);
+    const faces = meshToFaces([floor, hedgeMaze, tnl, floating, path2, rampToJmp, mntn]);
 
     // precomputed world bounds, so not needed at runtime
     const worldBounds = computeSceneBounds(faces);

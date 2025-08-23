@@ -1,7 +1,7 @@
 // Only difference between these is the Q value of the wah filter being modulated.
 
 // THE MODULATED Q IS BETTER. It gets the mee in the meow. and the 700 value makes for a nicer mee as well.
-function theBestDamnCatHolyShit(audioCtx) {
+function theBestDamnCatHolyShit2(audioCtx: AudioContext) {
   const osc = audioCtx.createOscillator();
   const gain = audioCtx.createGain();
   const wah = audioCtx.createBiquadFilter();
@@ -122,7 +122,7 @@ function prettyGoodCat(audioCtx: AudioContext) {
   osc.stop(audioCtx.currentTime + 1);
 }
 
-function prettyGoodCat2(audioCtx) {
+function prettyGoodCat2(audioCtx: AudioContext) {
   const osc = audioCtx.createOscillator();
   const gain = audioCtx.createGain();
   const wah = audioCtx.createBiquadFilter();
