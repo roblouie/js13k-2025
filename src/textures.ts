@@ -12,10 +12,10 @@ export async function initTextures() {
   materials.silver = new Material({ texture: textureLoader.load_(await metals('', 20)) });
   materials.iron = new Material({ texture: textureLoader.load_(await metals()) });
   materials.marble = new Material({ texture: textureLoader.load_(await marbleFloor())});
-  materials.ceilingTiles = new Material({ texture: textureLoader.load_(await ceilingTiles())});
+  materials.cartoonRockWall = new Material({ texture: textureLoader.load_(await cartoonRockWall())});
   materials.cartoonGrass = new Material({ texture: textureLoader.load_(await cartoonGrass())});
   materials.cobblestone = new Material({ texture: textureLoader.load_(await cobblestonePath())});
-  materials.greenPlasterWall = new Material({ texture: textureLoader.load_(await wallpaper())});
+  materials.grassRockTransition = new Material({ texture: textureLoader.load_(await grassRockTransition())});
   materials.white = new Material({ texture: textureLoader.load_(await color('#bbb'))});
   materials.red = new Material({ texture: textureLoader.load_(await color('#b00'))});
 
@@ -41,8 +41,71 @@ export async function initTextures() {
   textureLoader.bindTextures();
 }
 
+export function grassRockTransition() {
+  return toImage(`<svg width="512" height="512" xmlns="http://www.w3.org/2000/svg">
+<pattern id="pattern" width="512" height="512" patternUnits="userSpaceOnUse">
+    <filter id="filter" width="100%" height="100%" x="0" y="0">
+        <feTurbulence type="fractalNoise" baseFrequency=".01" numOctaves="8"/>
+
+        <feDiffuseLighting color-interpolation-filters="sRGB" lighting-color="#0a0" surfaceScale="-3" result="d">
+            <feDistantLight azimuth="40" elevation="60"/>
+        </feDiffuseLighting>
+
+
+    </filter>
+        <rect width="100%" height="100%" filter="url(#filter)"/>
+    </pattern>
+    <filter id="m" width="512" height="512" x="-0.1" y="-0.1">
+        <feTurbulence type="fractalNoise" baseFrequency=".005" numOctaves="7" stitchTiles="stitch"/>
+        <feDiffuseLighting diffuseConstant="6" surfaceScale="4" lighting-color="#7B3F00" color-interpolation="sRGB">
+            <feDistantLight elevation="4" azimuth="170"/>
+        </feDiffuseLighting>
+    </filter>
+
+    <filter id="shadow" x="-50%" y="-50%" width="200%" height="200%">
+      <feDropShadow dx="8" dy="8" stdDeviation="6" flood-color="black" flood-opacity="0.5"/>
+    </filter>
+
+    <rect width="100%" height="100%" filter="url(#m)"/>
+    <g filter="url(#shadow)">
+        <circle r="80" fill="url(#pattern)" />
+        <circle r="80" fill="url(#pattern)" cx="128" />
+        <circle r="80" fill="url(#pattern)" cx="256" />
+        <circle r="80" fill="url(#pattern)" cx="384" />
+        <circle r="80" fill="url(#pattern)" cx="512" />
+    </g>
+</svg>`)
+}
+
+export function cartoonRockWall() {
+  return toImage(`<svg width="512" height="512" xmlns="http://www.w3.org/2000/svg">
+    <filter id="m" width="512" height="512" x="-0.1" y="-0.1">
+        <feTurbulence type="fractalNoise" baseFrequency=".005" numOctaves="7" stitchTiles="stitch"/>
+        <feDiffuseLighting diffuseConstant="6" surfaceScale="4" lighting-color="#7B3F00" color-interpolation="sRGB">
+            <feDistantLight elevation="4" azimuth="170"/>
+        </feDiffuseLighting>
+    </filter>
+    <rect width="100%" height="100%" filter="url(#m)"/>
+</svg>`)
+}
+
 function wallpaper(isPattern = false) {
-  return toImage(`<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512"><pattern id="b" width="128" height="128" patternUnits="userSpaceOnUse"><path fill="#687A5E" d="M0 0h128v128H0z"/>${isPattern ? '<text x="64" y="64" style="font-size:64px" stroke="#506546" fill="#506546">❀</text><text y="128" style="font-size:50px" stroke="#506546" fill="#506546">✦</text>' : ''}</pattern><filter id="a"><feTurbulence baseFrequency=".4" stitchTiles="stitch"/><feDiffuseLighting color-interpolation-filters="sRGB" lighting-color="#687A5E"><feDistantLight azimuth="120" elevation="45"/></feDiffuseLighting><feBlend in="SourceGraphic" mode="difference"/></filter><rect width="100%" height="100%" filter="url(#a)" fill="url(#b)"/></svg>`);
+  return toImage(`
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512">
+<pattern id="b" width="128" height="128" patternUnits="userSpaceOnUse">
+<path fill="#687A5E" d="M0 0h128v128H0z"/>
+${isPattern ? '<text x="64" y="64" style="font-size:64px" stroke="#506546" fill="#506546">❀</text><text y="128" style="font-size:50px" stroke="#506546" fill="#506546">✦</text>' : ''}
+</pattern>
+
+<filter id="a">
+<feTurbulence baseFrequency=".4" stitchTiles="stitch"/>
+<feDiffuseLighting color-interpolation-filters="sRGB" lighting-color="#687A5E">
+<feDistantLight azimuth="120" elevation="45"/>
+</feDiffuseLighting>
+<feBlend in="SourceGraphic" mode="difference"/>
+</filter>
+<rect width="100%" height="100%" filter="url(#a)" fill="url(#b)"/>
+</svg>`);
 }
 
 function redCarpet() {

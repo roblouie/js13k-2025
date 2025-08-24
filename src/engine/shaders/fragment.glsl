@@ -37,22 +37,41 @@ float linearizeDepth(float z, float near, float far) {
 }
 
 void main() {
-    float hitByLight = sampleShadowPCF(shadowMap, positionFromLightPov);
+    // === Shadow sampling ===
+    float shadowFactor = sampleShadowPCF(shadowMap, positionFromLightPov);
+    // 1.0 = fully lit, 0.0 = fully shadowed
 
-    vec3 correctedNormals = normalize(mat3(vNormalMatrix) * vNormal);
-    vec3 normalizedLightPosition = normalize(lightDirection);
-    float litPercent = dot(normalizedLightPosition, correctedNormals) * hitByLight;
-    vec3 litColor = litPercent * vec3(1.0, 1.0, 1.0);
-    vec4 vColor = clamp(vec4(litColor, 1.0) + ambientLight, ambientLight, vec4(1.0, 1.0, 1.0, 1.0));
+    // === Normalized inputs ===
+    vec3 normal     = normalize(mat3(vNormalMatrix) * vNormal);
+    vec3 lightDir   = normalize(lightDirection);
 
+    // === Basic diffuse ===
+    float NdotL = max(dot(lightDir, normal), 0.0);
+
+    // Instead of killing diffuse in shadow, scale it down
+    float shadowedDiffuse = mix(0.2 * NdotL, NdotL, shadowFactor);
+
+    // === Lighting ===
+    vec3 diffuseColor = shadowedDiffuse * vec3(1.0); // white light
+    vec3 litColor = diffuseColor + ambientLight.rgb;
+
+    // Clamp to [ambient .. 1] range
+    vec3 finalLighting = clamp(litColor, ambientLight.rgb, vec3(1.0));
+
+    // === Texture sample ===
+    vec4 baseColor = texture(uSampler, vec3(vTexCoord, vDepth));
+    vec3 shadedColor = baseColor.rgb * finalLighting;
+
+    // === Fog ===
     float depth = linearizeDepth(gl_FragCoord.z, 1.0, 700.0);
-    float fogFactor = smoothstep(0.5, 1.0, depth);
-    fogFactor = min(fogFactor, 0.5);
+    // Fog ramps from near → far, capped so it never fully grays out
+    float fogFactor = clamp(smoothstep(0.4, 1.0, depth), 0.0, 0.5);
 
-    vec4 tempCol = texture(uSampler, vec3(vTexCoord, vDepth)) * vColor;
+    vec3 fogColor = vec3(0.3, 0.3, 0.5);
+    vec3 foggedColor = mix(shadedColor, fogColor, fogFactor);
 
-    vec3 foggedColor = mix(tempCol.rgb, vec3(0.3, 0.3, 0.5), fogFactor);
-    outColor = vec4(foggedColor, tempCol.a);
+    // === Final output ===
+    outColor = vec4(foggedColor, baseColor.a);
 
     if (outColor.a < 0.5) {
         discard;

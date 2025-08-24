@@ -26,12 +26,13 @@ export class MoldableCubeGeometry {
   texturePerSide(leftOrAll: Material, right?: Material, top?: Material, bottom?: Material, back?: Material, front?: Material) {
     const allSides = [
       ...getTextureForSide(this.widthSegments, this.depthSegments, top ?? leftOrAll),
+      ...getTextureForSide(this.widthSegments, this.depthSegments, bottom ?? leftOrAll),
       ...getTextureForSide(this.depthSegments, this.heightSegments, leftOrAll),
-        ...getTextureForSide(this.depthSegments, this.heightSegments, right ?? leftOrAll),
-        ...getTextureForSide(this.widthSegments, this.depthSegments, bottom ?? leftOrAll),
-        ...getTextureForSide(this.widthSegments, this.heightSegments, back ?? leftOrAll),
-        ...getTextureForSide(this.widthSegments, this.heightSegments, front ?? leftOrAll),
+      ...getTextureForSide(this.depthSegments, this.heightSegments, right ?? leftOrAll),
+      ...getTextureForSide(this.widthSegments, this.heightSegments, back ?? leftOrAll),
+      ...getTextureForSide(this.widthSegments, this.heightSegments, front ?? leftOrAll),
     ];
+
     this.setAttribute_(AttributeLocation.TextureDepth, new Float32Array(allSides), 1);
     return this;
   }
@@ -135,6 +136,11 @@ export class MoldableCubeGeometry {
     return this;
   }
 
+  refineSelect(callback: (vertex: EnhancedDOMPoint, index: number, array: EnhancedDOMPoint[]) => boolean) {
+    this.verticesToActOn = this.verticesToActOn.filter(callback);
+    return this;
+  }
+
   translate_(x = 0, y = 0, z = 0) {
     this.verticesToActOn.forEach(vertex => vertex.add_({x, y, z}));
     return this;
@@ -157,9 +163,9 @@ export class MoldableCubeGeometry {
     return this;
   }
 
-  spherify(radius: number) {
+  spherify(radius: number, circleCenter: VectorLike = {x: 0, y: 0, z: 0}) {
     this.modifyEachVertex(vertex => {
-      vertex.normalize_().scale_(radius);
+      vertex.subtract(circleCenter).normalize_().scale_(radius);
     });
     return this;
   }
@@ -196,6 +202,25 @@ export class MoldableCubeGeometry {
       vertex.subtract(circleCenter).normalize_().scale_(radius);
       vertex[aroundAxis] = originalAxis;
     });
+    return this;
+  }
+
+  cylindrify2(radius: number) {
+    // Find bounds along X for angle mapping
+    let minX = Infinity, maxX = -Infinity;
+    this.verticesToActOn.forEach(v => {
+      if (v.x < minX) minX = v.x;
+      if (v.x > maxX) maxX = v.x;
+    });
+
+    // Cylindrical transform
+    this.modifyEachVertex(vertex => {
+      const angle = (vertex.x - minX) / (maxX - minX) * 2 * Math.PI;
+
+      vertex.x = radius * Math.cos(angle);
+      vertex.z = radius * Math.sin(angle);
+    });
+
     return this;
   }
 

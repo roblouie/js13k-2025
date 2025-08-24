@@ -16,6 +16,11 @@ import {floatingPath} from "@/js13k-shared-modeling/floating-path";
 import {floatingPlatforms} from "@/js13k-shared-modeling/floating-platforms";
 import {rampToJump} from "@/js13k-shared-modeling/ramp-to-jump";
 import {mountain} from "@/js13k-shared-modeling/mountain";
+import {
+  frontLeftCliffForBridge,
+  mountainAreaLeftCliff,
+  tubeCliffAndCave
+} from "@/js13k-shared-modeling/world-geography";
 
 export class GameState implements State {
   player: ThirdPersonPlayer;
@@ -106,9 +111,12 @@ export class GameState implements State {
     const path2 = floatingPath();
     const rampToJmp = rampToJump();
     const mntn = mountain();
+    const tubeCaveArea = tubeCliffAndCave();
+    const mtnAreaCliff = mountainAreaLeftCliff();
+    const frontLeftCliff = frontLeftCliffForBridge();
 
-    this.scene.add_(floor, this.player.mesh, hedgeMaze, tnl, floating, path2, rampToJmp, mntn);
-    const faces = meshToFaces([floor, hedgeMaze, tnl, floating, path2, rampToJmp, mntn]);
+    this.scene.add_(floor, this.player.mesh, hedgeMaze, tnl, floating, path2, rampToJmp, mntn, tubeCaveArea, mtnAreaCliff, frontLeftCliff);
+    const faces = meshToFaces([floor, hedgeMaze, tnl, floating, path2, rampToJmp, mntn, tubeCaveArea, mtnAreaCliff, frontLeftCliff]);
 
     // precomputed world bounds, so not needed at runtime
     const worldBounds = computeSceneBounds(faces);
