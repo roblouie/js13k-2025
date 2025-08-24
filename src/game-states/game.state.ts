@@ -21,6 +21,7 @@ import {
   mountainAreaLeftCliff,
   tubeCliffAndCave
 } from "@/js13k-shared-modeling/world-geography";
+import {bridge, frontRamp} from "@/js13k-shared-modeling/bridges";
 
 export class GameState implements State {
   player: ThirdPersonPlayer;
@@ -114,9 +115,11 @@ export class GameState implements State {
     const tubeCaveArea = tubeCliffAndCave();
     const mtnAreaCliff = mountainAreaLeftCliff();
     const frontLeftCliff = frontLeftCliffForBridge();
+    const brdge = bridge();
+    const frntBrdge = frontRamp();
 
-    this.scene.add_(floor, this.player.mesh, hedgeMaze, tnl, floating, path2, rampToJmp, mntn, tubeCaveArea, mtnAreaCliff, frontLeftCliff);
-    const faces = meshToFaces([floor, hedgeMaze, tnl, floating, path2, rampToJmp, mntn, tubeCaveArea, mtnAreaCliff, frontLeftCliff]);
+    this.scene.add_(floor, this.player.mesh, hedgeMaze, tnl, floating, path2, rampToJmp, mntn, tubeCaveArea, mtnAreaCliff, frontLeftCliff, brdge, frntBrdge);
+    const faces = meshToFaces([floor, hedgeMaze, tnl, floating, path2, rampToJmp, mntn, tubeCaveArea, mtnAreaCliff, frontLeftCliff, brdge, frntBrdge]);
 
     // precomputed world bounds, so not needed at runtime
     const worldBounds = computeSceneBounds(faces);
