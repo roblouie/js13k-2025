@@ -19,9 +19,10 @@ import {mountain} from "@/js13k-shared-modeling/mountain";
 import {
   frontLeftCliffForBridge,
   mountainAreaLeftCliff,
-  tubeCliffAndCave
+  tubeCliffAndCave, worldWall
 } from "@/js13k-shared-modeling/world-geography";
 import {bridge, frontRamp} from "@/js13k-shared-modeling/bridges";
+import {radsToDegrees} from "@/engine/helpers";
 
 export class GameState implements State {
   player: ThirdPersonPlayer;
@@ -36,12 +37,14 @@ export class GameState implements State {
     this.scene = new Scene(skybox);
     //this.player = new FreeCam(new Camera(Math.PI / 3, 16 / 9, 1, 500));
 
-    this.player = new ThirdPersonPlayer(new Camera(Math.PI / 3, 16 / 9, 1, 700));
+    this.player = new ThirdPersonPlayer(new Camera(Math.PI / 2.5, 16 / 9, 1, 700));
   }
 
+
+  // TODO: remember to update this from the computed octree when level design finished
   octree = new OctreeNode({
-    max: {x: 1024, y: 12, z: 1024, w: 1},
-    min: { x: -1024, y: -3, z: -1024 }
+    max: {x: 512, y: 12, z: 512, w: 1},
+    min: { x: -512, y: -3, z: -512 }
   }, 0);
 
   async onEnter() {
@@ -117,9 +120,10 @@ export class GameState implements State {
     const frontLeftCliff = frontLeftCliffForBridge();
     const brdge = bridge();
     const frntBrdge = frontRamp();
+    const wrldWall = worldWall();
 
-    this.scene.add_(floor, this.player.mesh, hedgeMaze, tnl, floating, path2, rampToJmp, mntn, tubeCaveArea, mtnAreaCliff, frontLeftCliff, brdge, frntBrdge);
-    const faces = meshToFaces([floor, hedgeMaze, tnl, floating, path2, rampToJmp, mntn, tubeCaveArea, mtnAreaCliff, frontLeftCliff, brdge, frntBrdge]);
+    this.scene.add_(floor, this.player.mesh, hedgeMaze, tnl, floating, path2, rampToJmp, mntn, tubeCaveArea, mtnAreaCliff, frontLeftCliff, brdge, frntBrdge, wrldWall);
+    const faces = meshToFaces([floor, hedgeMaze, tnl, floating, path2, rampToJmp, mntn, tubeCaveArea, mtnAreaCliff, frontLeftCliff, brdge, frntBrdge, wrldWall]);
 
     // precomputed world bounds, so not needed at runtime
     const worldBounds = computeSceneBounds(faces);
