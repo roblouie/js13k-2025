@@ -3,7 +3,6 @@ import {materials} from "@/textures";
 import {Mesh} from "@/engine/renderer/mesh";
 
 const bodyRadius = 2;
-const bodyDepth = 6;
 
 function catHead(dipNRot = 0) {
   const eyes = new MoldableCubeGeometry(3.8, 0.01, 1.6, 1, 1, 1)

@@ -1,9 +1,9 @@
 import {MoldableCubeGeometry} from "@/engine/moldable-cube-geometry";
 import {Mesh} from "@/engine/renderer/mesh";
 import {materials} from "@/textures";
-import {cylinderSelector2} from "@/js13k-shared-modeling/building-blocks";
-import { rampSection } from '@/js13k-shared-modeling/hedge-maze-and-tube';
-import { platformMaker } from '@/js13k-shared-modeling/floating-platforms';
+import {cylinderSelector2} from "@/modeling/building-blocks";
+import {rampSection} from "@/modeling/hedge-maze-and-tube";
+import {platformMaker} from "@/modeling/floating-platforms";
 
 export function mountain() {
   return new Mesh(

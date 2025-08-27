@@ -3,7 +3,6 @@ import {cylinderSelector2} from "@/modeling/building-blocks";
 import {Mesh} from "@/engine/renderer/mesh";
 import {materials} from "@/textures";
 
-// TODO: Finish landing area
 export function rampToJump() {
   return new Mesh(new MoldableCubeGeometry(4,6,4,6,1,6).selectBy(cylinderSelector2).cylindrify(14).all_().translate_(5, 3, 40)
       .merge(new MoldableCubeGeometry(4,18,4,6,1,6).cylindrify(8).all_().translate_(7, 9))
@@ -25,11 +24,15 @@ export function rampToJump() {
         .spreadTextureCoords()
         .done_())
 
-      .merge(new MoldableCubeGeometry(4, 40, 4, 6, 1, 6).selectBy(cylinderSelector2).cylindrify(8).all_().translate_(80, 20, 70).done_())
-      .merge(new MoldableCubeGeometry(4, 40, 4, 6, 1, 6).selectBy(cylinderSelector2).cylindrify(8).all_().translate_(40, 20, 60).done_())
+      .merge(new MoldableCubeGeometry(4, 44, 4, 6, 1, 6).selectBy(cylinderSelector2).cylindrify(8).all_().translate_(80, 22, 50).done_())
+      .merge(new MoldableCubeGeometry(4, 52, 4, 6, 1, 6).selectBy(cylinderSelector2).cylindrify(8).all_().translate_(60, 26, 45).done_())
+
+      // world positioning
+      .rotate_(0, Math.PI)
+      .translate_(240, 0, 52)
       .computeNormals()
 
       .done_(),
-    materials.white
+    materials.cartoonGrass
   );
 }

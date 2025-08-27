@@ -11,17 +11,17 @@ import {elevatorDoor1, elevatorDoorTest, footstep} from '@/sounds';
 import {computeSceneBounds, OctreeNode} from "@/engine/physics/octree";
 import {ThirdPersonPlayer} from "@/core/third-person-player";
 import {Skybox} from "@/engine/skybox";
-import {hedgeMazeAndTube, tunnel} from "@/js13k-shared-modeling/hedge-maze-and-tube";
-import {floatingPath} from "@/js13k-shared-modeling/floating-path";
-import {floatingPlatforms} from "@/js13k-shared-modeling/floating-platforms";
-import {rampToJump} from "@/js13k-shared-modeling/ramp-to-jump";
-import {mountain} from "@/js13k-shared-modeling/mountain";
+import {hedgeMazeAndTube, tunnel} from "@/modeling/hedge-maze-and-tube";
+import {floatingPath} from "@/modeling/floating-path";
+import {floatingPlatforms} from "@/modeling/floating-platforms";
+import {rampToJump} from "@/modeling/ramp-to-jump";
+import {mountain} from "@/modeling/mountain";
 import {
   frontLeftCliffForBridge,
-  mountainAreaLeftCliff,
+  mountainAreaLeftCliff, nightCave,
   tubeCliffAndCave, worldWall
-} from "@/js13k-shared-modeling/world-geography";
-import {bridge, frontRamp} from "@/js13k-shared-modeling/bridges";
+} from "@/modeling/world-geography";
+import {bridge, frontRamp} from "@/modeling/bridges";
 import {radsToDegrees} from "@/engine/helpers";
 
 export class GameState implements State {
@@ -121,9 +121,10 @@ export class GameState implements State {
     const brdge = bridge();
     const frntBrdge = frontRamp();
     const wrldWall = worldWall();
+    const cave = nightCave();
 
-    this.scene.add_(floor, this.player.mesh, hedgeMaze, tnl, floating, path2, rampToJmp, mntn, tubeCaveArea, mtnAreaCliff, frontLeftCliff, brdge, frntBrdge, wrldWall);
-    const faces = meshToFaces([floor, hedgeMaze, tnl, floating, path2, rampToJmp, mntn, tubeCaveArea, mtnAreaCliff, frontLeftCliff, brdge, frntBrdge, wrldWall]);
+    this.scene.add_(floor, this.player.mesh, hedgeMaze, tnl, floating, path2, rampToJmp, mntn, tubeCaveArea, mtnAreaCliff, frontLeftCliff, brdge, frntBrdge, wrldWall, cave);
+    const faces = meshToFaces([floor, hedgeMaze, tnl, floating, path2, rampToJmp, mntn, tubeCaveArea, mtnAreaCliff, frontLeftCliff, brdge, frntBrdge, wrldWall, cave]);
 
     // precomputed world bounds, so not needed at runtime
     const worldBounds = computeSceneBounds(faces);

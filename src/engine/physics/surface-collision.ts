@@ -78,8 +78,9 @@ function closestPointInTriangle(p: EnhancedDOMPoint, a: EnhancedDOMPoint, b: Enh
   const vc = d1 * d4 - d3 * d2;
 
   if (vc <= 0 && d1 >= 0 && d3 <= 0) {
-    const v = d1 / (d1 - d3);
-    return new EnhancedDOMPoint().addVectors(a, new EnhancedDOMPoint().set(ab).scale_(v));
+    const denom = d1 - d3;
+    if (Math.abs(denom) < 1e-8) return a;
+    const v = d1 / denom;    return new EnhancedDOMPoint().addVectors(a, new EnhancedDOMPoint().set(ab).scale_(v));
   }
 
   const cp = new EnhancedDOMPoint().subtractVectors(p, c);
@@ -90,13 +91,17 @@ function closestPointInTriangle(p: EnhancedDOMPoint, a: EnhancedDOMPoint, b: Enh
 
   const vb = d5 * d2 - d1 * d6;
   if (vb <= 0 && d2 >= 0 && d6 <= 0) {
-    const w = d2 / (d2 - d6);
+    const denom = d2 - d6;
+    if (Math.abs(denom) < 1e-8) return a;
+    const w = d2 / denom;
     return new EnhancedDOMPoint().addVectors(a, new EnhancedDOMPoint().set(ac).scale_(w));
   }
 
   const va = d3 * d6 - d5 * d4;
   if (va <= 0 && (d4 - d3) >= 0 && (d5 - d6) >= 0) {
-    const w = (d4 - d3) / ((d4 - d3) + (d5 - d6));
+    const denom = (d4 - d3) + (d5 - d6);
+    if (Math.abs(denom) < 1e-8) return b;
+    const w = (d4 - d3) / denom;
     const wbc = new EnhancedDOMPoint().subtractVectors(c, b).scale_(w);
     return new EnhancedDOMPoint().addVectors(b, wbc);
   }

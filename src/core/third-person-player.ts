@@ -50,6 +50,10 @@ export class ThirdPersonPlayer {
     this.velocity.y -= 0.01; // gravity
     this.chassisCenter.add_(this.velocity);  // move the player position by the velocity
 
+    if (isNaN(this.velocity.x)) {
+      debugger;
+    }
+
     // if the player falls through the floor, reset them
     if (this.chassisCenter.y < -100) {
       this.chassisCenter.y = 50;
@@ -58,6 +62,10 @@ export class ThirdPersonPlayer {
 
     this.velocity.y = clamp(this.velocity.y, -1, 1);
     this.collideWithLevel(octreeNode); // do collision detection, if collision is found, feetCenter gets pushed out of the collision
+
+    if (isNaN(this.velocity.x)) {
+      debugger;
+    }
 
     this.mesh.position.set(this.chassisCenter); // at this point, feetCenter is in the correct spot, so draw the mesh there
     this.mesh.position.y -= 0.5; // move up by half height so mesh ends at feet position
@@ -113,6 +121,7 @@ export class ThirdPersonPlayer {
     this.nearbyFaces.clear();
     querySphere(octreeNode, this.collisionSphere, this.nearbyFaces);
 
+    tmpl.innerHTML += this.nearbyFaces.size;
 
     findWallCollisionsFromList(this.nearbyFaces, this);
 
@@ -164,9 +173,13 @@ export class ThirdPersonPlayer {
 
   private updateAudio() {
     if (this.listener.positionX) {
-      this.listener.positionX.value = this.mesh.position.x;
-      this.listener.positionY.value = this.mesh.position.y;
-      this.listener.positionZ.value = this.mesh.position.z;
+      try {
+        this.listener.positionX.value = this.mesh.position.x;
+        this.listener.positionY.value = this.mesh.position.y;
+        this.listener.positionZ.value = this.mesh.position.z;
+      } catch (error) {
+        debugger;
+      }
     }
 
     const cameraPlayerDirection = this.mesh.position.clone_()
