@@ -3,7 +3,9 @@
 // THE MODULATED Q IS BETTER. It gets the mee in the meow. and the 700 value makes for a nicer mee as well.
 import {audioContext} from "@/engine/audio/simplest-midi";
 
-export function theBestDamnCatHolyShit2(audioCtx: AudioContext) {
+export function theBestDamnCatHolyShit2() {
+  // return theBestDamnCatHolyShit(audioContext);
+
   const osc = audioContext.createOscillator();
   const gain = audioContext.createGain();
   const wah = audioContext.createBiquadFilter();
@@ -12,8 +14,9 @@ export function theBestDamnCatHolyShit2(audioCtx: AudioContext) {
   osc.type = "sawtooth";
 
   osc.frequency.value = 700; // 600 - 700 works
+  osc.frequency.setValueAtTime(700, audioContext.currentTime + 0.1);
   osc.frequency.linearRampToValueAtTime(500, audioContext.currentTime + 0.7);
-  osc.frequency.linearRampToValueAtTime(700, audioContext.currentTime + 0.9);
+  osc.frequency.linearRampToValueAtTime(900, audioContext.currentTime + 0.9);
 
   // Amp envelope
   gain.gain.setValueAtTime(0, audioContext.currentTime);
@@ -29,7 +32,7 @@ export function theBestDamnCatHolyShit2(audioCtx: AudioContext) {
   // Sweep the "wah"
   // wah.frequency.setValueAtTime(1500, audioCtx.currentTime);
   wah.frequency.linearRampToValueAtTime(2800, audioContext.currentTime + 0.3);
-  wah.frequency.linearRampToValueAtTime(40, audioContext.currentTime + 0.8);
+  wah.frequency.linearRampToValueAtTime(40, audioContext.currentTime + 1);
 
   wah.Q.linearRampToValueAtTime(22, audioContext.currentTime + 0.5);
   wah.Q.linearRampToValueAtTime(0, audioContext.currentTime + 0.8);
