@@ -173,7 +173,7 @@ export class ThirdPersonPlayer {
       if (!this.isJumping) {
         this.velocity.y = 0.4;
         this.isJumping = true;
-        theBestDamnCatHolyShit2();
+        jumpSound();
       }
     }
   }

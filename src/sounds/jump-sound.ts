@@ -8,15 +8,15 @@ export function jumpSound(isLanding?: boolean) {
 
 
   const noiseFilter = audioContext.createBiquadFilter();
-  noiseFilter.type = isLanding ? "lowpass" : "bandpass";
-  noiseFilter.frequency.value = 100;
+  noiseFilter.type = 'lowpass';
+  noiseFilter.frequency.value = isLanding ? 140 : 450;
   noiseFilter.gain.value = 0;
 
   noise.connect(noiseFilter);
 
 
   const gain = audioContext.createGain();
-  const stopTime = envelopeMe(gain.gain, audioContext.currentTime, 0.4, 0.05, 0.01, 0.05, 0.03, 0.1)
+  const stopTime = envelopeMe(gain.gain, audioContext.currentTime, 0.1, 0.05, 0.01, isLanding ? 0.1 : 0.07, 0.03, 0.07)
 
   noiseFilter.connect(gain);
   gain.connect(audioContext.destination);

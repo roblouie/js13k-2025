@@ -17,7 +17,6 @@ export async function initTextures() {
   materials.white = new Material({ texture: textureLoader.load_(await solidColor('#bbb'))});
   materials.witchFace = new Material({ texture: textureLoader.load_(await witchFace())});
   materials.witchSkin = new Material({ texture: textureLoader.load_(await solidColor('#63C328'))});
-  materials.witchClothes = new Material({ texture: textureLoader.load_(await solidColor('#902EBB'))})
 
   // NOTE: Right now in the fragment shader the texture depth is checked to determine
   // shadows, so that these don't cast shadows. That is currently set to depth >= 10.0f.
@@ -25,6 +24,7 @@ export async function initTextures() {
   // If any materials are added after this, anythign using them won't cast shadows
   materials.catEye = new Material({ texture: textureLoader.load_(await catEye())});
   materials.catMouth = new Material({ texture: textureLoader.load_(await catMouth())});
+  materials.witchClothes = new Material({ texture: textureLoader.load_(await solidColor('#902EBB'))})
 
   const box = await drawSkyboxHor();
   const slicer = horizontalSkyboxSlice(box);

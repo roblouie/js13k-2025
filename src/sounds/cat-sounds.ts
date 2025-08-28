@@ -4,7 +4,7 @@
 import {audioContext} from "@/engine/audio/simplest-midi";
 
 export function theBestDamnCatHolyShit2() {
-  // return theBestDamnCatHolyShit(audioContext);
+  //return theBestDamnCatHolyShit(audioContext);
 
   const osc = audioContext.createOscillator();
   const gain = audioContext.createGain();
@@ -14,7 +14,7 @@ export function theBestDamnCatHolyShit2() {
   osc.type = "sawtooth";
 
   osc.frequency.value = 700; // 600 - 700 works
-  osc.frequency.setValueAtTime(700, audioContext.currentTime + 0.1);
+  osc.frequency.setValueAtTime(700, audioContext.currentTime + 0.15);
   osc.frequency.linearRampToValueAtTime(500, audioContext.currentTime + 0.7);
   osc.frequency.linearRampToValueAtTime(900, audioContext.currentTime + 0.9);
 
@@ -27,7 +27,7 @@ export function theBestDamnCatHolyShit2() {
   // Wah filter
   wah.type = "lowpass";   // can also try "bandpass"
   wah.frequency.value = 2200;
-  wah.Q.value = 0; // resonance
+  wah.Q.value = 8; // resonance
 
   // Sweep the "wah"
   // wah.frequency.setValueAtTime(1500, audioCtx.currentTime);
@@ -35,7 +35,6 @@ export function theBestDamnCatHolyShit2() {
   wah.frequency.linearRampToValueAtTime(40, audioContext.currentTime + 1);
 
   wah.Q.linearRampToValueAtTime(22, audioContext.currentTime + 0.5);
-  wah.Q.linearRampToValueAtTime(0, audioContext.currentTime + 0.8);
 
 
   // Connect

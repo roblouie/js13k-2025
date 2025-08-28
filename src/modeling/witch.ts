@@ -2,6 +2,7 @@ import {MoldableCubeGeometry} from "@/engine/moldable-cube-geometry";
 import {materials} from "@/textures";
 import {Mesh} from "@/engine/renderer/mesh";
 import {EnhancedDOMPoint} from "@/engine/enhanced-dom-point";
+import {cylinderSelector2} from "@/modeling/building-blocks";
 
 export function makeWitch(pos: EnhancedDOMPoint, rot: EnhancedDOMPoint) {
   const witchLimb = (flip?: boolean) => {
@@ -33,7 +34,9 @@ export function makeWitch(pos: EnhancedDOMPoint, rot: EnhancedDOMPoint) {
       // hat
       .merge(
         new MoldableCubeGeometry(3, 3, 3, 3, 3, 3)
+          .selectBy(cylinderSelector2(1.5))
           .cylindrify(2.5)
+          .all_()
           .translate_(0, 1)
           .modifyEachVertex(vert => {
             const t = vert.y / 3; // normalize against height
@@ -42,7 +45,7 @@ export function makeWitch(pos: EnhancedDOMPoint, rot: EnhancedDOMPoint) {
             vert.x *= scale;
             vert.z *= scale;
             if (vert.y > 0) {
-              vert.y -= 0.5;
+              vert.y -= 0.4;
             }
           })
           .translate_(0, 1.5)
@@ -93,7 +96,8 @@ export function makeWitch(pos: EnhancedDOMPoint, rot: EnhancedDOMPoint) {
 
       .selectBy(vert => vert.y > -4)
       .rotate_(0,0,(frame - 0.5) * 0.3)
-      .computeNormals()
+      // .all_()
+      .computeNormals(true)
       .done_();
   }
 
