@@ -1,23 +1,25 @@
 // Only difference between these is the Q value of the wah filter being modulated.
 
 // THE MODULATED Q IS BETTER. It gets the mee in the meow. and the 700 value makes for a nicer mee as well.
-function theBestDamnCatHolyShit2(audioCtx: AudioContext) {
-  const osc = audioCtx.createOscillator();
-  const gain = audioCtx.createGain();
-  const wah = audioCtx.createBiquadFilter();
+import {audioContext} from "@/engine/audio/simplest-midi";
+
+export function theBestDamnCatHolyShit2(audioCtx: AudioContext) {
+  const osc = audioContext.createOscillator();
+  const gain = audioContext.createGain();
+  const wah = audioContext.createBiquadFilter();
 
   // Source: sawtooth or triangle works best
   osc.type = "sawtooth";
 
   osc.frequency.value = 700; // 600 - 700 works
-  osc.frequency.linearRampToValueAtTime(500, audioCtx.currentTime + 0.7);
-  osc.frequency.linearRampToValueAtTime(700, audioCtx.currentTime + 0.9);
+  osc.frequency.linearRampToValueAtTime(500, audioContext.currentTime + 0.7);
+  osc.frequency.linearRampToValueAtTime(700, audioContext.currentTime + 0.9);
 
   // Amp envelope
-  gain.gain.setValueAtTime(0, audioCtx.currentTime);
-  gain.gain.linearRampToValueAtTime(0.7, audioCtx.currentTime + 0.2);
-  gain.gain.linearRampToValueAtTime(0.5, audioCtx.currentTime + 0.3);
-  gain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 0.8);
+  gain.gain.setValueAtTime(0, audioContext.currentTime);
+  gain.gain.linearRampToValueAtTime(0.7, audioContext.currentTime + 0.2);
+  gain.gain.linearRampToValueAtTime(0.5, audioContext.currentTime + 0.3);
+  gain.gain.linearRampToValueAtTime(0, audioContext.currentTime + 0.8);
 
   // Wah filter
   wah.type = "lowpass";   // can also try "bandpass"
@@ -26,20 +28,20 @@ function theBestDamnCatHolyShit2(audioCtx: AudioContext) {
 
   // Sweep the "wah"
   // wah.frequency.setValueAtTime(1500, audioCtx.currentTime);
-  wah.frequency.linearRampToValueAtTime(2800, audioCtx.currentTime + 0.3);
-  wah.frequency.linearRampToValueAtTime(40, audioCtx.currentTime + 0.8);
+  wah.frequency.linearRampToValueAtTime(2800, audioContext.currentTime + 0.3);
+  wah.frequency.linearRampToValueAtTime(40, audioContext.currentTime + 0.8);
 
-  wah.Q.linearRampToValueAtTime(22, audioCtx.currentTime + 0.5);
-  wah.Q.linearRampToValueAtTime(0, audioCtx.currentTime + 0.8);
+  wah.Q.linearRampToValueAtTime(22, audioContext.currentTime + 0.5);
+  wah.Q.linearRampToValueAtTime(0, audioContext.currentTime + 0.8);
 
 
   // Connect
   osc.connect(gain);
   gain.connect(wah);
-  wah.connect(audioCtx.destination);
+  wah.connect(audioContext.destination);
 
   osc.start();
-  osc.stop(audioCtx.currentTime + 1);
+  osc.stop(audioContext.currentTime + 1);
 }
 
 function theBestDamnCatHolyShit(audioCtx: AudioContext) {

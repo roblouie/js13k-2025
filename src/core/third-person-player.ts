@@ -10,10 +10,14 @@ import {Object3d} from "@/engine/renderer/object-3d";
 import {makeCat} from "@/modeling/cat";
 import {Sphere} from "@/engine/physics/aabb";
 import {Mesh} from "@/engine/renderer/mesh";
+import {jumpSound} from "@/sounds/jump-sound";
+import {theBestDamnCatHolyShit2} from "@/sounds/cat-sounds";
 
 export class ThirdPersonPlayer {
   isJumping = false;
+  isGroundedThisFrame = false;
   isGrounded = false;
+  wasGrounded = false;
   groundedTimer = 0;
   smoothedNormal = new EnhancedDOMPoint(0, 1, 0);
   chassisCenter = new EnhancedDOMPoint(0, 0, 0);
@@ -45,6 +49,8 @@ export class ThirdPersonPlayer {
   maxPitch = Math.PI / 2;
 
   update(octreeNode: OctreeNode) {
+    this.wasGrounded = this.isGrounded;
+
     this.updateVelocityFromControls();  // set x / z velocity based on input
 
     this.velocity.y -= 0.01; // gravity
@@ -109,6 +115,10 @@ export class ThirdPersonPlayer {
     this.camera.lookAt(this.mesh.position);
     this.camera.updateWorldMatrix();
 
+    if (!this.wasGrounded && this.isGrounded) {
+      jumpSound(true);
+    }
+
     this.updateAudio();
   }
 
@@ -118,17 +128,20 @@ export class ThirdPersonPlayer {
 
     findWallCollisionsFromList(this.nearbyFaces, this);
 
-    if (this.isGrounded) {
+    if (this.isGroundedThisFrame) {
       this.groundedTimer = 0;
-    } else {
-      this.groundedTimer++;
-      if (this.groundedTimer > 10) {
-        this.smoothedNormal = this.smoothedNormal.lerp(new EnhancedDOMPoint(0,1,0), 0.1).normalize_();
-        this.mesh.rotationMatrix = new DOMMatrix();
-        const axis = new EnhancedDOMPoint().crossVectors(this.mesh.up, this.smoothedNormal);
-        const radians = Math.acos(this.smoothedNormal.dot(this.mesh.up));
-        this.mesh.rotationMatrix.rotateAxisAngleSelf(axis.x, axis.y, axis.z, radsToDegrees(radians));
-      }
+      this.isGrounded = true;
+    } else { // here the player is in the air
+      this.groundedTimer++; // increase timer while they are in the air.
+      this.isGrounded = this.groundedTimer < 20; // if they are in the air longer than x frames, they are no longer grounded
+    }
+
+    if (this.isGrounded) {
+      this.smoothedNormal = this.smoothedNormal.lerp(new EnhancedDOMPoint(0,1,0), 0.1).normalize_();
+      this.mesh.rotationMatrix = new DOMMatrix();
+      const axis = new EnhancedDOMPoint().crossVectors(this.mesh.up, this.smoothedNormal);
+      const radians = Math.acos(this.smoothedNormal.dot(this.mesh.up));
+      this.mesh.rotationMatrix.rotateAxisAngleSelf(axis.x, axis.y, axis.z, radsToDegrees(radians));
     }
 
     this.chassisCenter.add_(this.velocity);
@@ -160,6 +173,7 @@ export class ThirdPersonPlayer {
       if (!this.isJumping) {
         this.velocity.y = 0.4;
         this.isJumping = true;
+        theBestDamnCatHolyShit2();
       }
     }
   }

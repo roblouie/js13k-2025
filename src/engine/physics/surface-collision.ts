@@ -3,34 +3,34 @@ import { EnhancedDOMPoint } from "@/engine/enhanced-dom-point";
 import {ThirdPersonPlayer} from "@/core/third-person-player";
 import {radsToDegrees} from "@/engine/helpers";
 
-export function findWallCollisionsFromList(walls: Set<Face>, player: ThirdPersonPlayer) {
-  player.isGrounded = false;
+export function findWallCollisionsFromList(surfaces: Set<Face>, player: ThirdPersonPlayer) {
+  player.isGroundedThisFrame = false;
 
-  for (const wall of walls) {
-    const newWallHit = testSphereTriangle(player.collisionSphere, wall);
+  for (const surface of surfaces) {
+    const newSurfaceHit = testSphereTriangle(player.collisionSphere, surface);
 
-    if (newWallHit) {
-      const depth = newWallHit.penetrationDepth + 0.00000001;
+    if (newSurfaceHit) {
+      const depth = newSurfaceHit.penetrationDepth;
 
-      if (wall.normal.y >= 0.6 && player.velocity.y < 0) {
-        player.smoothedNormal = player.smoothedNormal.lerp(wall.normal, 0.1).normalize_();
+      if (surface.normal.y >= 0.6 && player.velocity.y < 0) {
+        player.smoothedNormal = player.smoothedNormal.lerp(surface.normal, 0.1).normalize_();
         player.collisionSphere.center.y += depth;
         player.velocity.y = 0;
         player.isJumping = false;
-        player.isGrounded = true;
+        player.isGroundedThisFrame = true;
         player.mesh.isUsingLookAt = true;
         player.mesh.rotationMatrix = new DOMMatrix();
         const axis = new EnhancedDOMPoint().crossVectors(player.mesh.up, player.smoothedNormal);
         const radians = Math.acos(player.smoothedNormal.dot(player.mesh.up));
         player.mesh.rotationMatrix.rotateAxisAngleSelf(axis.x, axis.y, axis.z, radsToDegrees(radians));
       } else {
-        const correctionVector = newWallHit.penetrationNormal.scale_(depth);
+        const correctionVector = newSurfaceHit.penetrationNormal.scale_(depth);
         player.collisionSphere.center.add_(correctionVector);
 
-        const normalComponent = newWallHit.penetrationNormal.scale_(player.velocity.dot(newWallHit.penetrationNormal));
+        const normalComponent = newSurfaceHit.penetrationNormal.scale_(player.velocity.dot(newSurfaceHit.penetrationNormal));
         player.velocity.subtract(normalComponent);
 
-        if (wall.normal.y <= -0.6 && player.velocity.y > 0) {
+        if (surface.normal.y <= -0.6 && player.velocity.y > 0) {
           player.velocity.y = 0;
         }
       }
