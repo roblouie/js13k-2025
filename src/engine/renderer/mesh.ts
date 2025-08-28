@@ -6,7 +6,7 @@ export class Mesh extends Object3d {
   geometry: MoldableCubeGeometry;
   material: Material;
   frameA = 0;
-  frameB = 0;
+  frameB = 1;
   alpha = 0;
 
   constructor(geometry: MoldableCubeGeometry, material: Material) {

@@ -22,7 +22,7 @@ import {
   tubeCliffAndCave, worldWall
 } from "@/modeling/world-geography";
 import {bridge, frontRamp} from "@/modeling/bridges";
-import {radsToDegrees} from "@/engine/helpers";
+import {WitchManager} from "@/engine/witch-manager";
 
 export class GameState implements State {
   player: ThirdPersonPlayer;
@@ -30,11 +30,14 @@ export class GameState implements State {
 
   sfxPlayer = new SimplestMidiRev2();
 
+  witchManager: WitchManager;
+
   constructor() {
     this.sfxPlayer.volume_.connect(biquadFilter);
     const skybox = new Skybox(...skyboxes.test);
     skybox.bindGeometry();
     this.scene = new Scene(skybox);
+    this.witchManager = new WitchManager(this.scene);
     //this.player = new FreeCam(new Camera(Math.PI / 3, 16 / 9, 1, 500));
 
     this.player = new ThirdPersonPlayer(new Camera(Math.PI / 2.5, 16 / 9, 1, 700));
@@ -74,12 +77,6 @@ export class GameState implements State {
         // .modifyEachVertex((vert, index) => vert.y = heightmap[index])
       .spreadTextureCoords(5, 5).computeNormals().done_(), materials.cartoonGrass);
 
-    const raisedSideArea = new MoldableCubeGeometry(100, 16, 100)
-      .selectBy(vert => vert.z < 50)
-      .translate_(-100)
-      .all_()
-      .translate_(100, 8, 200)
-      .done_();
 
     const ramp = new MoldableCubeGeometry(10, 3, 60)
       .rotate_(Math.PI / 6, 0, 0)
@@ -136,6 +133,7 @@ export class GameState implements State {
     tmpl.innerHTML = '';
 
     this.player.update(this.octree);
+    this.witchManager.update();
     this.scene.updateWorldMatrix();
     render(this.player.camera, this.scene);
   }

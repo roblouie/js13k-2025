@@ -11,9 +11,6 @@ import {
   u_viewDirectionProjectionInverse,
 } from '@/engine/shaders/shaders';
 import { EnhancedDOMPoint } from '@/engine/enhanced-dom-point';
-import { ShadowCubeMapFbo } from '@/engine/renderer/cube-buffer-2';
-import { lightInfo } from '@/light-info';
-import {Skybox} from "@/engine/skybox";
 import {createOrtho, Object3d} from "@/engine/renderer/object-3d";
 
 // IMPORTANT! The index of a given buffer in the buffer array must match it's respective data location in the shader.
@@ -98,11 +95,9 @@ export function render(camera: Camera, scene: Scene) {
   gl.viewport(0, 0, depthTextureSize.x, depthTextureSize.y);
 
   scene.solidMeshes.forEach((mesh, index) => {
-    if (index > 0) {
       gl.bindVertexArray(mesh.geometry.vao!);
       gl.uniformMatrix4fv(lightPovMvpDepthLocation, false, lightPovMvpMatrix.multiply(mesh.worldMatrix).toFloat32Array());
       gl.drawElements(gl.TRIANGLES, mesh.geometry.getIndices()!.length, gl.UNSIGNED_SHORT, 0);
-    }
   });
   // End render shadow map
 

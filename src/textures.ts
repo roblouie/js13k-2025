@@ -13,8 +13,11 @@ export async function initTextures() {
   materials.marble = new Material({ texture: textureLoader.load_(await marbleFloor())});
   materials.cartoonRockWall = new Material({ texture: textureLoader.load_(await cartoonRockWall())});
   materials.cartoonGrass = new Material({ texture: textureLoader.load_(await cartoonGrass())});
-  materials.cobblestone = new Material({ texture: textureLoader.load_(await color('#bbb'))});
-  materials.white = new Material({ texture: textureLoader.load_(await color('#bbb'))});
+  materials.cobblestone = new Material({ texture: textureLoader.load_(await solidColor('#bbb'))});
+  materials.white = new Material({ texture: textureLoader.load_(await solidColor('#bbb'))});
+  materials.witchFace = new Material({ texture: textureLoader.load_(await witchFace())});
+  materials.witchSkin = new Material({ texture: textureLoader.load_(await solidColor('#63C328'))});
+  materials.witchClothes = new Material({ texture: textureLoader.load_(await solidColor('#902EBB'))})
 
   // NOTE: Right now in the fragment shader the texture depth is checked to determine
   // shadows, so that these don't cast shadows. That is currently set to depth >= 10.0f.
@@ -83,7 +86,7 @@ export function heightMap() {
 `, 100)
 }
 
-function color(color: string | number) {
+function solidColor(color: string | number) {
   return toImage(`<svg width="512" height="512" xmlns="http://www.w3.org/2000/svg"><rect x="0" y="0" width="100%" height="100%" fill="${color}"/></svg>`)
 }
 
@@ -153,6 +156,24 @@ function catMouth() {
   <line x1="312" y1="270" x2="392" y2="280" stroke="white" stroke-width="4"/>
 </svg>
 `);
+}
+
+function witchFace() {
+  const yPos = 220;
+  const color = 'white';
+  return toImage(`<svg width="512" height="512" xmlns="http://www.w3.org/2000/svg">
+    <rect x="0" y="0" width="100%" height="100%" fill="#63C328"/>
+    
+    <circle r="40" cx="160" cy="${yPos}" fill="${color}"  stroke-width="8" />
+    <circle r="40" cx="352" cy="${yPos}" fill="${color}"  stroke-width="8" />
+
+    <circle cx="352" cy="${yPos + 10}" r="30" fill="#black"/>
+    <circle cx="160" cy="${yPos + 10}" r="30" fill="#black"/>
+
+    <circle cx="256" cy="360" r="60" fill="white"/>
+    <rect x="0" y="300" width="100%" height="50" fill="#63C328"/>
+
+</svg>`)
 }
 
 function catEye() {
