@@ -18,6 +18,14 @@ export function isAABBOverlapping(a: AABB, b: AABB): boolean {
     && a.min.z <= b.max.z && a.max.z >= b.min.z;
 }
 
+export function areSpheresOverlapping(a: Sphere, b: Sphere): boolean {
+  const dx = a.center.x - b.center.x;
+  const dy = a.center.y - b.center.y;
+  const dz = a.center.z - b.center.z;
+  const r = a.radius + b.radius;
+  return dx*dx + dy*dy + dz*dz <= r*r;
+}
+
 export function isSphereOverlappingAABB(sphere: Sphere, box: AABB) {
   let d = 0;
 

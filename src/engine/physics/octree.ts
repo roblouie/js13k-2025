@@ -1,6 +1,7 @@
 import {Face} from "@/engine/physics/face";
 import {AABB, isAABBOverlapping, isSphereOverlappingAABB, Sphere} from "@/engine/physics/aabb";
 import {EnhancedDOMPoint} from "@/engine/enhanced-dom-point";
+import {Witch} from "@/engine/witch-manager";
 
 // TODO: In full js13k release, precomupte this and just put in the hard bounds in the base
 // octree, and delete th is function
@@ -21,27 +22,28 @@ export function computeSceneBounds(triangles: Face[]): AABB {
   return { min, max };
 }
 
-export function querySphere(node: OctreeNode, sphere: Sphere, results: Set<Face>) {
+export function querySphere(node: OctreeNode, sphere: Sphere, onLeaf: (node: OctreeNode) => void) {
   if (!isSphereOverlappingAABB(sphere, node.bounds)) {
     return;
   }
 
   if (!node.children) {
-    node.faces.forEach(face => results.add(face));
+    onLeaf(node);
   } else {
-    node.children.forEach(child => querySphere(child, sphere, results));
+    node.children.forEach(child => querySphere(child, sphere, onLeaf));
   }
 }
 
 export class OctreeNode {
   bounds: AABB;
   faces: Face[] = [];
+  witches?: Witch[];
   children: OctreeNode[] | null = null;
   depth: number;
 
   static MAX_TRIANGLES = 10;
   static MAX_DEPTH = 6;
-  static MIN_HEIGHT = 0.3;
+  static MIN_SIZE = 1;
 
   constructor(bounds: AABB, depth = 0) {
     this.bounds = bounds;
@@ -49,9 +51,9 @@ export class OctreeNode {
   }
 
   private isBigEnough() {
-    return (this.bounds.max.y - this.bounds.min.y) >= OctreeNode.MIN_HEIGHT
-      && (this.bounds.max.z - this.bounds.min.z) >= OctreeNode.MIN_HEIGHT
-      && (this.bounds.max.x - this.bounds.min.x) >= OctreeNode.MIN_HEIGHT;
+    return (this.bounds.max.y - this.bounds.min.y) >= OctreeNode.MIN_SIZE
+      && (this.bounds.max.z - this.bounds.min.z) >= OctreeNode.MIN_SIZE
+      && (this.bounds.max.x - this.bounds.min.x) >= OctreeNode.MIN_SIZE;
   }
 
   insert(face: Face) {

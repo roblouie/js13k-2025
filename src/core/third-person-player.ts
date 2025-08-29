@@ -12,6 +12,7 @@ import {Sphere} from "@/engine/physics/aabb";
 import {Mesh} from "@/engine/renderer/mesh";
 import {jumpSound} from "@/sounds/jump-sound";
 import {theBestDamnCatHolyShit2} from "@/sounds/cat-sounds";
+import {Witch} from "@/engine/witch-manager";
 
 export class ThirdPersonPlayer {
   isJumping = false;
@@ -41,26 +42,24 @@ export class ThirdPersonPlayer {
   angle = 0;
 
   nearbyFaces = new Set<Face>();
+  witchesToCheck = new Set<Witch>();
   collisionSphere = new Sphere(this.chassisCenter, 2);
 
   yaw = 0;
   pitch = 0;
   cameraSpeed = 0.05;
   maxPitch = Math.PI / 2;
+  isFrozen = false;
 
   update(octreeNode: OctreeNode) {
     this.wasGrounded = this.isGrounded;
 
-    this.updateVelocityFromControls();  // set x / z velocity based on input
+    if (!this.isFrozen) {
+      this.updateVelocityFromControls();  // set x / z velocity based on input
+    }
 
     this.velocity.y -= 0.01; // gravity
     this.chassisCenter.add_(this.velocity);  // move the player position by the velocity
-
-    // if the player falls through the floor, reset them
-    if (this.chassisCenter.y < -100) {
-      this.chassisCenter.y = 50;
-      this.velocity.y = 0;
-    }
 
     this.velocity.y = clamp(this.velocity.y, -1, 1);
     this.collideWithLevel(octreeNode); // do collision detection, if collision is found, feetCenter gets pushed out of the collision
@@ -68,8 +67,13 @@ export class ThirdPersonPlayer {
     this.mesh.position.set(this.chassisCenter); // at this point, feetCenter is in the correct spot, so draw the mesh there
     this.mesh.position.y -= 0.5; // move up by half height so mesh ends at feet position
 
-    tmpl.innerHTML += `${this.mesh.position.x}, ${this.mesh.position.y}, ${this.mesh.position.z}<br>`;
-    tmpl.innerHTML += `${this.mesh.children_[0].rotation_.x}, ${this.mesh.children_[0].rotation_.y}, ${this.mesh.children_[0].rotation_.z}<br>`;
+    // tmpl.innerHTML += `${this.mesh.position.x}, ${this.mesh.position.y}, ${this.mesh.position.z}<br>`;
+    // tmpl.innerHTML += `${this.mesh.children_[0].rotation_.x}, ${this.mesh.children_[0].rotation_.y}, ${this.mesh.children_[0].rotation_.z}<br>`;
+
+    // STOP HERE IF FROZEN
+    if (this.isFrozen) {
+      return;
+    }
 
     if (this.groundedTimer < 10 && !this.isJumping) {
       const mesh = this.mesh.children_[0] as Mesh;
@@ -124,7 +128,12 @@ export class ThirdPersonPlayer {
 
   collideWithLevel(octreeNode: OctreeNode) {
     this.nearbyFaces.clear();
-    querySphere(octreeNode, this.collisionSphere, this.nearbyFaces);
+    this.witchesToCheck.clear();
+    querySphere(octreeNode, this.collisionSphere, node => {
+      node.faces.forEach(face => this.nearbyFaces.add(face));
+      node.witches?.forEach(witch => this.witchesToCheck.add(witch));
+    });
+    tmpl.innerHTML += this.nearbyFaces.size;
 
     findWallCollisionsFromList(this.nearbyFaces, this);
 
@@ -169,12 +178,10 @@ export class ThirdPersonPlayer {
       this.velocity.z = 0;
     }
 
-    if (controls.isJump) {
-      if (!this.isJumping) {
-        this.velocity.y = 0.4;
-        this.isJumping = true;
-        jumpSound();
-      }
+    if (controls.isJump && this.isGrounded && !this.isJumping) {
+      this.velocity.y = 0.4;
+      this.isJumping = true;
+      jumpSound();
     }
   }
 

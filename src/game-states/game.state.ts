@@ -37,21 +37,11 @@ export class GameState implements State {
     const skybox = new Skybox(...skyboxes.test);
     skybox.bindGeometry();
     this.scene = new Scene(skybox);
-    this.witchManager = new WitchManager(this.scene);
     //this.player = new FreeCam(new Camera(Math.PI / 3, 16 / 9, 1, 500));
 
     this.player = new ThirdPersonPlayer(new Camera(Math.PI / 2.5, 16 / 9, 1, 700));
-  }
 
-
-  // TODO: remember to update this from the computed octree when level design finished
-  octree = new OctreeNode({
-    max: {x: 512, y: 12, z: 512, w: 1},
-    min: { x: -512, y: -3, z: -512 }
-  }, 0);
-
-  async onEnter() {
-    const heightmap = await heightMap();
+    // const heightmap = await heightMap();
     const floorGeo = new MoldableCubeGeometry(512, 1, 512, 63, 1, 63, 1)
     //const texDepths = new Array(256 * 256).fill(materials.cartoonGrass.texture.id);
 
@@ -75,7 +65,7 @@ export class GameState implements State {
     const floor = new Mesh(
       floorGeo
         // .modifyEachVertex((vert, index) => vert.y = heightmap[index])
-      .spreadTextureCoords(5, 5).computeNormals().done_(), materials.cartoonGrass);
+        .spreadTextureCoords(5, 5).computeNormals().done_(), materials.cartoonGrass);
 
 
     const ramp = new MoldableCubeGeometry(10, 3, 60)
@@ -92,7 +82,7 @@ export class GameState implements State {
 
     // const features = rampToJump();
 
-    const path = await pathTest();
+    // const path = await pathTest();
 
     // let val = 0;
     // for (let i = 3; i < path.data.length; i+=4) {
@@ -127,13 +117,22 @@ export class GameState implements State {
     const worldBounds = computeSceneBounds(faces);
     this.octree = new OctreeNode(worldBounds, 0);
     faces.forEach(face => this.octree.insert(face));
+
+    this.witchManager = new WitchManager(this.scene, this.octree);
   }
+
+
+  // TODO: remember to update this from the computed octree when level design finished
+  octree = new OctreeNode({
+    max: {x: 512, y: 12, z: 512, w: 1},
+    min: { x: -512, y: -3, z: -512 }
+  }, 0);
 
   onUpdate() {
     tmpl.innerHTML = '';
 
     this.player.update(this.octree);
-    this.witchManager.update();
+    this.witchManager.update(this.player);
     this.scene.updateWorldMatrix();
     render(this.player.camera, this.scene);
   }

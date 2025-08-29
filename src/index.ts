@@ -12,7 +12,6 @@ tmpl.innerHTML = `<div style="font-size: 30px; text-align: center; position: abs
     await initTextures();
 
     const gameState = new GameState();
-    gameState.onEnter();
 
     draw(0);
 
