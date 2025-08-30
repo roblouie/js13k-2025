@@ -48,7 +48,7 @@ export class ThirdPersonPlayer {
   yaw = 0;
   pitch = 0;
   cameraSpeed = 0.05;
-  maxPitch = Math.PI / 2;
+  maxPitch = Math.PI / 3;
   isFrozen = false;
 
   update(octreeNode: OctreeNode) {

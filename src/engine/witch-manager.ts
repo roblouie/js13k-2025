@@ -55,7 +55,6 @@ export class WitchManager {
     // 7 - mountaintop witch
     this.witches.push(new Witch(makeWitch(new EnhancedDOMPoint(-105, 194.5, -106.5), new EnhancedDOMPoint(0, -180))));
 
-
     this.sceneRef.add_(...this.witches.flatMap(witch => [witch.mesh, witch.orb]));
 
     this.witches.forEach(witch => {
@@ -66,13 +65,6 @@ export class WitchManager {
         node.witches.push(witch);
         witch.octreeNodes.push(node);
       });
-
-      // const testSphere = new MoldableCubeGeometry(4, 4, 4, 4, 4, 4)
-      //   .spherify(10)
-      //   .translate_(witch.mesh.position.x, witch.mesh.position.y, witch.mesh.position.z)
-      //   .spreadTextureCoords(2, 2)
-      //   .done_();
-      // this.sceneRef.add_(new Mesh(testSphere, materials.bars))
     });
   }
 
@@ -91,8 +83,6 @@ export class WitchManager {
         witch.mesh.frameB = witch.mesh.frameB === 0 ? 1 : 0;
       }
     });
-
-    // maybe move this into game state as it feels jank to modify player here, but doing it for now for testing
 
     if (this.activeSavingWitch) {
       player.isFrozen = true;
@@ -117,6 +107,7 @@ export class WitchManager {
         this.activeSavingWitch.octreeNodes.forEach(node => node.witches = node.witches?.filter(w => w !== this.activeSavingWitch));
         player.isFrozen = false;
         player.camera.position.set(this.originalPlayerCameraPosition);
+        player.camera.lookAt(player.mesh.position);
         this.activeSavingWitch = undefined;
         this.witchSavingTimer = 0;
       }
