@@ -9,6 +9,13 @@ import {OctreeNode, querySphere} from "@/engine/physics/octree";
 import {ThirdPersonPlayer} from "@/core/third-person-player";
 import {theBestDamnCatHolyShit2} from "@/sounds/cat-sounds";
 import {playPop} from "@/sounds/bubble-pop";
+import {
+  particleRandomizeHorizontal,
+  particles,
+  particleSpreadRadius,
+  randomNegativeOneOne,
+  spawnParticles
+} from "@/engine/particles";
 
 export class Witch {
   mesh: Mesh;
@@ -72,6 +79,7 @@ export class WitchManager {
   activeSavingWitch?: Witch;
   originalPlayerCameraPosition = new EnhancedDOMPoint();
   cameraPositionTarget = new EnhancedDOMPoint();
+  starParticlePosition = new EnhancedDOMPoint();
 
   update(player: ThirdPersonPlayer) {
     this.witches.forEach(witch => {
@@ -97,18 +105,67 @@ export class WitchManager {
 
       if (this.witchSavingTimer === 100) {
         playPop();
+        for (let i = 0; i < 30; i++) {
+          particles.push({
+            position: particleSpreadRadius(this.activeSavingWitch.mesh.position, 4),
+            size: 50 + Math.random() * 10,
+            life: 1.0,
+            velocity: particleRandomizeHorizontal(0.4, 0.4),
+            sizeModifier: -1,
+            lifeModifier: 0.01,
+            isAffectedByGravity: true,
+          });
+        }
         this.sceneRef.remove_(this.activeSavingWitch.orb);
       }
 
+      if (this.witchSavingTimer === 110) {
+        const pos = this.activeSavingWitch.mesh.position.clone_();
+        pos.y += 4;
+        for (let i = 0; i < 5; i++) {
+          particles.push({
+            position: particleSpreadRadius(pos, 1.5),
+            size: 1 + Math.random(),
+            life: 4,
+            velocity: new EnhancedDOMPoint(randomNegativeOneOne() * 0.04, 0.04, randomNegativeOneOne() * 0.04),
+            sizeModifier: 1,
+            lifeModifier: 0.03,
+            isAffectedByGravity: false,
+          });
+        }
+      }
 
-      if (this.witchSavingTimer > 300) {
+      if (this.witchSavingTimer === 200) {
+        playPop(); // TODO: Replace with sparkle effect
+        for (let i = 0; i < 50; i++) {
+          particles.push({
+            position: particleSpreadRadius(this.starParticlePosition, 2),
+            size: 20 + Math.random() * 10,
+            life: 3.0,
+            velocity: particleRandomizeHorizontal(0.01, 0.13),
+            sizeModifier: 1,
+            lifeModifier: 0.03,
+            isAffectedByGravity: false,
+          });
+        }
+      }
+
+      if (this.witchSavingTimer > 230) {
+        this.activeSavingWitch.mesh.scale_.x *= 0.8;
+        this.activeSavingWitch.mesh.scale_.z *= 0.8;
+      }
+
+      if (this.witchSavingTimer === 250) {
         this.witches.filter(w => w !== this.activeSavingWitch);
         this.sceneRef.remove_(this.activeSavingWitch.mesh);
         this.activeSavingWitch.octreeNodes.forEach(node => node.witches = node.witches?.filter(w => w !== this.activeSavingWitch));
+      }
+
+      if (this.witchSavingTimer === 300) {
+        this.activeSavingWitch = undefined;
         player.isFrozen = false;
         player.camera.position.set(this.originalPlayerCameraPosition);
         player.camera.lookAt(player.mesh.position);
-        this.activeSavingWitch = undefined;
         this.witchSavingTimer = 0;
       }
       player.camera.updateWorldMatrix();
@@ -118,6 +175,8 @@ export class WitchManager {
           // for testing, just remove the witch from the nodes, scene, and the witch manager itself
           this.originalPlayerCameraPosition = player.camera.position.clone_();
           this.cameraPositionTarget = new EnhancedDOMPoint().set(witch.mesh.worldMatrix.transformPoint(new EnhancedDOMPoint(0,0,15)));
+          this.starParticlePosition = new EnhancedDOMPoint().set(witch.mesh.worldMatrix.transformPoint(new EnhancedDOMPoint(0,0,6)));
+          this.starParticlePosition.y -= 5;
           this.activeSavingWitch = witch;
         }
       });

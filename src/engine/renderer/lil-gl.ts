@@ -1,7 +1,14 @@
 import {
   depth_fragment_glsl,
   depth_vertex_glsl,
-  fragment_glsl, shadowCubeMap, shadowMap, skybox_fragment_glsl, skybox_vertex_glsl, uSampler, vertex_glsl
+  fragment_glsl, particle_fragment_glsl,
+  particle_vertex_glsl,
+  shadowCubeMap,
+  shadowMap,
+  skybox_fragment_glsl,
+  skybox_vertex_glsl,
+  uSampler,
+  vertex_glsl
 } from '@/engine/shaders/shaders';
 
 export class LilGl {
@@ -9,6 +16,7 @@ export class LilGl {
   program: WebGLProgram;
   skyboxProgram: WebGLProgram;
   depthProgram: WebGLProgram;
+  particleProgram: WebGLProgram;
 
  constructor() {
    // @ts-ignore
@@ -24,6 +32,10 @@ export class LilGl {
    const depthVertex = this.createShader(this.gl.VERTEX_SHADER, depth_vertex_glsl);
    const depthFragment = this.createShader(this.gl.FRAGMENT_SHADER, depth_fragment_glsl);
    this.depthProgram = this.createProgram(depthVertex, depthFragment);
+
+   const particleVertex = this.createShader(this.gl.VERTEX_SHADER, particle_vertex_glsl);
+   const particleFragment = this.createShader(this.gl.FRAGMENT_SHADER, particle_fragment_glsl);
+   this.particleProgram = this.createProgram(particleVertex, particleFragment);
 
    const shadowMapLocation = this.gl.getUniformLocation(this.program, shadowMap);
    const textureLocation = this.gl.getUniformLocation(this.program, uSampler);

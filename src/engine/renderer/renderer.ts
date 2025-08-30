@@ -8,10 +8,11 @@ import {
   modelviewProjection,
   normalMatrix,
   u_skybox,
-  u_viewDirectionProjectionInverse,
+  u_viewDirectionProjectionInverse, uViewProj,
 } from '@/engine/shaders/shaders';
 import { EnhancedDOMPoint } from '@/engine/enhanced-dom-point';
 import {createOrtho, Object3d} from "@/engine/renderer/object-3d";
+import {wireParticles} from "@/engine/particles";
 
 // IMPORTANT! The index of a given buffer in the buffer array must match it's respective data location in the shader.
 // This allows us to use the index while looping through buffers to bind the attributes. So setting a buffer
@@ -26,7 +27,7 @@ export const enum AttributeLocation {
 
 gl.enable(gl.CULL_FACE);
 gl.enable(gl.DEPTH_TEST);
-// gl.enable(gl.BLEND);
+gl.enable(gl.BLEND);
 gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
 
@@ -80,6 +81,11 @@ const alphaLocation = gl.getUniformLocation(lilgl.program, alpha);
 const frameALocation = gl.getUniformLocation(lilgl.program, frameA);
 const frameBLocation = gl.getUniformLocation(lilgl.program, frameB);
 
+// particle setup
+const [particleVao, drawParticles] = wireParticles();
+const particleViewProjectionMatrixLocation = gl.getUniformLocation(lilgl.particleProgram, uViewProj);
+// end particle setup
+
 export function render(camera: Camera, scene: Scene) {
   const viewMatrix = camera.worldMatrix.inverse();
   const viewMatrixCopy = viewMatrix.scale(1, 1, 1);
@@ -102,8 +108,9 @@ export function render(camera: Camera, scene: Scene) {
   // End render shadow map
 
 
+
+
   gl.useProgram(lilgl.program);
-  gl.enable(gl.BLEND);
 
   // Render solid meshes first
   gl.activeTexture(gl.TEXTURE0);
@@ -111,7 +118,6 @@ export function render(camera: Camera, scene: Scene) {
 
   gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
   gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-  gl.cullFace(gl.BACK);
   gl.clearColor(0.0, 0.0, 0.0, 0.0);
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
@@ -133,9 +139,10 @@ export function render(camera: Camera, scene: Scene) {
     gl.drawElements(gl.TRIANGLES, mesh.geometry.getIndices()!.length, gl.UNSIGNED_SHORT, 0);
   });
 
+
+
   gl.depthFunc(gl.LEQUAL);
   gl.useProgram(lilgl.skyboxProgram);
-  gl.enable(gl.BLEND);
   gl.uniform1i(skyboxLocation, 0);
   viewMatrixCopy.m41 = 0;
   viewMatrixCopy.m42 = 0;
@@ -145,6 +152,18 @@ export function render(camera: Camera, scene: Scene) {
   gl.bindVertexArray(scene.skybox.vao);
   gl.drawArrays(gl.TRIANGLES, 0, 6);
   gl.depthFunc(gl.LESS);
+
+  // --------------Particle test start
+  gl.useProgram(lilgl.particleProgram);
+  gl.bindVertexArray(particleVao);
+
+// bind uniforms
+  gl.uniformMatrix4fv(particleViewProjectionMatrixLocation, false, viewProjectionMatrix.toFloat32Array());
+
+// draw
+  gl.drawArrays(gl.POINTS, 0, drawParticles());
+  //------------- Particle test end
+
 
   // Unbinding the vertex array being used to make sure the last item drawn isn't still bound on the next draw call.
   // In theory this isn't necessary but avoids bugs.
