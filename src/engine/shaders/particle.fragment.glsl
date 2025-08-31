@@ -5,13 +5,14 @@ precision highp float;
 //]
 
 in float vLife;
+in float vDepth;
 out vec4 fragColor;
 
-uniform sampler2D uTex;
+uniform mediump sampler2DArray uSampler;
 
 void main() {
-    // gl_PointCoord is vec2(0..1)
-    vec4 texColor = vec4(1.0, 0.0, 0.0, 1.0);
+    // gl_PointCoord is vec2(0..1)vec3(gl_PointCoord, 0.1)
+    vec4 texColor = texture(uSampler, vec3(gl_PointCoord, vDepth));
 
     // fade with life
     float alpha = texColor.a * vLife;

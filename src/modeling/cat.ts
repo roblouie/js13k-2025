@@ -5,7 +5,7 @@ import {Mesh} from "@/engine/renderer/mesh";
 const bodyRadius = 2;
 
 function catHead(dipNRot = 0) {
-  const eyes = new MoldableCubeGeometry(3.8, 0.01, 1.6, 1, 1, 1)
+  const eyes = new MoldableCubeGeometry(3.8, 0.01, 3.2, 1, 1, 1)
     .texturePerSide(materials.catEye,
       materials.nothing, materials.nothing,materials.nothing,materials.nothing,materials.nothing,)
 

@@ -24,7 +24,11 @@ export async function initTextures() {
   // If any materials are added after this, anythign using them won't cast shadows
   materials.catEye = new Material({ texture: textureLoader.load_(await catEye())});
   materials.catMouth = new Material({ texture: textureLoader.load_(await catMouth())});
-  materials.witchClothes = new Material({ texture: textureLoader.load_(await solidColor('#902EBB'))})
+  materials.witchClothes = new Material({ texture: textureLoader.load_(await solidColor('#902EBB'))});
+  materials.sparkle = new Material({ texture: textureLoader.load_(await emojiParticle('✨', 'filter: hue-rotate(160deg)'))});
+  materials.heart = new Material({ texture: textureLoader.load_(await emojiParticle('❤️'))});
+  materials.bubbles = new Material({ texture: textureLoader.load_(await emojiParticle('🫧'))});
+
 
   const box = await drawSkyboxHor();
   const slicer = horizontalSkyboxSlice(box);
@@ -32,8 +36,8 @@ export async function initTextures() {
   skyboxes.test = [
     horSlices[3],
     horSlices[1],
-    await toImage(drawSkyboxTopBottom('#248')),
-    await toImage(drawSkyboxTopBottom('#094009')),
+    await solidColor('#248', skyboxSize),
+    await solidColor('#094009', skyboxSize),
     horSlices[2],
     horSlices[0],
   ];
@@ -41,53 +45,48 @@ export async function initTextures() {
   textureLoader.bindTextures();
 }
 
+function emojiParticle(emoji: string, style = '') {
+  return toImage(`<text x="50%" y="50%" font-size="400" text-anchor="middle" dominant-baseline="middle" style="${style}">${emoji}</text>`)
+}
+
 function bars() {
-  return toImage(`<svg width="512" height="512" xmlns="http://www.w3.org/2000/svg">
-    <rect width="50%" height="100%" x="25%" fill="#fff"/>
-  </svg>`);
+  return toImage(`<rect width="50%" height="100%" x="25%" fill="#fff"/>`);
 }
 
 export function cartoonRockWall() {
-  return toImage(`<svg width="512" height="512" xmlns="http://www.w3.org/2000/svg">
-    <filter id="m" width="512" height="512" x="-0.1" y="-0.1">
+  return toImage(`<filter id="m" width="512" height="512" x="-0.1" y="-0.1">
         <feTurbulence type="fractalNoise" baseFrequency=".005" numOctaves="7" stitchTiles="stitch"/>
         <feDiffuseLighting diffuseConstant="6" surfaceScale="4" lighting-color="#7B3F00" color-interpolation="sRGB">
             <feDistantLight elevation="4" azimuth="170"/>
         </feDiffuseLighting>
     </filter>
-    <rect width="100%" height="100%" filter="url(#m)"/>
-</svg>`)
+    <rect width="100%" height="100%" filter="url(#m)"/>`)
 }
 
 
 function marbleFloor() {
-  return toImage(`<svg width="512" height="512" xmlns="http://www.w3.org/2000/svg"><pattern id="a" width="256" height="256" patternUnits="userSpaceOnUse"><circle r="290" fill="#fff"/><path d="M0 0h128v256h128V128H0z"/></pattern><filter id="b"><feTurbulence baseFrequency=".04" numOctaves="5"/><feColorMatrix values="1 -1 0 0 0 1 -1 0 0 0 1 -1 0 0 0 0 0 0 0 0.3"/><feBlend in="SourceGraphic" mode="soft-light"/></filter><rect width="100%" height="100%" fill="url(#a)" filter="url(#b)"/></svg>`)
+  return toImage(`<pattern id="a" width="256" height="256" patternUnits="userSpaceOnUse"><circle r="290" fill="#fff"/><path d="M0 0h128v256h128V128H0z"/></pattern><filter id="b"><feTurbulence baseFrequency=".04" numOctaves="5"/><feColorMatrix values="1 -1 0 0 0 1 -1 0 0 0 1 -1 0 0 0 0 0 0 0 0.3"/><feBlend in="SourceGraphic" mode="soft-light"/></filter><rect width="100%" height="100%" fill="url(#a)" filter="url(#b)"/>`)
 }
 
 function wood() {
-  return toImage(`<svg width="512" height="512" xmlns="http://www.w3.org/2000/svg"><filter id="a"><feTurbulence type="fractalNoise" baseFrequency="0.1, 0.007" numOctaves="6" stitchTiles="stitch"/><feComposite in="s" operator="arithmetic" k2=".5" k3=".6"/><feComponentTransfer><feFuncA type="table" tableValues="0, .1, .2, .3, .4, .2, .4"/></feComponentTransfer><feDiffuseLighting color-interpolation-filters="sRGB" surfaceScale="3" lighting-color="#6e3f2b"><feDistantLight azimuth="110" elevation="48"/></feDiffuseLighting></filter><rect height="100%" width="100%" filter="url(#a)"/></svg>`)
+  return toImage(`<filter id="a"><feTurbulence type="fractalNoise" baseFrequency="0.1, 0.007" numOctaves="6" stitchTiles="stitch"/><feComposite in="s" operator="arithmetic" k2=".5" k3=".6"/><feComponentTransfer><feFuncA type="table" tableValues="0, .1, .2, .3, .4, .2, .4"/></feComponentTransfer><feDiffuseLighting color-interpolation-filters="sRGB" surfaceScale="3" lighting-color="#6e3f2b"><feDistantLight azimuth="110" elevation="48"/></feDiffuseLighting></filter><rect height="100%" width="100%" filter="url(#a)"/>`)
 }
 
 export function metals() {
-  return toImage(`
-<svg width="512" height="512" xmlns="http://www.w3.org/2000/svg">
-<filter id="b">
+  return toImage(`<filter id="b">
 <feTurbulence baseFrequency="0.01,0.0008" numOctaves="2" seed="23" type="fractalNoise" stitchTiles="stitch" />
 <feColorMatrix values="0.01 0.01 0.01 0 0 0.01 0.01 0.01 0 0 0.01 0.01 0.01 0 0 1 1 1 1 1"/>
 </filter>
-<rect x="0" y="0" width="100%" height="100%" filter="url(#b)"/></svg>`);
+<rect x="0" y="0" width="100%" height="100%" filter="url(#b)"/>`);
 }
 
 export function heightMap() {
-  return toHeightmap(`<svg width="64" height="64" xmlns="http://www.w3.org/2000/svg">
-    <rect width="100%" height="100%" fill="#808080"/>
-    <circle r="10" cx="32" cy="43" fill="#999"/>
-</svg>
-`, 100)
+  return toHeightmap(`<rect width="100%" height="100%" fill="#808080"/>
+    <circle r="10" cx="32" cy="43" fill="#999"/>`, 64, 100)
 }
 
-function solidColor(color: string | number) {
-  return toImage(`<svg width="512" height="512" xmlns="http://www.w3.org/2000/svg"><rect x="0" y="0" width="100%" height="100%" fill="${color}"/></svg>`)
+function solidColor(color: string | number, size = 512) {
+  return toImage(`<rect x="0" y="0" width="100%" height="100%" fill="${color}"/>`, size);
 }
 
 function drawSkyboxHor() {
@@ -107,11 +106,7 @@ function drawSkyboxHor() {
     </filter>
     <g><rect filter="url(#f)" height="100%" width="100%" y="500" fill="#094009"/></g>`
 
-  return toImage(`<svg style="width: 100%;" width="${skyboxSize * 4}" height="${skyboxSize}"  xmlns="http://www.w3.org/2000/svg">${element}</svg>`);
-}
-
-function drawSkyboxTopBottom(color: string) {
-  return `<svg width="${skyboxSize}" height="${skyboxSize}" style="background: ${color}" xmlns="http://www.w3.org/2000/svg"></svg>`;
+  return toImage(element, skyboxSize * 4, skyboxSize);
 }
 
 function horizontalSkyboxSlice(image: CanvasImageSource) {
@@ -128,8 +123,7 @@ function horizontalSkyboxSlice(image: CanvasImageSource) {
 }
 
 function catMouth() {
-  return toImage(`<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
-  <path d="M256 210
+  return toImage(`<path d="M256 210
            Q236 220 226 240
            Q256 250 286 240
            Q276 220 256 210 Z"
@@ -153,16 +147,13 @@ function catMouth() {
 
   <line x1="312" y1="250" x2="392" y2="240" stroke="white" stroke-width="4"/>
   <line x1="312" y1="260" x2="392" y2="260" stroke="white" stroke-width="4"/>
-  <line x1="312" y1="270" x2="392" y2="280" stroke="white" stroke-width="4"/>
-</svg>
-`);
+  <line x1="312" y1="270" x2="392" y2="280" stroke="white" stroke-width="4"/>`);
 }
 
 function witchFace() {
   const yPos = 220;
   const color = 'white';
-  return toImage(`<svg width="512" height="512" xmlns="http://www.w3.org/2000/svg">
-    <rect x="0" y="0" width="100%" height="100%" fill="#63C328"/>
+  return toImage(`<rect x="0" y="0" width="100%" height="100%" fill="#63C328"/>
     
     <circle r="40" cx="160" cy="${yPos}" fill="${color}"  stroke-width="8" />
     <circle r="40" cx="352" cy="${yPos}" fill="${color}"  stroke-width="8" />
@@ -171,25 +162,20 @@ function witchFace() {
     <circle cx="160" cy="${yPos + 10}" r="30" fill="#black"/>
 
     <circle cx="256" cy="360" r="60" fill="white"/>
-    <rect x="0" y="300" width="100%" height="50" fill="#63C328"/>
-
-</svg>`)
+    <rect x="0" y="300" width="100%" height="50" fill="#63C328"/>`);
 }
 
 function catEye() {
-  return toImage(`<svg width="512" height="512" style="transform: scaleY(2)" xmlns="http://www.w3.org/2000/svg">
-    <circle r="75" cx="160" cy="256" fill="limegreen" stroke="black" stroke-width="8" />
+  return toImage(`<circle r="75" cx="160" cy="256" fill="limegreen" stroke="black" stroke-width="8" />
 
   <ellipse cx="160" cy="256" rx="25" ry="70" fill="black"/>
   
     <circle r="75" cx="352" cy="256" fill="limegreen" stroke="black" stroke-width="8" />
-  <ellipse cx="352" cy="256" rx="25" ry="70" fill="black"/>
-</svg>`);
+  <ellipse cx="352" cy="256" rx="25" ry="70" fill="black"/>`);
 }
 
 export function cartoonGrass() {
-  return toImage(`<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512">
-    <filter id="filter">
+  return toImage(`<filter id="filter">
         <feTurbulence type="fractalNoise" baseFrequency=".01" numOctaves="8"/>
         
         <feDiffuseLighting color-interpolation-filters="sRGB" lighting-color="#0a0" surfaceScale="-3" result="d">
@@ -197,8 +183,7 @@ export function cartoonGrass() {
         </feDiffuseLighting>
        
     </filter>
-    <rect width="100%" height="100%" filter="url(#filter)" />
-</svg>`)
+    <rect width="100%" height="100%" filter="url(#filter)" />`)
 }
 
 // function cobblestonePath() {
@@ -228,8 +213,7 @@ export function cartoonGrass() {
 // }
 
 export function pathTest() {
-  return toImageData(`<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" style="filter: blur(2px)">
-<filter id="blurMe">
+  return toImageData(`<filter id="blurMe">
     <feGaussianBlur in="SourceGraphic" stdDeviation="6" />
   </filter>
    
@@ -237,6 +221,5 @@ export function pathTest() {
     d="M 10 80 Q 52.5 10, 95 80 T 180 80"
     stroke="white"
         stroke-width="10px"
-    fill="transparent" />
-</svg>`)
+    fill="transparent" />`)
 }

@@ -99,29 +99,32 @@ export class WitchManager {
       player.camera.position.set(this.cameraPositionTarget)
       player.camera.lookAt(this.activeSavingWitch.mesh.position);
 
-      if (this.witchSavingTimer === 30) {
+      if (this.witchSavingTimer === 10) {
         theBestDamnCatHolyShit2();
       }
 
-      if (this.witchSavingTimer === 100) {
+      // BUBBLE POP
+      if (this.witchSavingTimer === 80) {
         playPop();
         for (let i = 0; i < 30; i++) {
           particles.push({
             position: particleSpreadRadius(this.activeSavingWitch.mesh.position, 4),
-            size: 50 + Math.random() * 10,
+            size: 50 + Math.random() * 30,
             life: 1.0,
             velocity: particleRandomizeHorizontal(0.4, 0.4),
             sizeModifier: -1,
             lifeModifier: 0.01,
             isAffectedByGravity: true,
+            textureId: materials.bubbles.texture.id,
           });
         }
         this.sceneRef.remove_(this.activeSavingWitch.orb);
       }
 
-      if (this.witchSavingTimer === 110) {
+      // HEARTS
+      if (this.witchSavingTimer === 90) {
         const pos = this.activeSavingWitch.mesh.position.clone_();
-        pos.y += 4;
+        pos.y += 3;
         for (let i = 0; i < 5; i++) {
           particles.push({
             position: particleSpreadRadius(pos, 1.5),
@@ -131,26 +134,29 @@ export class WitchManager {
             sizeModifier: 1,
             lifeModifier: 0.03,
             isAffectedByGravity: false,
+            textureId: materials.heart.texture.id,
           });
         }
       }
 
-      if (this.witchSavingTimer === 200) {
-        playPop(); // TODO: Replace with sparkle effect
-        for (let i = 0; i < 50; i++) {
+      // SPARKLES
+      if (this.witchSavingTimer > 160 && this.witchSavingTimer < 200) {
+        // playPop(); // TODO: Replace with sparkle effect
+        // for (let i = 0; i < 50; i++) {
           particles.push({
             position: particleSpreadRadius(this.starParticlePosition, 2),
-            size: 20 + Math.random() * 10,
+            size: 10 + Math.random() * 10,
             life: 3.0,
-            velocity: particleRandomizeHorizontal(0.01, 0.13),
-            sizeModifier: 1,
+            velocity: particleRandomizeHorizontal(0.01, 0.15),
+            sizeModifier: 2 + Math.random(),
             lifeModifier: 0.03,
             isAffectedByGravity: false,
+            textureId: materials.sparkle.texture.id,
           });
-        }
+        // }
       }
 
-      if (this.witchSavingTimer > 230) {
+      if (this.witchSavingTimer > 180) {
         this.activeSavingWitch.mesh.scale_.x *= 0.8;
         this.activeSavingWitch.mesh.scale_.z *= 0.8;
       }

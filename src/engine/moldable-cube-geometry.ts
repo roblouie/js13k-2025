@@ -81,7 +81,7 @@ export class MoldableCubeGeometry {
           vector[w] = depthHalf;
 
           this.vertices.push(vector);
-          uvs.push(ix / gridX, 1 - iy / gridY);
+          uvs.push(ix / gridX, iy / gridY);
         }
       }
 
