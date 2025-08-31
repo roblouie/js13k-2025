@@ -42,7 +42,7 @@ export class WitchManager {
     this.sceneRef = sceneRef;
 
     // 1 - Map start witch
-    this.witches.push(new Witch(makeWitch(new EnhancedDOMPoint(103, 6.5, 125), new EnhancedDOMPoint(0, 50, 0))));
+    this.witches.push(new Witch(makeWitch(new EnhancedDOMPoint(123, 12, 151), new EnhancedDOMPoint(0, 50, 0))));
 
     // 2 - hedge maze witch
     this.witches.push(new Witch(makeWitch(new EnhancedDOMPoint(-202, 6.5, 195), new EnhancedDOMPoint(0, 37))));

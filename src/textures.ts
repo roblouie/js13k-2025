@@ -85,10 +85,10 @@ export function metals() {
 
 export function heightMap() {
   return toHeightmap(`<filter id="b">
-    <feTurbulence baseFrequency="0.2,0.2" numOctaves="1" seed="3" type="fractalNoise" stitchTiles="stitch" />
-    <feColorMatrix values="0,0,0,.4,0,
-                           0,0,0,.4,0,
-                           0,0,0,.4,0,
+    <feTurbulence baseFrequency="0.12,0.2" numOctaves="1" seed="7" type="fractalNoise" stitchTiles="stitch" />
+    <feColorMatrix values="0,0,0,.5,0,
+                           0,0,0,.5,0,
+                           0,0,0,.5,0,
                            1,1,1,0,0"/>
     </filter>
         <rect x="0" y="0" width="100%" height="100%" fill="#808080"/>
@@ -97,7 +97,7 @@ export function heightMap() {
 <!--    <rect x="23" y="10" width="12" height="10" fill="#808080"/>-->
 <!--        <rect x="0" y="9" width="12" height="10" fill="#888"/>-->
 
-`, 32, 40)
+`, 32, 45)
 }
 
 function solidColor(color: string | number, size = 512) {
@@ -119,7 +119,7 @@ function drawSkyboxHor() {
         <feTurbulence baseFrequency="0.008,0" numOctaves="2" seed="15" stitchTiles="stitch" type="fractalNoise" />
         <feDisplacementMap in="SourceGraphic" scale="100"/>
     </filter>
-    <g><rect filter="url(#f)" height="100%" width="100%" y="500" fill="#094009"/></g>`
+    <g><rect filter="url(#f)" height="100%" width="100%" y="700" fill="#094009"/></g>`
 
   return toImage(element, skyboxSize * 4, skyboxSize);
 }
