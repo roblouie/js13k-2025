@@ -14,7 +14,7 @@ export function findWallCollisionsFromList(surfaces: Set<Face>, player: ThirdPer
 
       // velocity y check for sphere interecting with opposite side of surface
       // and if you're jumping upward, this never matters
-      if (surface.normal.y >= 0.6 && player.velocity.y <= 0) {
+      if (surface.normal.y >= 0.7 && player.velocity.y <= 0) {
         player.updatePlayerPitchRoll(surface.normal, 0.3)
         player.collisionSphere.center.y += depth;
         player.velocity.y = 0;
@@ -27,7 +27,7 @@ export function findWallCollisionsFromList(surfaces: Set<Face>, player: ThirdPer
         const normalComponent = newSurfaceHit.penetrationNormal.scale_(player.velocity.dot(newSurfaceHit.penetrationNormal));
         player.velocity.subtract(normalComponent);
 
-        if (surface.normal.y < 0.6 && surface.normal.y >= 0.3) {
+        if (surface.normal.y < 0.7 && surface.normal.y >= 0.3) {
           player.isGroundedThisFrame = true;
           player.isJumping = false;
           player.updatePlayerPitchRoll(surface.normal, 0.3);

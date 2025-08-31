@@ -65,7 +65,7 @@ export class ThirdPersonPlayer {
     this.velocity.y -= 0.017; // gravity
     this.chassisCenter.add_(this.velocity);  // move the player position by the velocity
 
-    this.velocity.y = clamp(this.velocity.y, -2, 2);
+    this.velocity.y = clamp(this.velocity.y, -1, 1);
     this.collideWithLevel(octreeNode); // do collision detection, if collision is found, feetCenter gets pushed out of the collision
 
     this.mesh.position.set(this.chassisCenter); // at this point, feetCenter is in the correct spot, so draw the mesh there
@@ -81,7 +81,7 @@ export class ThirdPersonPlayer {
 
     if (this.groundedTimer < 10 && !this.isJumping && controls.inputDirection.magnitude > 0) {
       const mesh = this.mesh.children_[0] as Mesh;
-      mesh.alpha += this.velocity.magnitude / 2;
+      mesh.alpha += this.velocity.magnitude * 0.4;
 
       if (mesh.alpha >= 1) {
         mesh.alpha = 0;
@@ -101,7 +101,7 @@ export class ThirdPersonPlayer {
       // recover spherical angles from vector
       const onGround = this.groundedTimer < 10;
       const idlePitch = Math.atan2(4, distanceToKeep); // target pitch
-      this.pitch += (idlePitch - this.pitch) * 0; //(onGround ? 0 : 0.05);   // smooth drift
+      this.pitch += (idlePitch - this.pitch) * 0; //(onGround ? 0 : 0.05);   // TODO: Use some sort of input timer to lerp towards ideal after x seconds wiht no camera control
 
       this.yaw   = Math.atan2(toCam.x, toCam.z);
     }
@@ -118,8 +118,6 @@ export class ThirdPersonPlayer {
 
     this.camera.position.lerp(desiredPosition, 0.7);
 
-    // Potentially the look at itself should be lerped, by having like a "meshTarget" that is updated to lerp towards mesh.position
-    // This would smooth out some of the abrupt movements when the model goes over bumpy surfaces
     this.lookatTarget.lerp(this.mesh.position, 0.7);
     this.camera.lookAt(this.lookatTarget);
     this.camera.updateWorldMatrix();
@@ -165,10 +163,18 @@ export class ThirdPersonPlayer {
     this.mesh.rotationMatrix.rotateAxisAngleSelf(axis.x, axis.y, axis.z, radsToDegrees(radians));
   }
 
+  private targetVelocity = new EnhancedDOMPoint();
+
+  jumpBuffer = {
+    isBuffered: false,
+    frameCount: 0,
+  }
+
   protected updateVelocityFromControls() {
-    const speedMultiplier = 0.2;
+    const speedMultiplier = 0.24;
 
     const mag = controls.inputDirection.magnitude;
+    this.targetVelocity.set(0,0,0);
 
     if (mag > 0.01) {
       const camDir = new EnhancedDOMPoint().set(this.camera.rotationMatrix.transformPoint(new EnhancedDOMPoint(0, 0, -1)));
@@ -176,21 +182,38 @@ export class ThirdPersonPlayer {
       camDir.normalize_();
 
       const camRight = new EnhancedDOMPoint(camDir.z, 0, -camDir.x);
-      this.velocity.x = (camDir.x * -controls.inputDirection.y + camRight.x * -controls.inputDirection.x) * speedMultiplier;
-      this.velocity.z = (camDir.z * -controls.inputDirection.y + camRight.z * -controls.inputDirection.x) * speedMultiplier;
-
+      this.targetVelocity.x = (camDir.x * -controls.inputDirection.y + camRight.x * -controls.inputDirection.x) * speedMultiplier;
+      this.targetVelocity.z = (camDir.z * -controls.inputDirection.y + camRight.z * -controls.inputDirection.x) * speedMultiplier;
       // Face direction of movement
-      this.angle = Math.atan2(this.velocity.x, this.velocity.z);
-      this.mesh.children_[0].setRotation_(0, this.angle, 0);
+
     } else {
-      this.velocity.x = 0;
-      this.velocity.z = 0;
+      this.velocity.x *= 0.9;
+      this.velocity.z *= 0.9;
+    }
+    this.velocity.x += (this.targetVelocity.x - this.velocity.x) * 0.2;
+    this.velocity.z += (this.targetVelocity.z - this.velocity.z) * 0.2;
+
+    this.angle = Math.atan2(this.velocity.x, this.velocity.z);
+    this.mesh.children_[0].setRotation_(0, this.angle, 0);
+
+    if (controls.isJump && !controls.isPrevJump) {
+      this.jumpBuffer.isBuffered = true;
     }
 
-    if (controls.isJump && this.isGrounded && !this.isJumping) {
+    if (this.jumpBuffer.isBuffered) {
+      this.jumpBuffer.frameCount++;
+      if (this.jumpBuffer.frameCount > 10) {
+        this.jumpBuffer.isBuffered = false;
+        this.jumpBuffer.frameCount = 0;
+      }
+    }
+
+    if (this.jumpBuffer.isBuffered && this.isGrounded && !this.isJumping) {
       this.velocity.y = 0.5;
       this.isJumping = true;
       jumpSound();
+      this.jumpBuffer.isBuffered = false;
+      this.jumpBuffer.frameCount = 0;
     }
   }
 

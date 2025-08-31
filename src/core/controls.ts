@@ -20,18 +20,13 @@ const enum XboxControllerButton {
 }
 
 class Controls {
-  isUp = false;
-  isDown = false;
-  isLeft = false;
-  isRight = false;
   inputDirection = new EnhancedDOMPoint();
   cameraDirection = new EnhancedDOMPoint();
-  mouseSensitivity = 0.5;
   mouseMovement = new EnhancedDOMPoint();
   isJump? = false;
+  isPrevJump? = false;
 
   keyMap: Map<string, boolean> = new Map();
-  previousState = { isUp: this.isUp, isDown: this.isDown };
 
   constructor() {
     document.addEventListener('keydown', event => this.toggleKey(event, true));
@@ -44,15 +39,14 @@ class Controls {
   }
 
   queryController() {
-    this.previousState.isUp = this.isUp;
-    this.previousState.isDown = this.isDown;
+    this.isPrevJump = this.isJump;
     const gamepad = navigator.getGamepads()[0];
     const isButtonPressed = (button: XboxControllerButton) => gamepad?.buttons[button].pressed;
 
-    const leftVal = (this.keyMap.get('KeyA') || this.keyMap.get('ArrowLeft') || isButtonPressed(XboxControllerButton.DpadLeft)) ? -1 : 0;
-    const rightVal = (this.keyMap.get('KeyD') || this.keyMap.get('ArrowRight') || isButtonPressed(XboxControllerButton.DpadRight)) ? 1 : 0;
-    const upVal = (this.keyMap.get('KeyW') || this.keyMap.get('ArrowUp') || isButtonPressed(XboxControllerButton.DpadUp)) ? -1 : 0;
-    const downVal = (this.keyMap.get('KeyS') || this.keyMap.get('ArrowDown') || isButtonPressed(XboxControllerButton.DpadDown)) ? 1 : 0;
+    const leftVal = (this.keyMap.get('KeyA') || isButtonPressed(XboxControllerButton.DpadLeft)) ? -1 : 0;
+    const rightVal = (this.keyMap.get('KeyD') || isButtonPressed(XboxControllerButton.DpadRight)) ? 1 : 0;
+    const upVal = (this.keyMap.get('KeyW') || isButtonPressed(XboxControllerButton.DpadUp)) ? -1 : 0;
+    const downVal = (this.keyMap.get('KeyS') || isButtonPressed(XboxControllerButton.DpadDown)) ? 1 : 0;
     this.inputDirection.x = (leftVal + rightVal) || gamepad?.axes[0] || 0;
     this.inputDirection.y = (upVal + downVal) || gamepad?.axes[1] || 0;
     this.cameraDirection.x = gamepad?.axes[2] || this.mouseMovement.x;
@@ -68,11 +62,6 @@ class Controls {
     if (this.cameraDirection.magnitude < deadzone) {
       this.cameraDirection.set(0, 0, 0);
     }
-
-    this.isUp = this.inputDirection.y < 0;
-    this.isDown = this.inputDirection.y > 0;
-    this.isLeft = this.inputDirection.x < 0;
-    this.isRight = this.inputDirection.x > 0;
 
     this.mouseMovement.set(0, 0);
   }

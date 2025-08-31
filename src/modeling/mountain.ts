@@ -50,7 +50,7 @@ export function mountain() {
       // side blocking ramp
       .merge(new MoldableCubeGeometry(40, 60, 30)
         .selectBy(vert => vert.y < 0 && vert.z < 0)
-        .translate_(0, 0, -40)
+        .translate_(0, 0, -50)
         .all_()
         .rotate_(0, 0.1)
         .translate_(104, 30, 0)
