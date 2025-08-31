@@ -12,7 +12,7 @@ in vec4 positionFromLightPov;
 uniform mediump sampler2DArray uSampler;
 uniform mediump sampler2DShadow shadowMap;
 
-vec3 lightDirection = vec3(0.05, 0.6, 0.2);
+vec3 lightDirection = normalize(vec3(0.3, 0.3, 0.2));
 vec4 ambientLight = vec4(0.2, 0.2, 0.2, 1.0);
 
 out vec4 outColor;
@@ -43,10 +43,9 @@ void main() {
 
     // === Normalized inputs ===
     vec3 normal     = normalize(mat3(vNormalMatrix) * vNormal);
-    vec3 lightDir   = normalize(lightDirection);
 
     // === Basic diffuse ===
-    float NdotL = max(dot(lightDir, normal), 0.0);
+    float NdotL = max(dot(lightDirection, normal), 0.0);
 
     // Instead of killing diffuse in shadow, scale it down
     float shadowedDiffuse = mix(0.2 * NdotL, NdotL, shadowFactor);

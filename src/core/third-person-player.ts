@@ -21,7 +21,7 @@ export class ThirdPersonPlayer {
   wasGrounded = false;
   groundedTimer = 0;
   smoothedNormal = new EnhancedDOMPoint(0, 1, 0);
-  chassisCenter = new EnhancedDOMPoint(0, 0, 0);
+  chassisCenter = new EnhancedDOMPoint();
   velocity = new EnhancedDOMPoint(0, 0, 0);
 
   mesh: Object3d;
@@ -31,7 +31,7 @@ export class ThirdPersonPlayer {
 
   constructor(camera: Camera) {
     this.mesh = new Object3d(makeCat());
-    this.chassisCenter.y = 10;
+    this.chassisCenter.y = 25;
     this.camera = camera;
     this.camera.position.set(this.chassisCenter);
     this.camera.position.z -=3;

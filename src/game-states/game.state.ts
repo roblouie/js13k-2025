@@ -1,7 +1,7 @@
 import {State} from '@/core/state';
 import {Scene} from '@/engine/renderer/scene';
 import {Camera} from '@/engine/renderer/camera';
-import {heightMap, materials, pathTest, skyboxes} from '@/textures';
+import {heightmap, heightMap, materials, pathTest, skyboxes} from '@/textures';
 import {Mesh} from '@/engine/renderer/mesh';
 import {meshToFaces} from '@/engine/physics/parse-faces';
 import {AttributeLocation, render} from '@/engine/renderer/renderer';
@@ -41,8 +41,7 @@ export class GameState implements State {
 
     this.player = new ThirdPersonPlayer(new Camera(Math.PI / 2.5, 16 / 9, 1, 700));
 
-    // const heightmap = await heightMap();
-    const floorGeo = new MoldableCubeGeometry(512, 1, 512, 63, 1, 63, 1)
+    const floorGeo = new MoldableCubeGeometry(512, 1, 512, 31, 1, 31, 1)
     //const texDepths = new Array(256 * 256).fill(materials.cartoonGrass.texture.id);
 
 
@@ -64,7 +63,7 @@ export class GameState implements State {
 
     const floor = new Mesh(
       floorGeo
-        // .modifyEachVertex((vert, index) => vert.y = heightmap[index])
+        .modifyEachVertex((vert, index) => vert.y = heightmap.data[index])
         .spreadTextureCoords(5, 5).computeNormals().done_(), materials.cartoonGrass);
 
 

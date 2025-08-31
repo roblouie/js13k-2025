@@ -40,7 +40,7 @@ const origin = new EnhancedDOMPoint(0, 0, 0);
 
 const lightPovProjection = createOrtho(-285,285,-285,285,-400,400);
 
-const inverseLightDirection = new EnhancedDOMPoint(0.05, 0.6, 0.2).normalize_();
+const inverseLightDirection = new EnhancedDOMPoint(0.3, 0.3, 0.2).normalize_();
 const lightPovView = new Object3d();
 lightPovView.position.set(inverseLightDirection);
 lightPovView.lookAt(origin);

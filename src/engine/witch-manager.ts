@@ -147,7 +147,7 @@ export class WitchManager {
             position: particleSpreadRadius(this.starParticlePosition, 2),
             size: 10 + Math.random() * 10,
             life: 3.0,
-            velocity: particleRandomizeHorizontal(0.01, 0.15),
+            velocity: particleRandomizeHorizontal(0.01, 0.13),
             sizeModifier: 2 + Math.random(),
             lifeModifier: 0.03,
             isAffectedByGravity: false,
@@ -156,9 +156,10 @@ export class WitchManager {
         // }
       }
 
-      if (this.witchSavingTimer > 180) {
-        this.activeSavingWitch.mesh.scale_.x *= 0.8;
-        this.activeSavingWitch.mesh.scale_.z *= 0.8;
+      if (this.witchSavingTimer > 220) {
+        this.activeSavingWitch.mesh.scale_.x *= 0.75;
+        this.activeSavingWitch.mesh.scale_.y *= 1.1;
+        this.activeSavingWitch.mesh.scale_.z *= 0.75;
       }
 
       if (this.witchSavingTimer === 250) {

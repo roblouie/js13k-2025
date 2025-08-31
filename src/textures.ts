@@ -6,6 +6,7 @@ const skyboxSize = 1024;
 
 export const materials: {[key: string]: Material} = {};
 export const skyboxes: {[key: string]: TexImageSource[]} = {};
+export const heightmap = { data: [] };
 
 export async function initTextures() {
   materials.bars = new Material({ texture: textureLoader.load_(await bars())});
@@ -28,6 +29,8 @@ export async function initTextures() {
   materials.sparkle = new Material({ texture: textureLoader.load_(await emojiParticle('✨', 'filter: hue-rotate(160deg)'))});
   materials.heart = new Material({ texture: textureLoader.load_(await emojiParticle('❤️'))});
   materials.bubbles = new Material({ texture: textureLoader.load_(await emojiParticle('🫧'))});
+
+  heightmap.data = await heightMap();
 
 
   const box = await drawSkyboxHor();
@@ -81,8 +84,20 @@ export function metals() {
 }
 
 export function heightMap() {
-  return toHeightmap(`<rect width="100%" height="100%" fill="#808080"/>
-    <circle r="10" cx="32" cy="43" fill="#999"/>`, 64, 100)
+  return toHeightmap(`<filter id="b">
+    <feTurbulence baseFrequency="0.2,0.2" numOctaves="1" seed="3" type="fractalNoise" stitchTiles="stitch" />
+    <feColorMatrix values="0,0,0,.4,0,
+                           0,0,0,.4,0,
+                           0,0,0,.4,0,
+                           1,1,1,0,0"/>
+    </filter>
+        <rect x="0" y="0" width="100%" height="100%" fill="#808080"/>
+       <rect x="13" y="21" width="16" height="9" filter="url(#b)"/>
+
+<!--    <rect x="23" y="10" width="12" height="10" fill="#808080"/>-->
+<!--        <rect x="0" y="9" width="12" height="10" fill="#888"/>-->
+
+`, 32, 40)
 }
 
 function solidColor(color: string | number, size = 512) {

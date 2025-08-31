@@ -4,8 +4,8 @@ export async function toImage(svgImageBuilder: string, widthOrSize = 512, height
   return new Promise(resolve => image_.addEventListener('load', () => resolve(image_)));
 }
 
-export async function toImageData(svgString: string, widthOrSize = 512, height?: number): Promise<ImageData> {
-  const image_ = await toImage(svgString, size);
+export async function toImageData(svgString: string, widthOrSize = 512): Promise<ImageData> {
+  const image_ = await toImage(svgString, widthOrSize);
   const canvas = new OffscreenCanvas(image_.width, image_.height);
   const context = canvas.getContext('2d')!;
   // @ts-ignore
