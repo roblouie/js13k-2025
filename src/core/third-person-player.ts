@@ -11,7 +11,6 @@ import {makeCat} from "@/modeling/cat";
 import {Sphere} from "@/engine/physics/aabb";
 import {Mesh} from "@/engine/renderer/mesh";
 import {jumpSound} from "@/sounds/jump-sound";
-import {theBestDamnCatHolyShit2} from "@/sounds/cat-sounds";
 import {Witch} from "@/engine/witch-manager";
 
 export class ThirdPersonPlayer {
@@ -50,7 +49,7 @@ export class ThirdPersonPlayer {
 
   yaw = 0;
   pitch = 0;
-  cameraSpeed = 0.05;
+  cameraSpeed = 0.04;
   maxPitch = Math.PI / 3;
   isFrozen = false;
 
@@ -192,8 +191,8 @@ export class ThirdPersonPlayer {
       this.velocity.x *= 0.9;
       this.velocity.z *= 0.9;
     }
-    this.velocity.x += (this.targetVelocity.x - this.velocity.x) * 0.2;
-    this.velocity.z += (this.targetVelocity.z - this.velocity.z) * 0.2;
+    this.velocity.x += (this.targetVelocity.x - this.velocity.x) * 0.3;
+    this.velocity.z += (this.targetVelocity.z - this.velocity.z) * 0.3;
 
     this.angle = Math.atan2(this.velocity.x, this.velocity.z);
     this.mesh.children_[0].setRotation_(0, this.angle, 0);

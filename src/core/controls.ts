@@ -33,8 +33,8 @@ class Controls {
     document.addEventListener('keyup', event => this.toggleKey(event, false));
 
     window.addEventListener("mousemove", (e) => {
-      this.mouseMovement.x += e.movementX * 0.1;
-      this.mouseMovement.y += e.movementY * 0.1;
+      this.mouseMovement.x += e.movementX * 0.05;
+      this.mouseMovement.y += e.movementY * 0.05;
     });
   }
 
@@ -49,8 +49,8 @@ class Controls {
     const downVal = (this.keyMap.get('KeyS') || isButtonPressed(XboxControllerButton.DpadDown)) ? 1 : 0;
     this.inputDirection.x = (leftVal + rightVal) || gamepad?.axes[0] || 0;
     this.inputDirection.y = (upVal + downVal) || gamepad?.axes[1] || 0;
-    this.cameraDirection.x = gamepad?.axes[2] || this.mouseMovement.x;
-    this.cameraDirection.y = gamepad?.axes[3] || this.mouseMovement.y;
+    this.cameraDirection.x = this.mouseMovement.x || gamepad?.axes[2] || 0;
+    this.cameraDirection.y = this.mouseMovement.y || gamepad?.axes[3] || 0;
     this.isJump = this.keyMap.get('Space') || isButtonPressed(XboxControllerButton.A);
 
     const deadzone = 0.15;
