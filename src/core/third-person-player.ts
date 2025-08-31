@@ -23,6 +23,7 @@ export class ThirdPersonPlayer {
   smoothedNormal = new EnhancedDOMPoint(0, 1, 0);
   chassisCenter = new EnhancedDOMPoint();
   velocity = new EnhancedDOMPoint(0, 0, 0);
+  lookatTarget = new EnhancedDOMPoint();
 
   mesh: Object3d;
   camera: Camera;
@@ -31,11 +32,13 @@ export class ThirdPersonPlayer {
 
   constructor(camera: Camera) {
     this.mesh = new Object3d(makeCat());
+    this.mesh.isUsingLookAt = true;
     this.chassisCenter.y = 25;
     this.camera = camera;
     this.camera.position.set(this.chassisCenter);
     this.camera.position.z -=3;
     this.listener = audioContext.listener;
+    this.lookatTarget.set(this.mesh.position);
   }
 
   speed = 1;
@@ -51,6 +54,7 @@ export class ThirdPersonPlayer {
   maxPitch = Math.PI / 3;
   isFrozen = false;
 
+
   update(octreeNode: OctreeNode) {
     this.wasGrounded = this.isGrounded;
 
@@ -58,10 +62,10 @@ export class ThirdPersonPlayer {
       this.updateVelocityFromControls();  // set x / z velocity based on input
     }
 
-    this.velocity.y -= 0.01; // gravity
+    this.velocity.y -= 0.017; // gravity
     this.chassisCenter.add_(this.velocity);  // move the player position by the velocity
 
-    this.velocity.y = clamp(this.velocity.y, -1, 1);
+    this.velocity.y = clamp(this.velocity.y, -2, 2);
     this.collideWithLevel(octreeNode); // do collision detection, if collision is found, feetCenter gets pushed out of the collision
 
     this.mesh.position.set(this.chassisCenter); // at this point, feetCenter is in the correct spot, so draw the mesh there
@@ -75,7 +79,7 @@ export class ThirdPersonPlayer {
       return;
     }
 
-    if (this.groundedTimer < 10 && !this.isJumping) {
+    if (this.groundedTimer < 10 && !this.isJumping && controls.inputDirection.magnitude > 0) {
       const mesh = this.mesh.children_[0] as Mesh;
       mesh.alpha += this.velocity.magnitude / 2;
 
@@ -97,7 +101,7 @@ export class ThirdPersonPlayer {
       // recover spherical angles from vector
       const onGround = this.groundedTimer < 10;
       const idlePitch = Math.atan2(4, distanceToKeep); // target pitch
-      this.pitch += (idlePitch - this.pitch) * (onGround ? 0 : 0.05);   // smooth drift
+      this.pitch += (idlePitch - this.pitch) * 0; //(onGround ? 0 : 0.05);   // smooth drift
 
       this.yaw   = Math.atan2(toCam.x, toCam.z);
     }
@@ -112,11 +116,12 @@ export class ThirdPersonPlayer {
       z: offsetZ
     });
 
-    this.camera.position.lerp(desiredPosition, 0.2);
+    this.camera.position.lerp(desiredPosition, 0.7);
 
     // Potentially the look at itself should be lerped, by having like a "meshTarget" that is updated to lerp towards mesh.position
     // This would smooth out some of the abrupt movements when the model goes over bumpy surfaces
-    this.camera.lookAt(this.mesh.position);
+    this.lookatTarget.lerp(this.mesh.position, 0.7);
+    this.camera.lookAt(this.lookatTarget);
     this.camera.updateWorldMatrix();
 
     if (!this.wasGrounded && this.isGrounded) {
@@ -142,18 +147,22 @@ export class ThirdPersonPlayer {
       this.isGrounded = true;
     } else { // here the player is in the air
       this.groundedTimer++; // increase timer while they are in the air.
-      this.isGrounded = this.groundedTimer < 20; // if they are in the air longer than x frames, they are no longer grounded
+      this.isGrounded = this.groundedTimer < 10; // if they are in the air longer than x frames, they are no longer grounded
     }
 
-    if (this.isGrounded) {
-      this.smoothedNormal = this.smoothedNormal.lerp(new EnhancedDOMPoint(0,1,0), 0.1).normalize_();
-      this.mesh.rotationMatrix = new DOMMatrix();
-      const axis = new EnhancedDOMPoint().crossVectors(this.mesh.up, this.smoothedNormal);
-      const radians = Math.acos(this.smoothedNormal.dot(this.mesh.up));
-      this.mesh.rotationMatrix.rotateAxisAngleSelf(axis.x, axis.y, axis.z, radsToDegrees(radians));
+    if (!this.isGrounded) {
+      this.updatePlayerPitchRoll(new EnhancedDOMPoint(0,1,0), 0.03);
     }
 
     this.chassisCenter.add_(this.velocity);
+  }
+
+  updatePlayerPitchRoll(targetPoint: EnhancedDOMPoint, lerpAmount: number) {
+    this.smoothedNormal.lerp(targetPoint, lerpAmount).normalize_();
+    this.mesh.rotationMatrix = new DOMMatrix();
+    const axis = new EnhancedDOMPoint().crossVectors(this.mesh.up, this.smoothedNormal);
+    const radians = Math.acos(this.smoothedNormal.dot(this.mesh.up));
+    this.mesh.rotationMatrix.rotateAxisAngleSelf(axis.x, axis.y, axis.z, radsToDegrees(radians));
   }
 
   protected updateVelocityFromControls() {
@@ -179,7 +188,7 @@ export class ThirdPersonPlayer {
     }
 
     if (controls.isJump && this.isGrounded && !this.isJumping) {
-      this.velocity.y = 0.4;
+      this.velocity.y = 0.5;
       this.isJumping = true;
       jumpSound();
     }

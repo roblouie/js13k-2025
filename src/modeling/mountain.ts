@@ -47,7 +47,15 @@ export function mountain() {
         .merge(platformMaker(15).translate_(-30, 35, -20).spreadTextureCoords(30, 30))
         .translate_(-16, 100))
 
-      // .merge(platformMaker(20).translate_(-20, 60, 100))
+      // side blocking ramp
+      .merge(new MoldableCubeGeometry(40, 60, 30)
+        .selectBy(vert => vert.y < 0 && vert.z < 0)
+        .translate_(0, 0, -40)
+        .all_()
+        .rotate_(0, 0.1)
+        .translate_(104, 30, 0)
+
+      )
 
     .all_()
     // World Location

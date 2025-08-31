@@ -12,23 +12,26 @@ export function findWallCollisionsFromList(surfaces: Set<Face>, player: ThirdPer
     if (newSurfaceHit) {
       const depth = newSurfaceHit.penetrationDepth;
 
-      if (surface.normal.y >= 0.6 && player.velocity.y < 0) {
-        player.smoothedNormal = player.smoothedNormal.lerp(surface.normal, 0.1).normalize_();
+      // velocity y check for sphere interecting with opposite side of surface
+      // and if you're jumping upward, this never matters
+      if (surface.normal.y >= 0.6 && player.velocity.y <= 0) {
+        player.updatePlayerPitchRoll(surface.normal, 0.3)
         player.collisionSphere.center.y += depth;
         player.velocity.y = 0;
         player.isJumping = false;
         player.isGroundedThisFrame = true;
-        player.mesh.isUsingLookAt = true;
-        player.mesh.rotationMatrix = new DOMMatrix();
-        const axis = new EnhancedDOMPoint().crossVectors(player.mesh.up, player.smoothedNormal);
-        const radians = Math.acos(player.smoothedNormal.dot(player.mesh.up));
-        player.mesh.rotationMatrix.rotateAxisAngleSelf(axis.x, axis.y, axis.z, radsToDegrees(radians));
       } else {
         const correctionVector = newSurfaceHit.penetrationNormal.scale_(depth);
         player.collisionSphere.center.add_(correctionVector);
 
         const normalComponent = newSurfaceHit.penetrationNormal.scale_(player.velocity.dot(newSurfaceHit.penetrationNormal));
         player.velocity.subtract(normalComponent);
+
+        if (surface.normal.y < 0.6 && surface.normal.y >= 0.3) {
+          player.isGroundedThisFrame = true;
+          player.isJumping = false;
+          player.updatePlayerPitchRoll(surface.normal, 0.3);
+        }
 
         if (surface.normal.y <= -0.6 && player.velocity.y > 0) {
           player.velocity.y = 0;
