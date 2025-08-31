@@ -21,7 +21,6 @@ export class ThirdPersonPlayer {
   wasGrounded = false;
   groundedTimer = 0;
   smoothedNormal = new EnhancedDOMPoint(0, 1, 0);
-  chassisCenter = new EnhancedDOMPoint();
   velocity = new EnhancedDOMPoint(0, 0, 0);
   lookatTarget = new EnhancedDOMPoint();
 
@@ -33,12 +32,13 @@ export class ThirdPersonPlayer {
   constructor(camera: Camera) {
     this.mesh = new Object3d(makeCat());
     this.mesh.isUsingLookAt = true;
-    this.chassisCenter.y = 25;
     this.camera = camera;
-    this.camera.position.set(this.chassisCenter);
+    this.camera.position.set(this.mesh.position);
     this.camera.position.z -=3;
     this.listener = audioContext.listener;
     this.lookatTarget.set(this.mesh.position);
+    this.collisionSphere = new Sphere(new EnhancedDOMPoint(0, 5, 0), 2);
+
   }
 
   speed = 1;
@@ -46,7 +46,7 @@ export class ThirdPersonPlayer {
 
   nearbyFaces = new Set<Face>();
   witchesToCheck = new Set<Witch>();
-  collisionSphere = new Sphere(this.chassisCenter, 2);
+  collisionSphere: Sphere;
 
   yaw = 0;
   pitch = 0;
@@ -63,12 +63,14 @@ export class ThirdPersonPlayer {
     }
 
     this.velocity.y -= 0.017; // gravity
-    this.chassisCenter.add_(this.velocity);  // move the player position by the velocity
+    this.collisionSphere.center.add_(this.velocity);  // move the player position by the velocity
 
     this.velocity.y = clamp(this.velocity.y, -1, 1);
     this.collideWithLevel(octreeNode); // do collision detection, if collision is found, feetCenter gets pushed out of the collision
+    this.collisionSphere.center.x = clamp(this.collisionSphere.center.x, -255, 255);
+    this.collisionSphere.center.z = clamp(this.collisionSphere.center.z, -255, 255);
 
-    this.mesh.position.set(this.chassisCenter); // at this point, feetCenter is in the correct spot, so draw the mesh there
+    this.mesh.position.set(this.collisionSphere.center); // at this point, feetCenter is in the correct spot, so draw the mesh there
     this.mesh.position.y -= 0.5; // move up by half height so mesh ends at feet position
 
     tmpl.innerHTML += `${this.mesh.position.x}, ${this.mesh.position.y}, ${this.mesh.position.z}<br>`;
@@ -152,7 +154,7 @@ export class ThirdPersonPlayer {
       this.updatePlayerPitchRoll(new EnhancedDOMPoint(0,1,0), 0.03);
     }
 
-    this.chassisCenter.add_(this.velocity);
+    this.collisionSphere.center.add_(this.velocity);
   }
 
   updatePlayerPitchRoll(targetPoint: EnhancedDOMPoint, lerpAmount: number) {
