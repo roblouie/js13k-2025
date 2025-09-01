@@ -64,7 +64,7 @@ export class GameState implements State {
     const floor = new Mesh(
       floorGeo
         .modifyEachVertex((vert, index) => vert.y = heightmap.data[index])
-        .spreadTextureCoords(5, 5).computeNormals().done_(), materials.cartoonGrass);
+        .spreadTextureCoords(40, 40).computeNormals().done_(), materials.cartoonGrass);
 
 
     const ramp = new MoldableCubeGeometry(10, 3, 60)

@@ -93,9 +93,9 @@ export function frontLeftCliffForBridge() {
 
 export function worldWall() {
   return new Mesh(
-    new MoldableCubeGeometry(512, 24, 2).texturePerSide(materials.cartoonGrass).translate_(0, 12, 256)      .spreadTextureCoords()
+    new MoldableCubeGeometry(512, 24, 2).texturePerSide(materials.shrubs).translate_(0, 12, 256)      .spreadTextureCoords()
 
-      .merge(new MoldableCubeGeometry(2, 24, 512).texturePerSide(materials.cartoonGrass).translate_(256, 12)      .spreadTextureCoords())
+      .merge(new MoldableCubeGeometry(2, 24, 512).texturePerSide(materials.shrubs).translate_(256, 12)      .spreadTextureCoords())
 
       .merge(new MoldableCubeGeometry(2, 24, 512, 1, 1, 4)
         .selectBy(vert => vert.z < 256 && vert.y > 0)
@@ -103,13 +103,13 @@ export function worldWall() {
         .selectBy(vert => vert.z < 128 && vert.y > 0)
         .translate_(0, 20)
         .all_()
-        .texturePerSide(materials.cartoonGrass).translate_(-256, 12)
-        .spreadTextureCoords()
+        .texturePerSide(materials.shrubs).translate_(-256, 12)
+        .spreadTextureCoords(40,40)
       )
 
       .merge(
         new MoldableCubeGeometry(512, 24, 2, 4)
-          .texturePerSide(materials.cartoonRockWall)
+          .texturePerSide(materials.shrubs)
           .selectBy(vert => vert.y > 0 && vert.x < 256)
           .translate_(0, 40)
           .all_()

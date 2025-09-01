@@ -1,6 +1,7 @@
 import { Material } from '@/engine/renderer/material';
 import { textureLoader } from '@/engine/renderer/texture-loader';
 import {toHeightmap, toImage, toImageData} from '@/engine/svg-maker/svg-string-converters';
+import {audioContext} from "@/engine/audio/simplest-midi";
 
 const skyboxSize = 1024;
 
@@ -8,12 +9,17 @@ export const materials: {[key: string]: Material} = {};
 export const skyboxes: {[key: string]: TexImageSource[]} = {};
 export const heightmap = { data: [] };
 
+// ultra hack firefox detection. If there's room, do this in a less insane way, like checking user agent for firefox
+const filterTag = (id: string) => `<filter id="${id}" ${audioContext.listener.positionX ? 'width="100%" height="100%" x="0" y="0"' : ''} >`
+
 export async function initTextures() {
   materials.bars = new Material({ texture: textureLoader.load_(await bars())});
   materials.iron = new Material({ texture: textureLoader.load_(await metals()) });
   materials.marble = new Material({ texture: textureLoader.load_(await marbleFloor())});
   materials.cartoonRockWall = new Material({ texture: textureLoader.load_(await cartoonRockWall())});
-  materials.cartoonGrass = new Material({ texture: textureLoader.load_(await cartoonGrass())});
+  materials.cartoonGrass = new Material({ texture: textureLoader.load_(await flora('#008115', .005))});
+  materials.shrubs = new Material({ texture: textureLoader.load_(await flora('#0d4b22', .1))});
+
   materials.cobblestone = new Material({ texture: textureLoader.load_(await solidColor('#bbb'))});
   materials.white = new Material({ texture: textureLoader.load_(await solidColor('#bbb'))});
   materials.witchFace = new Material({ texture: textureLoader.load_(await witchFace())});
@@ -57,7 +63,7 @@ function bars() {
 }
 
 export function cartoonRockWall() {
-  return toImage(`<filter id="m" width="512" height="512" x="-0.1" y="-0.1">
+  return toImage(`${filterTag('m')}
         <feTurbulence type="fractalNoise" baseFrequency=".005" numOctaves="7" stitchTiles="stitch"/>
         <feDiffuseLighting diffuseConstant="6" surfaceScale="4" lighting-color="#7B3F00" color-interpolation="sRGB">
             <feDistantLight elevation="4" azimuth="170"/>
@@ -189,12 +195,12 @@ function catEye() {
   <ellipse cx="352" cy="256" rx="25" ry="70" fill="black"/>`);
 }
 
-export function cartoonGrass() {
-  return toImage(`<filter id="filter">
-        <feTurbulence type="fractalNoise" baseFrequency=".01" numOctaves="8"/>
+export function flora(color: string, baseFrequency: number) {
+  return toImage(`${filterTag('filter')}
+        <feTurbulence type="fractalNoise" baseFrequency="${baseFrequency}" numOctaves="8" stitchTiles="stitch"/>
         
-        <feDiffuseLighting color-interpolation-filters="sRGB" lighting-color="#0a0" surfaceScale="-3" result="d">
-            <feDistantLight azimuth="40" elevation="60"/>
+        <feDiffuseLighting color-interpolation-filters="sRGB" lighting-color="${color}" surfaceScale="-3" result="d">
+            <feDistantLight azimuth="0" elevation="40"/>
         </feDiffuseLighting>
        
     </filter>
