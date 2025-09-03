@@ -1,10 +1,10 @@
 export const audioContext = new AudioContext();
 export const compressor = audioContext.createDynamicsCompressor();
 export const biquadFilter = audioContext.createBiquadFilter();
-biquadFilter.type = 'lowshelf';
-biquadFilter.frequency.value = 500;
-biquadFilter.gain.value = 20;
-biquadFilter.connect(compressor);
+// biquadFilter.type = 'lowshelf';
+// biquadFilter.frequency.value = 500;
+// biquadFilter.gain.value = 20;
+// biquadFilter.connect(compressor);
 compressor.threshold.value = -50;
 compressor.knee.value = 40;
 compressor.ratio.value = 12;

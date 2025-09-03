@@ -20,8 +20,8 @@ export function theBestDamnCatHolyShit2() {
 
   // Amp envelope
   gain.gain.setValueAtTime(0, audioContext.currentTime);
-  gain.gain.linearRampToValueAtTime(0.7, audioContext.currentTime + 0.2);
-  gain.gain.linearRampToValueAtTime(0.5, audioContext.currentTime + 0.3);
+  gain.gain.linearRampToValueAtTime(0.6, audioContext.currentTime + 0.2);
+  gain.gain.linearRampToValueAtTime(0.4, audioContext.currentTime + 0.3);
   gain.gain.linearRampToValueAtTime(0, audioContext.currentTime + 0.8);
 
   // Wah filter

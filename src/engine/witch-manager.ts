@@ -16,6 +16,7 @@ import {
   randomNegativeOneOne,
   spawnParticles
 } from "@/engine/particles";
+import {alpha} from "@/engine/shaders/shaders";
 
 export class Witch {
   mesh: Mesh;
@@ -27,10 +28,13 @@ export class Witch {
     this.mesh = mesh;
     this.collisionSphere = new Sphere(mesh.position.clone_(), 10);
     this.orb = new Mesh(new MoldableCubeGeometry(4, 4, 4, 4, 4, 4)
+      // .spreadTextureCoords(15, 15)
       .spherify(8)
-      .translate_(mesh.position.x, mesh.position.y, mesh.position.z)
-      .spreadTextureCoords(2, 2)
-      .done_(), materials.bars);
+      // .translate_(mesh.position.x, mesh.position.y, mesh.position.z)
+      // .spreadTextureCoords()
+      .done_(), materials.witchBubble);
+
+    this.orb.position.set(this.mesh.position)
   }
 }
 
@@ -83,6 +87,7 @@ export class WitchManager {
 
   update(player: ThirdPersonPlayer) {
     this.witches.forEach(witch => {
+      witch.orb.rotate_(0.005, 0.005, 0);
       // Animation
       witch.mesh.alpha += 0.03;
       if (witch.mesh.alpha >= 1) {

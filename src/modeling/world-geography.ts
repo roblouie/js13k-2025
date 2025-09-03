@@ -125,6 +125,7 @@ export function worldWall() {
 export function nightCave() {
   return new Mesh(
     makeBridgePiece(60, 1, 1.3)
+      .texturePerSide(materials.cartoonRockWall)
       .selectBy(vert => vert.z > 10 && vert.y < 0)
       .translate_(0, -13)
       // .selectBy(vert => vert.x > 5 && vert.y > -20)
@@ -137,6 +138,7 @@ export function nightCave() {
       // Roof with opening
       .merge(
         makeBridgePiece(2, 1, 1.3)
+          .texturePerSide(materials.cartoonRockWall)
           .selectBy(vert => vert.y < 0 && Math.abs(vert.z) < 20)
           .scale_(1, 1, 0.2)
           .selectBy(vert => vert.y > 5 && vert.y < 16 && Math.abs(vert.z) < 17)
@@ -157,6 +159,7 @@ export function nightCave() {
 
       // backing wall
       .merge(new MoldableCubeGeometry(2, 100, 150, 1, 1, 10)
+        .texturePerSide(materials.cartoonRockWall)
         .selectBy(vert => vert.y > 0)
         .cylindrify(90, 'x')
         .translate_(0, -40)
@@ -165,7 +168,7 @@ export function nightCave() {
       )
 
       // rooftop cave opening
-      .merge(makeBridgePiece(120, 1, 1.).scale_(1, 1, 1.3).all_().scale_(1, 1.3, 2).translate_(40, 50))
+      .merge(makeBridgePiece(120, 1, 1.).texturePerSide(materials.cartoonRockWall).scale_(1, 1, 1.3).all_().scale_(1, 1.3, 2).translate_(40, 50))
 
       // wall behind pipe
 

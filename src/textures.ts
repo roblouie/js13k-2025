@@ -19,6 +19,7 @@ export async function initTextures() {
   materials.cartoonRockWall = new Material({ texture: textureLoader.load_(await cartoonRockWall())});
   materials.cartoonGrass = new Material({ texture: textureLoader.load_(await flora('#008115', .005))});
   materials.shrubs = new Material({ texture: textureLoader.load_(await flora('#0d4b22', .1))});
+  materials.brickWall = new Material({ texture: textureLoader.load_(await brickWall())})
 
   materials.cobblestone = new Material({ texture: textureLoader.load_(await solidColor('#bbb'))});
   materials.white = new Material({ texture: textureLoader.load_(await solidColor('#bbb'))});
@@ -29,12 +30,13 @@ export async function initTextures() {
   // shadows, so that these don't cast shadows. That is currently set to depth >= 10.0f.
   // If any materials before this are removed, this number will be wrong, so adjust as needed.
   // If any materials are added after this, anythign using them won't cast shadows
-  materials.catEye = new Material({ texture: textureLoader.load_(await catEye())});
   materials.catMouth = new Material({ texture: textureLoader.load_(await catMouth())});
   materials.witchClothes = new Material({ texture: textureLoader.load_(await solidColor('#902EBB'))});
   materials.sparkle = new Material({ texture: textureLoader.load_(await emojiParticle('✨', 'filter: hue-rotate(160deg)'))});
   materials.heart = new Material({ texture: textureLoader.load_(await emojiParticle('❤️'))});
   materials.bubbles = new Material({ texture: textureLoader.load_(await emojiParticle('🫧'))});
+  materials.witchBubble = new Material({ texture: textureLoader.load_(await witchBubble())});
+  materials.catEye = new Material({ texture: textureLoader.load_(await catEye())});
 
   heightmap.data = await heightMap();
 
@@ -52,6 +54,36 @@ export async function initTextures() {
   ];
 
   textureLoader.bindTextures();
+}
+
+function brickWall() {
+  return toImage(`<pattern id="pattern" width="99" height="70" patternUnits="userSpaceOnUse">
+<!--         <path d="m0 67h96V35H0V32h47V0h3v32h49V0H0"/> -->
+      <rect width="93" height="32" x="3" y="3"/>
+      <rect width="93" height="32" x="50" y="38"/>
+      <rect width="93" height="32" x="-50" y="38"/>
+    </pattern>
+    ${filterTag('filter')}
+        <feDropShadow dx="0" dy="0" flood-opacity="0.3" result="s" stdDeviation="3" />
+        <feTurbulence type="fractalNoise" baseFrequency=".02" numOctaves="8"/>
+        <feComposite in="s" operator="arithmetic" k2=".7" k3=".35"/>
+        <feDiffuseLighting lighting-color="#999" surfaceScale="9">
+            <feDistantLight azimuth="115" elevation="40"/>
+        </feDiffuseLighting>
+    </filter>
+    <rect width="100%" height="100%"  filter="url(#filter)"/>`)
+}
+
+function witchBubble() {
+  return toImage(`${filterTag('b')}
+      <feTurbulence baseFrequency="0.005" numOctaves="2" seed="23"  stitchTiles="stitch" />
+<feColorMatrix values="
+      0 0 0 0 0
+      0 0 0 0 0
+      0 0 0 0 2
+      -1 -1 -1 -1 1.4
+      "/>     </filter>
+      <rect x="0" y="0" width="100%" height="100%" filter="url(#b)"/>`)
 }
 
 function emojiParticle(emoji: string, style = '') {
@@ -187,11 +219,11 @@ function witchFace() {
 }
 
 function catEye() {
-  return toImage(`<circle r="75" cx="160" cy="256" fill="limegreen" stroke="black" stroke-width="8" />
+  return toImage(`<circle r="75" cx="160" cy="256" fill="#0c0" stroke="black" stroke-width="8" />
 
   <ellipse cx="160" cy="256" rx="25" ry="70" fill="black"/>
   
-    <circle r="75" cx="352" cy="256" fill="limegreen" stroke="black" stroke-width="8" />
+    <circle r="75" cx="352" cy="256" fill="#0c0" stroke="black" stroke-width="8" />
   <ellipse cx="352" cy="256" rx="25" ry="70" fill="black"/>`);
 }
 

@@ -48,7 +48,8 @@ void main() {
     float NdotL = max(dot(lightDirection, normal), 0.0);
 
     // Instead of killing diffuse in shadow, scale it down
-    float shadowedDiffuse = mix(0.2 * NdotL, NdotL, shadowFactor);
+    // Obviously a hack for emissive, but any texture past the 14th is full lit
+    float shadowedDiffuse = vDepth > 14.0 ? 1.0 : mix(0.2 * NdotL, NdotL, shadowFactor);
 
     // === Lighting ===
     vec3 diffuseColor = shadowedDiffuse * vec3(1.0); // white light

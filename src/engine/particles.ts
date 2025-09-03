@@ -76,7 +76,7 @@ export function wireParticles(): [WebGLVertexArrayObject, () => number] {
     gl.bindBuffer(gl.ARRAY_BUFFER, particleBuffer);
     gl.bufferData(gl.ARRAY_BUFFER, data, gl.DYNAMIC_DRAW);
 
-    return data.length;
+    return particles.length;
   }
 
   return [vao, updateParticles];

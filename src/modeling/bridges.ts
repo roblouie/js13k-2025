@@ -14,9 +14,9 @@ export const makeBridgePiece = (depth: number, scaleY: number, scaleZ: number) =
 
 export function bridge() {
   return new Mesh(
-    makeBridgePiece(20, 1.3, 2).texturePerSide(materials.cobblestone).spreadTextureCoords(20, 20)
-      .merge(makeBridgePiece(2, 1.3, 2).texturePerSide(materials.cobblestone).all_().translate_(9, 3).spreadTextureCoords(20, 20))
-      .merge(makeBridgePiece(2, 1.3, 2).texturePerSide(materials.cobblestone).all_().translate_(-9, 3).spreadTextureCoords(20, 20))
+    makeBridgePiece(20, 1.3, 2).texturePerSide(materials.brickWall).spreadTextureCoords(20, 20)
+      .merge(makeBridgePiece(2, 1.3, 2).texturePerSide(materials.brickWall).all_().translate_(9, 3).spreadTextureCoords(20, 20))
+      .merge(makeBridgePiece(2, 1.3, 2).texturePerSide(materials.brickWall).all_().translate_(-9, 3).spreadTextureCoords(20, 20))
 
       .merge(new MoldableCubeGeometry(1, 38, 35).texturePerSide(materials.bars).spreadTextureCoords(3))
 
@@ -41,14 +41,15 @@ export function bridge() {
 
 export function frontRamp() {
   return new Mesh(
-    new MoldableCubeGeometry(10, 2, 60)
-      .spreadTextureCoords(20, 20)
+    new MoldableCubeGeometry(12, 2, 70)
+      .texturePerSide(materials.brickWall)
+      // .spreadTextureCoords(20, 20)
 
       .selectBy(vert => vert.z > 0)
-      .translate_(0, -30)
+      .translate_(0, -35)
       .all_()
       .rotate_(0, 0.6)
-      .translate_(-59, 29, 108)
+      .translate_(-55, 29, 113)
       .done_()
 
     , materials.cobblestone);
