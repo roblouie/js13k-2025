@@ -1,7 +1,8 @@
 // Only difference between these is the Q value of the wah filter being modulated.
 
 // THE MODULATED Q IS BETTER. It gets the mee in the meow. and the 700 value makes for a nicer mee as well.
-import {audioContext} from "@/engine/audio/simplest-midi";
+
+import {audioContext} from "@/engine/audio/audio-helpers";
 
 export function theBestDamnCatHolyShit2() {
   //return theBestDamnCatHolyShit(audioContext);

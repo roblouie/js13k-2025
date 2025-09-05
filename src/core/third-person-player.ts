@@ -5,13 +5,13 @@ import { findWallCollisionsFromList } from '@/engine/physics/surface-collision';
 import {clamp, radsToDegrees} from '@/engine/helpers';
 import {OctreeNode, querySphere} from "@/engine/physics/octree";
 import {controls} from "@/core/controls";
-import {audioContext} from "@/engine/audio/simplest-midi";
 import {Object3d} from "@/engine/renderer/object-3d";
 import {makeCat} from "@/modeling/cat";
 import {Sphere} from "@/engine/physics/aabb";
 import {Mesh} from "@/engine/renderer/mesh";
 import {jumpSound} from "@/sounds/jump-sound";
 import {Witch} from "@/engine/witch-manager";
+import {audioContext} from "@/engine/audio/audio-helpers";
 
 export class ThirdPersonPlayer {
   isJumping = false;

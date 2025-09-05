@@ -6,8 +6,6 @@ import {Mesh} from '@/engine/renderer/mesh';
 import {meshToFaces} from '@/engine/physics/parse-faces';
 import {AttributeLocation, render} from '@/engine/renderer/renderer';
 import {MoldableCubeGeometry} from '@/engine/moldable-cube-geometry';
-import {audioContext, biquadFilter, SimplestMidiRev2} from '@/engine/audio/simplest-midi';
-import {elevatorDoor1, elevatorDoorTest, footstep} from '@/sounds';
 import {computeSceneBounds, OctreeNode} from "@/engine/physics/octree";
 import {ThirdPersonPlayer} from "@/core/third-person-player";
 import {Skybox} from "@/engine/skybox";
@@ -23,17 +21,16 @@ import {
 } from "@/modeling/world-geography";
 import {bridge, frontRamp} from "@/modeling/bridges";
 import {WitchManager} from "@/engine/witch-manager";
+import {playSong} from "@/sounds/song";
 
 export class GameState implements State {
   player: ThirdPersonPlayer;
   scene: Scene;
 
-  sfxPlayer = new SimplestMidiRev2();
 
   witchManager: WitchManager;
 
   constructor() {
-    this.sfxPlayer.volume_.connect(biquadFilter);
     const skybox = new Skybox(...skyboxes.test);
     skybox.bindGeometry();
     this.scene = new Scene(skybox);
@@ -118,6 +115,9 @@ export class GameState implements State {
     faces.forEach(face => this.octree.insert(face));
 
     this.witchManager = new WitchManager(this.scene, this.octree);
+
+    playSong();
+    setInterval(playSong, 14_200);
   }
 
 
@@ -135,12 +135,4 @@ export class GameState implements State {
     this.scene.updateWorldMatrix();
     render(this.player.camera, this.scene);
   }
-
-  playElevatorSound() {
-    this.player.sfxPlayer.playNote(audioContext.currentTime, 60, 70, elevatorDoor1, audioContext.currentTime + 4);
-    this.player.sfxPlayer.playNote(audioContext.currentTime + 0.5, 60, 70, footstep, audioContext.currentTime + 2.5);
-    this.player.sfxPlayer.playNote(audioContext.currentTime + 1.8, 60, 70, footstep, audioContext.currentTime + 2.5);
-    this.sfxPlayer.playNote(audioContext.currentTime, 60, 70, elevatorDoorTest, audioContext.currentTime + 1);
-  }
-
 }

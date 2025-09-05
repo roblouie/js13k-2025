@@ -1,7 +1,7 @@
 import { Material } from '@/engine/renderer/material';
 import { textureLoader } from '@/engine/renderer/texture-loader';
 import {toHeightmap, toImage, toImageData} from '@/engine/svg-maker/svg-string-converters';
-import {audioContext} from "@/engine/audio/simplest-midi";
+import {audioContext} from "@/engine/audio/audio-helpers";
 
 const skyboxSize = 1024;
 
@@ -58,7 +58,6 @@ export async function initTextures() {
 
 function brickWall() {
   return toImage(`<pattern id="pattern" width="99" height="70" patternUnits="userSpaceOnUse">
-<!--         <path d="m0 67h96V35H0V32h47V0h3v32h49V0H0"/> -->
       <rect width="93" height="32" x="3" y="3"/>
       <rect width="93" height="32" x="50" y="38"/>
       <rect width="93" height="32" x="-50" y="38"/>
@@ -131,10 +130,6 @@ export function heightMap() {
     </filter>
         <rect x="0" y="0" width="100%" height="100%" fill="#808080"/>
        <rect x="13" y="21" width="16" height="9" filter="url(#b)"/>
-
-<!--    <rect x="23" y="10" width="12" height="10" fill="#808080"/>-->
-<!--        <rect x="0" y="9" width="12" height="10" fill="#888"/>-->
-
 `, 32, 45)
 }
 

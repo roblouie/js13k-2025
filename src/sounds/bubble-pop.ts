@@ -1,4 +1,4 @@
-import {audioContext} from "@/engine/audio/simplest-midi";
+import {audioContext} from "@/engine/audio/audio-helpers";
 
 export function playPop() {
   const osc = audioContext.createOscillator();

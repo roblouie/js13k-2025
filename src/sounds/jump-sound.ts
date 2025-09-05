@@ -1,5 +1,4 @@
-import {audioContext} from "@/engine/audio/simplest-midi";
-import {envelopeMe, softBuffer} from "@/engine/audio/audio-helpers";
+import {audioContext, envelopeMe, softBuffer} from "@/engine/audio/audio-helpers";
 
 export function jumpSound(isLanding?: boolean) {
   const noise = audioContext.createBufferSource();

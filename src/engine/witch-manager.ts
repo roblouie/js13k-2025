@@ -17,6 +17,7 @@ import {
   spawnParticles
 } from "@/engine/particles";
 import {alpha} from "@/engine/shaders/shaders";
+import {playWitchEscapeSound} from "@/sounds/witch-magic";
 
 export class Witch {
   mesh: Mesh;
@@ -142,6 +143,10 @@ export class WitchManager {
             textureId: materials.heart.texture.id,
           });
         }
+      }
+
+      if (this.witchSavingTimer === 170) {
+        playWitchEscapeSound();
       }
 
       // SPARKLES
