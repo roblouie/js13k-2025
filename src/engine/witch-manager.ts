@@ -67,6 +67,9 @@ export class WitchManager {
     // 7 - mountaintop witch
     this.witches.push(new Witch(makeWitch(new EnhancedDOMPoint(-105, 194.5, -106.5), new EnhancedDOMPoint(0, -180))));
 
+    // 8 - backside of mountain witch
+    this.witches.push(new Witch(makeWitch(new EnhancedDOMPoint(-237, 48, -172), new EnhancedDOMPoint(0, 180))))
+
     this.sceneRef.add_(...this.witches.flatMap(witch => [witch.mesh, witch.orb]));
 
     this.witches.forEach(witch => {
@@ -154,14 +157,21 @@ export class WitchManager {
         // playPop(); // TODO: Replace with sparkle effect
         // for (let i = 0; i < 50; i++) {
           particles.push({
-            position: particleSpreadRadius(this.starParticlePosition, 2),
-            size: 10 + Math.random() * 10,
+            position: this.starParticlePosition.clone_(),
+            size: 40 + Math.random() * 10,
             life: 3.0,
-            velocity: particleRandomizeHorizontal(0.01, 0.13),
-            sizeModifier: 2 + Math.random(),
-            lifeModifier: 0.03,
+            velocity: this.starParticlePosition.clone_(),
+            sizeModifier: Math.random(),
+            lifeModifier: Math.max(Math.abs(Math.random() * 2), 0.2),
             isAffectedByGravity: false,
             textureId: materials.sparkle.texture.id,
+            modifierCallback(particle) {
+              particle.position.x = this.velocity.x + Math.sin(particle.position.y * particle.sizeModifier) * 7;
+              particle.position.z = this.velocity.z + Math.cos(particle.position.y * particle.sizeModifier) * 7;
+              particle.position.y += 0.1 * particle.lifeModifier;
+              particle.life -= 0.02;
+              particle.size += this.lifeModifier;
+            }
           });
         // }
       }
@@ -192,7 +202,7 @@ export class WitchManager {
           // for testing, just remove the witch from the nodes, scene, and the witch manager itself
           this.originalPlayerCameraPosition = player.camera.position.clone_();
           this.cameraPositionTarget = new EnhancedDOMPoint().set(witch.mesh.worldMatrix.transformPoint(new EnhancedDOMPoint(0,0,15)));
-          this.starParticlePosition = new EnhancedDOMPoint().set(witch.mesh.worldMatrix.transformPoint(new EnhancedDOMPoint(0,0,6)));
+          this.starParticlePosition = new EnhancedDOMPoint().set(witch.mesh.position);
           this.starParticlePosition.y -= 5;
           this.activeSavingWitch = witch;
         }

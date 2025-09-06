@@ -7,8 +7,7 @@ import {
   lightPovMvp,
   modelviewProjection,
   normalMatrix,
-  u_skybox,
-  u_viewDirectionProjectionInverse, uViewProj,
+  u_viewDirectionProjectionInverse, uSampler, uViewProj,
 } from '@/engine/shaders/shaders';
 import { EnhancedDOMPoint } from '@/engine/enhanced-dom-point';
 import {createOrtho, Object3d} from "@/engine/renderer/object-3d";
@@ -33,7 +32,6 @@ gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 
 const modelviewProjectionLocation = gl.getUniformLocation(lilgl.program, modelviewProjection)!;
 const normalMatrixLocation =  gl.getUniformLocation(lilgl.program, normalMatrix)!;
-const skyboxLocation = gl.getUniformLocation(lilgl.skyboxProgram, u_skybox)!;
 const viewDirectionProjectionInverseLocation = gl.getUniformLocation(lilgl.skyboxProgram, u_viewDirectionProjectionInverse)!;
 
 const origin = new EnhancedDOMPoint(0, 0, 0);
@@ -139,11 +137,10 @@ export function render(camera: Camera, scene: Scene) {
     gl.drawElements(gl.TRIANGLES, mesh.geometry.getIndices()!.length, gl.UNSIGNED_SHORT, 0);
   });
 
-
-
   gl.depthFunc(gl.LEQUAL);
   gl.useProgram(lilgl.skyboxProgram);
-  gl.uniform1i(skyboxLocation, 0);
+
+  gl.activeTexture(gl.TEXTURE2);
   viewMatrixCopy.m41 = 0;
   viewMatrixCopy.m42 = 0;
   viewMatrixCopy.m43 = 0;

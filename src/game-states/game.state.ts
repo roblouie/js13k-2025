@@ -8,7 +8,6 @@ import {AttributeLocation, render} from '@/engine/renderer/renderer';
 import {MoldableCubeGeometry} from '@/engine/moldable-cube-geometry';
 import {computeSceneBounds, OctreeNode} from "@/engine/physics/octree";
 import {ThirdPersonPlayer} from "@/core/third-person-player";
-import {Skybox} from "@/engine/skybox";
 import {hedgeMazeAndTube, tunnel} from "@/modeling/hedge-maze-and-tube";
 import {floatingPath} from "@/modeling/floating-path";
 import {floatingPlatforms} from "@/modeling/floating-platforms";
@@ -31,9 +30,7 @@ export class GameState implements State {
   witchManager: WitchManager;
 
   constructor() {
-    const skybox = new Skybox(...skyboxes.test);
-    skybox.bindGeometry();
-    this.scene = new Scene(skybox);
+    this.scene = new Scene();
     //this.player = new FreeCam(new Camera(Math.PI / 3, 16 / 9, 1, 500));
 
     this.player = new ThirdPersonPlayer(new Camera(Math.PI / 2.5, 16 / 9, 1, 700));

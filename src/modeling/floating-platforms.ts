@@ -9,11 +9,11 @@ export const platformMaker = (rad: number) => new MoldableCubeGeometry(4, rad/2,
 
 export function floatingPlatforms() {
   return new Mesh(
-    platformMaker(8)
-      .merge(platformMaker(20).translate_(30, 8, 18))
-      .merge(platformMaker(12).translate_(68, 19, 40))
-      .merge(platformMaker(10).translate_(60, 32, 10))
-      .merge(platformMaker(28).translate_(30, 40, -20))
+    platformMaker(8).spreadTextureCoords()
+      .merge(platformMaker(20).translate_(30, 8, 18).spreadTextureCoords())
+      .merge(platformMaker(12).translate_(68, 19, 40).spreadTextureCoords())
+      .merge(platformMaker(10).translate_(60, 32, 10).spreadTextureCoords())
+      .merge(platformMaker(28).translate_(30, 40, -20).spreadTextureCoords())
       .all_()
 
       // World placement
@@ -21,5 +21,5 @@ export function floatingPlatforms() {
       // End world placement
       .computeNormals()
       .done_()
-    , materials.white);
+    , materials.brickWall);
 }

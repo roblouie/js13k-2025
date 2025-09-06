@@ -10,6 +10,7 @@ type Particle = {
   sizeModifier: number;
   lifeModifier: number;
   textureId: number;
+  modifierCallback?: (particle: Particle) => void;
 };
 
 export const particles: Particle[] = [];
@@ -50,6 +51,10 @@ export function wireParticles(): [WebGLVertexArrayObject, () => number] {
       return 0;
     }
     for (let i = particles.length - 1; i >= 0; i--) {
+      if (particles[i].modifierCallback) {
+        particles[i].modifierCallback!(particles[i]);
+        continue;
+      }
       const p = particles[i];
       if (p.isAffectedByGravity) {
         p.velocity.y -= 0.03;

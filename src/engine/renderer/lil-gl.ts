@@ -39,9 +39,14 @@ export class LilGl {
 
    const shadowMapLocation = this.gl.getUniformLocation(this.program, shadowMap);
    const textureLocation = this.gl.getUniformLocation(this.program, uSampler);
+   const skyboxLocation = this.gl.getUniformLocation(this.skyboxProgram, uSampler)!;
+
    this.gl.useProgram(this.program);
    this.gl.uniform1i(textureLocation, 0);
    this.gl.uniform1i(shadowMapLocation, 1);
+
+   this.gl.useProgram(this.skyboxProgram);
+   this.gl.uniform1i(skyboxLocation, 2);
  }
 
   createShader(type: GLenum, source: string): WebGLShader {

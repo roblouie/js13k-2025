@@ -33,6 +33,6 @@ export function rampToJump() {
       .computeNormals()
 
       .done_(),
-    materials.cartoonGrass
+    materials.brickWall
   );
 }

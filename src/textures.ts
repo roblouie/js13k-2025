@@ -40,18 +40,7 @@ export async function initTextures() {
 
   heightmap.data = await heightMap();
 
-
-  const box = await drawSkyboxHor();
-  const slicer = horizontalSkyboxSlice(box);
-  const horSlices = [await slicer(), await slicer(), await slicer(), await slicer()];
-  skyboxes.test = [
-    horSlices[3],
-    horSlices[1],
-    await solidColor('#248', skyboxSize),
-    await solidColor('#094009', skyboxSize),
-    horSlices[2],
-    horSlices[0],
-  ];
+  textureLoader.loadSkybox(await drawSkyboxHor());
 
   textureLoader.bindTextures();
 }
@@ -139,7 +128,7 @@ function solidColor(color: string | number, size = 512) {
 
 function drawSkyboxHor() {
   const element = `
-<filter id="filter" width="100%" height="100%" x="0">
+<filter id="filter" width="100%" height="100%" x="0" y="0">
         <feTurbulence type="fractalNoise" baseFrequency=".002 .01" numOctaves="5" stitchTiles="stitch" seed="25"/>
         <feColorMatrix values="0 0 0 0 1
                                0 0 0 0 1
@@ -147,27 +136,14 @@ function drawSkyboxHor() {
                                0 0 0 -0.45 0.2"/>
         <feBlend in2="SourceGraphic"/>
     </filter>
-    <rect width="100%" height="100%" fill="#248" filter="url(#filter)"/>
-    <filter height="100%" id="f" width="100%" x="0" >
+    <rect width="100%" height="100%" y="0" fill="#248" filter="url(#filter)"/>
+    <filter id="f">
         <feTurbulence baseFrequency="0.008,0" numOctaves="2" seed="15" stitchTiles="stitch" type="fractalNoise" />
-        <feDisplacementMap in="SourceGraphic" scale="100"/>
+        <feDisplacementMap in="SourceGraphic" scale="-100"/>
     </filter>
-    <g><rect filter="url(#f)" height="100%" width="100%" y="700" fill="#094009"/></g>`
+    <g><rect filter="url(#f)" height="45%" width="104%" y="-30" x="-2%" fill="#094009"/></g>`
 
   return toImage(element, skyboxSize * 4, skyboxSize);
-}
-
-function horizontalSkyboxSlice(image: CanvasImageSource) {
-  let xPos = 0;
-  const context = new OffscreenCanvas(skyboxSize, skyboxSize).getContext('2d')!;
-
-  return async (): Promise<ImageData> => {
-    // @ts-ignore
-    context.drawImage(image, xPos, 0);
-    xPos -= skyboxSize;
-    // @ts-ignore
-    return context.getImageData(0, 0, skyboxSize, skyboxSize);
-  };
 }
 
 function catMouth() {

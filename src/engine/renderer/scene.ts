@@ -1,14 +1,22 @@
 import { Object3d } from '@/engine/renderer/object-3d';
 import { Mesh } from '@/engine/renderer/mesh';
-import {Skybox} from "@/engine/skybox";
+import {MoldableCubeGeometry} from "@/engine/moldable-cube-geometry";
 
 export class Scene extends Object3d {
-  skybox: Skybox;
+  skybox = new MoldableCubeGeometry();
   solidMeshes: Mesh[] = [];
 
-  constructor(skybox: Skybox) {
+  constructor() {
     super();
-    this.skybox = skybox;
+    this.skybox.setAttribute_(0, new Float32Array([
+      -1, -1,
+      1, -1,
+      -1, 1,
+      -1, 1,
+      1, -1,
+      1, 1,
+    ]), 2);
+    this.skybox.bindGeometry();
   }
 
   add_(...object3ds: Object3d[]) {

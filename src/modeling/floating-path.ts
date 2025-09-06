@@ -18,5 +18,5 @@ export function floatingPath() {
 
       .computeNormals()
       .done_()
-    , materials.white);
+    , materials.brickWall);
 }
