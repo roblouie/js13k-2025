@@ -21,6 +21,8 @@ import {
 import {bridge, frontRamp} from "@/modeling/bridges";
 import {WitchManager} from "@/engine/witch-manager";
 import {playSong} from "@/sounds/song";
+import {makeWorld} from "@/js13k-shared-modeling/full-world";
+import {makeFloor} from "@/js13k-shared-modeling/world-geography";
 
 export class GameState implements State {
   player: ThirdPersonPlayer;
@@ -55,10 +57,8 @@ export class GameState implements State {
 
     // floorGeo.setAttribute_(AttributeLocation.TextureDepth, new Float32Array(texDepths), 1);
 
-    const floor = new Mesh(
-      floorGeo
-        .modifyEachVertex((vert, index) => vert.y = heightmap.data[index])
-        .spreadTextureCoords(40, 40).computeNormals().done_(), materials.cartoonGrass);
+
+
 
 
     const ramp = new MoldableCubeGeometry(10, 3, 60)
@@ -103,8 +103,8 @@ export class GameState implements State {
     const wrldWall = worldWall();
     const cave = nightCave();
 
-    this.scene.add_(floor, this.player.mesh, hedgeMaze, tnl, floating, path2, rampToJmp, mntn, tubeCaveArea, mtnAreaCliff, frontLeftCliff, brdge, frntBrdge, wrldWall, cave);
-    const faces = meshToFaces([floor, hedgeMaze, tnl, floating, path2, rampToJmp, mntn, tubeCaveArea, mtnAreaCliff, frontLeftCliff, brdge, frntBrdge, wrldWall, cave]);
+    this.scene.add_(makeFloor(), makeWorld(), this.player.mesh);
+    const faces = meshToFaces([makeFloor(), makeWorld()]);
 
     // precomputed world bounds, so not needed at runtime
     const worldBounds = computeSceneBounds(faces);

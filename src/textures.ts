@@ -20,6 +20,7 @@ export async function initTextures() {
   materials.cartoonGrass = new Material({ texture: textureLoader.load_(await flora('#008115', .005))});
   materials.shrubs = new Material({ texture: textureLoader.load_(await flora('#0d4b22', .1))});
   materials.brickWall = new Material({ texture: textureLoader.load_(await brickWall())})
+  materials.wood = new Material({ texture: textureLoader.load_(await wood())})
 
   materials.cobblestone = new Material({ texture: textureLoader.load_(await solidColor('#bbb'))});
   materials.white = new Material({ texture: textureLoader.load_(await solidColor('#bbb'))});
@@ -79,7 +80,7 @@ function emojiParticle(emoji: string, style = '') {
 }
 
 function bars() {
-  return toImage(`<rect width="50%" height="100%" x="25%" fill="#fff"/>`);
+  return toImage(`<rect width="50%" height="100%" x="25%" fill="#999"/>`);
 }
 
 export function cartoonRockWall() {
@@ -97,8 +98,15 @@ function marbleFloor() {
   return toImage(`<pattern id="a" width="256" height="256" patternUnits="userSpaceOnUse"><circle r="290" fill="#fff"/><path d="M0 0h128v256h128V128H0z"/></pattern><filter id="b"><feTurbulence baseFrequency=".04" numOctaves="5"/><feColorMatrix values="1 -1 0 0 0 1 -1 0 0 0 1 -1 0 0 0 0 0 0 0 0.3"/><feBlend in="SourceGraphic" mode="soft-light"/></filter><rect width="100%" height="100%" fill="url(#a)" filter="url(#b)"/>`)
 }
 
-function wood() {
-  return toImage(`<filter id="a"><feTurbulence type="fractalNoise" baseFrequency="0.1, 0.007" numOctaves="6" stitchTiles="stitch"/><feComposite in="s" operator="arithmetic" k2=".5" k3=".6"/><feComponentTransfer><feFuncA type="table" tableValues="0, .1, .2, .3, .4, .2, .4"/></feComponentTransfer><feDiffuseLighting color-interpolation-filters="sRGB" surfaceScale="3" lighting-color="#6e3f2b"><feDistantLight azimuth="110" elevation="48"/></feDiffuseLighting></filter><rect height="100%" width="100%" filter="url(#a)"/>`)
+export function wood() {
+  return toImage(`${filterTag('m')}
+        <feTurbulence type="fractalNoise" baseFrequency="0.09,.01" numOctaves="4" stitchTiles="stitch"/>
+        <feDiffuseLighting diffuseConstant="6" surfaceScale="1" lighting-color="#7B3F00" color-interpolation="sRGB">
+            <feDistantLight elevation="6" azimuth="170"/>
+        </feDiffuseLighting>
+    </filter>
+
+        <rect width="100%" height="100%" filter="url(#m)"/>`)
 }
 
 export function metals() {

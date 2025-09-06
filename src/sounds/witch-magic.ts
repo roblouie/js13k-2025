@@ -8,5 +8,5 @@ export function playWitchEscapeSound() {
     pizzicatoStrings(audioContext.currentTime + i/15 + 0.7, 0.5, frequencyFromMidiNote(90 + i));
   }
 
-  shake(audioContext.currentTime + 0.8, 1);
+  shake(audioContext.currentTime + 0.9, 1);
 }

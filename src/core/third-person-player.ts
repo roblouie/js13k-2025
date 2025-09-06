@@ -73,8 +73,8 @@ export class ThirdPersonPlayer {
     this.mesh.position.set(this.collisionSphere.center); // at this point, feetCenter is in the correct spot, so draw the mesh there
     this.mesh.position.y -= 0.5; // move up by half height so mesh ends at feet position
 
-    // tmpl.innerHTML += `${this.mesh.position.x}, ${this.mesh.position.y}, ${this.mesh.position.z}<br>`;
-    // tmpl.innerHTML += `${this.mesh.children_[0].rotation_.x}, ${this.mesh.children_[0].rotation_.y}, ${this.mesh.children_[0].rotation_.z}<br>`;
+    tmpl.innerHTML += `${this.mesh.position.x}, ${this.mesh.position.y}, ${this.mesh.position.z}<br>`;
+    tmpl.innerHTML += `${this.mesh.children_[0].rotation_.x}, ${this.mesh.children_[0].rotation_.y}, ${this.mesh.children_[0].rotation_.z}<br>`;
 
     // STOP HERE IF FROZEN
     if (this.isFrozen) {
@@ -122,6 +122,7 @@ export class ThirdPersonPlayer {
     this.camera.position.lerp(desiredPosition, 0.7);
 
     this.lookatTarget.lerp(this.mesh.position, 0.7);
+    this.lookatTarget.y += 2;
     this.camera.lookAt(this.lookatTarget);
     this.camera.updateWorldMatrix();
 

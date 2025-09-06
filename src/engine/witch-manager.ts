@@ -70,6 +70,15 @@ export class WitchManager {
     // 8 - backside of mountain witch
     this.witches.push(new Witch(makeWitch(new EnhancedDOMPoint(-237, 48, -172), new EnhancedDOMPoint(0, 180))))
 
+    // 9 - floating platform
+    this.witches.push(new Witch(makeWitch(new EnhancedDOMPoint(-156, 168, 90), new EnhancedDOMPoint(0, -160))))
+
+    // 10 - mountain platform
+    this.witches.push(new Witch(makeWitch(new EnhancedDOMPoint(-71, 103, -44), new EnhancedDOMPoint(0, 30))))
+
+    // 11 - caged witch
+    this.witches.push(new Witch(makeWitch(new EnhancedDOMPoint(20, 4, 233), new EnhancedDOMPoint(0, 180))))
+
     this.sceneRef.add_(...this.witches.flatMap(witch => [witch.mesh, witch.orb]));
 
     this.witches.forEach(witch => {
@@ -148,7 +157,7 @@ export class WitchManager {
         }
       }
 
-      if (this.witchSavingTimer === 170) {
+      if (this.witchSavingTimer === 160) {
         playWitchEscapeSound();
       }
 
@@ -188,7 +197,7 @@ export class WitchManager {
         this.activeSavingWitch.octreeNodes.forEach(node => node.witches = node.witches?.filter(w => w !== this.activeSavingWitch));
       }
 
-      if (this.witchSavingTimer === 300) {
+      if (this.witchSavingTimer === 275) {
         this.activeSavingWitch = undefined;
         player.isFrozen = false;
         player.camera.position.set(this.originalPlayerCameraPosition);
