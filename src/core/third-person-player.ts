@@ -12,6 +12,7 @@ import {Mesh} from "@/engine/renderer/mesh";
 import {jumpSound} from "@/sounds/jump-sound";
 import {Witch} from "@/engine/witch-manager";
 import {audioContext} from "@/engine/audio/audio-helpers";
+import {playCatFootstepSound} from "@/sounds/cat-footstep";
 
 export class ThirdPersonPlayer {
   isJumping = false;
@@ -85,6 +86,7 @@ export class ThirdPersonPlayer {
       mesh.alpha += this.velocity.magnitude * 0.4;
 
       if (mesh.alpha >= 1) {
+        playCatFootstepSound();
         mesh.alpha = 0;
         mesh.frameA = mesh.frameA === 0 ? 1 : 0;
         mesh.frameB = mesh.frameB === 0 ? 1 : 0;
@@ -185,15 +187,12 @@ export class ThirdPersonPlayer {
       const camRight = new EnhancedDOMPoint(camDir.z, 0, -camDir.x);
       this.targetVelocity.x = (camDir.x * -controls.inputDirection.y + camRight.x * -controls.inputDirection.x) * speedMultiplier;
       this.targetVelocity.z = (camDir.z * -controls.inputDirection.y + camRight.z * -controls.inputDirection.x) * speedMultiplier;
-      // Face direction of movement
-
-    } else {
-      this.velocity.x *= 0.9;
-      this.velocity.z *= 0.9;
     }
-    this.velocity.x += (this.targetVelocity.x - this.velocity.x) * 0.3;
-    this.velocity.z += (this.targetVelocity.z - this.velocity.z) * 0.3;
 
+    this.velocity.x += (this.targetVelocity.x - this.velocity.x) * 0.25;
+    this.velocity.z += (this.targetVelocity.z - this.velocity.z) * 0.25;
+
+      // Face direction of movement
     this.angle = Math.atan2(this.velocity.x, this.velocity.z);
     this.mesh.children_[0].setRotation_(0, this.angle, 0);
 
