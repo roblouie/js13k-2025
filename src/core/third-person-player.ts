@@ -121,7 +121,10 @@ export class ThirdPersonPlayer {
 
     this.camera.position.lerp(desiredPosition, 0.7);
 
-    this.lookatTarget.lerp(this.mesh.position, 0.7);
+    const toLookAt = this.mesh.position.clone_();
+    toLookAt.y += 2;
+
+    this.lookatTarget.lerp(toLookAt, 0.7);
     this.lookatTarget.y += 2;
     this.camera.lookAt(this.lookatTarget);
     this.camera.updateWorldMatrix();

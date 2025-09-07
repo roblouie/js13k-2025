@@ -49,7 +49,7 @@ export function makeWitch(pos: EnhancedDOMPoint, rot: EnhancedDOMPoint) {
             }
           })
           .translate_(0, 1.5)
-          .texturePerSide(materials.witchClothes)
+          .texturePerSide(materials.witchHat)
       )
 
       // hair
@@ -105,7 +105,7 @@ export function makeWitch(pos: EnhancedDOMPoint, rot: EnhancedDOMPoint) {
   const frame2 = makeWitch(1)
   body.addFrame(1, frame2.vertices);
 
-  const mesh = new Mesh(body, materials.white);
+  const mesh = new Mesh(body, materials.whichSkin);
   mesh.position.set(pos);
   mesh.rotation_.set(rot);
   return mesh;

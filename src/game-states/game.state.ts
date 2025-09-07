@@ -1,8 +1,6 @@
 import {State} from '@/core/state';
 import {Scene} from '@/engine/renderer/scene';
 import {Camera} from '@/engine/renderer/camera';
-import {heightmap, heightMap, materials, pathTest, skyboxes} from '@/textures';
-import {Mesh} from '@/engine/renderer/mesh';
 import {meshToFaces} from '@/engine/physics/parse-faces';
 import {AttributeLocation, render} from '@/engine/renderer/renderer';
 import {MoldableCubeGeometry} from '@/engine/moldable-cube-geometry';

@@ -36,7 +36,7 @@ export function bridge() {
       .translate_(-190, 20, 9)
       .done_()
 
-    , materials.cobblestone);
+    , materials.brickWall);
 }
 
 export function frontRamp() {
@@ -52,5 +52,5 @@ export function frontRamp() {
       .translate_(-55, 29, 113)
       .done_()
 
-    , materials.cobblestone);
+    , materials.brickWall);
 }

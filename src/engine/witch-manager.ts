@@ -47,7 +47,7 @@ export class WitchManager {
     this.sceneRef = sceneRef;
 
     // 1 - Map start witch
-    this.witches.push(new Witch(makeWitch(new EnhancedDOMPoint(123, 12, 151), new EnhancedDOMPoint(0, 50, 0))));
+    this.witches.push(new Witch(makeWitch(new EnhancedDOMPoint(112, 11.5, 152), new EnhancedDOMPoint(0, 54, 0))));
 
     // 2 - hedge maze witch
     this.witches.push(new Witch(makeWitch(new EnhancedDOMPoint(-202, 6.5, 195), new EnhancedDOMPoint(0, 37))));
@@ -77,7 +77,7 @@ export class WitchManager {
     this.witches.push(new Witch(makeWitch(new EnhancedDOMPoint(-71, 103, -44), new EnhancedDOMPoint(0, 30))))
 
     // 11 - caged witch
-    this.witches.push(new Witch(makeWitch(new EnhancedDOMPoint(20, 4, 233), new EnhancedDOMPoint(0, 180))))
+    this.witches.push(new Witch(makeWitch(new EnhancedDOMPoint(20, 10, 235), new EnhancedDOMPoint(0, 180))))
 
     this.sceneRef.add_(...this.witches.flatMap(witch => [witch.mesh, witch.orb]));
 
@@ -201,7 +201,7 @@ export class WitchManager {
         this.activeSavingWitch = undefined;
         player.isFrozen = false;
         player.camera.position.set(this.originalPlayerCameraPosition);
-        player.camera.lookAt(player.mesh.position);
+        player.camera.lookAt(player.lookatTarget);
         this.witchSavingTimer = 0;
       }
       player.camera.updateWorldMatrix();
