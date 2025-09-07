@@ -52,6 +52,7 @@ export class ThirdPersonPlayer {
   pitch = 0;
   cameraSpeed = 0.04;
   maxPitch = Math.PI / 3;
+  minPitch = -0.08;
   isFrozen = false;
 
 
@@ -98,7 +99,7 @@ export class ThirdPersonPlayer {
     if (controls.cameraDirection.magnitude) {
       this.yaw += controls.cameraDirection.x * -this.cameraSpeed;
       this.pitch += controls.cameraDirection.y * this.cameraSpeed;
-      this.pitch = clamp(this.pitch, -this.maxPitch, this.maxPitch);
+      this.pitch = clamp(this.pitch, this.minPitch, this.maxPitch);
     } else {
       const toCam = this.camera.position.clone_().subtract(this.mesh.position).normalize_();
       // recover spherical angles from vector

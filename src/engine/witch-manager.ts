@@ -50,7 +50,7 @@ export class WitchManager {
     this.witches.push(new Witch(makeWitch(new EnhancedDOMPoint(112, 11.5, 152), new EnhancedDOMPoint(0, 54, 0))));
 
     // 2 - hedge maze witch
-    this.witches.push(new Witch(makeWitch(new EnhancedDOMPoint(-202, 6.5, 195), new EnhancedDOMPoint(0, 37))));
+    this.witches.push(new Witch(makeWitch(new EnhancedDOMPoint(-190, 6.5, 190), new EnhancedDOMPoint(0, 37))));
 
     // 3 - behind bridge witch
     this.witches.push(new Witch(makeWitch(new EnhancedDOMPoint(-219, 6.5, 8), new EnhancedDOMPoint(0, 90))));
