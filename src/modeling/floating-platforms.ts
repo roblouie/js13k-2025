@@ -1,25 +1,24 @@
 import {materials} from "@/textures";
-import {Mesh} from "@/engine/renderer/mesh";
 import {MoldableCubeGeometry} from "@/engine/moldable-cube-geometry";
-import {cylinderSelector2} from "@/modeling/building-blocks";
+import {cylinderSelector2} from "./building-blocks";
+import {geoTexPerSide} from "./world-geography";
 
-export const platformMaker = (rad: number) => new MoldableCubeGeometry(4, rad/2, 4, 6, 1, 6)
+export const platformMaker = (rad: number) => new MoldableCubeGeometry(4, rad/2, 4, 6, 1, 6).texturePerSide(materials.brickWall)
   .selectBy(cylinderSelector2()).cylindrify(rad)
   .selectBy(vert => vert.y < 0).scale_(0, 1, 0).all_()
 
 export function floatingPlatforms() {
-  return new Mesh(
-    platformMaker(8).spreadTextureCoords()
-      .merge(platformMaker(20).translate_(30, 8, 18).spreadTextureCoords())
-      .merge(platformMaker(12).translate_(68, 19, 40).spreadTextureCoords())
-      .merge(platformMaker(10).translate_(60, 32, 10).spreadTextureCoords())
-      .merge(platformMaker(28).translate_(30, 40, -20).spreadTextureCoords())
+  return platformMaker(8).texturePerSide(...geoTexPerSide()).spreadTextureCoords()
+      .merge(platformMaker(20).texturePerSide(...geoTexPerSide()).translate_(30, 8, 18).spreadTextureCoords())
+      .merge(platformMaker(12).texturePerSide(...geoTexPerSide()).translate_(68, 19, 40).spreadTextureCoords())
+      .merge(platformMaker(10).texturePerSide(...geoTexPerSide()).translate_(90, 32, 30).spreadTextureCoords())
+      .merge(platformMaker(28).texturePerSide(...geoTexPerSide()).translate_(140, 35, 50).spreadTextureCoords())
       .all_()
 
       // World placement
-      .translate_(-140, 80)
+    .rotate_(0, -1)
+      .translate_(-190, 120, -60)
       // End world placement
       .computeNormals()
-      .done_()
-    , materials.brickWall);
+      .done_();
 }

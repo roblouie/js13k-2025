@@ -27,7 +27,7 @@ export const defaultTerserOptions: Terser.MinifyOptions = {
   // Parser options
   parse: {
     bare_returns: false,
-    ecma: 2022 as ECMA,
+    ecma: 2024 as ECMA,
     html5_comments: false,
     shebang: true,
   },
@@ -190,7 +190,7 @@ export const defaultTerserOptions: Terser.MinifyOptions = {
     // logic in certain contrived cases, but should be fine for most code.
     // It assumes that standard built-in ECMAScript functions and classes have not been
     // altered or replaced.
-    unsafe: true,
+    //unsafe: true,
 
     // Convert ES5 style anonymous function expressions to arrow functions if the function
     // body does not reference this. Note: it is not always safe to perform this conversion
@@ -285,7 +285,7 @@ export const defaultTerserOptions: Terser.MinifyOptions = {
     ie8: false,
 
     // set desired EcmaScript standard version for output.
-    ecma: 2022 as ECMA,
+    ecma: 2024 as ECMA,
 
     /** Emit shorthand properties {a} instead of {a: a} */
     shorthand: true,

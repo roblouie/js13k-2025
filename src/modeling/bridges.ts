@@ -13,8 +13,7 @@ export const makeBridgePiece = (depth: number, scaleY: number, scaleZ: number) =
 };
 
 export function bridge() {
-  return new Mesh(
-    makeBridgePiece(20, 1.3, 2).texturePerSide(materials.brickWall).spreadTextureCoords(20, 20)
+  return makeBridgePiece(20, 1.3, 2).texturePerSide(materials.brickWall).spreadTextureCoords(20, 20)
       .merge(makeBridgePiece(2, 1.3, 2).texturePerSide(materials.brickWall).all_().translate_(9, 3).spreadTextureCoords(20, 20))
       .merge(makeBridgePiece(2, 1.3, 2).texturePerSide(materials.brickWall).all_().translate_(-9, 3).spreadTextureCoords(20, 20))
 
@@ -34,14 +33,11 @@ export function bridge() {
       .all_()
 
       .translate_(-190, 20, 9)
-      .done_()
-
-    , materials.brickWall);
+      .done_();
 }
 
 export function frontRamp() {
-  return new Mesh(
-    new MoldableCubeGeometry(12, 2, 70)
+  return new MoldableCubeGeometry(12, 2, 70)
       .texturePerSide(materials.brickWall)
       // .spreadTextureCoords(20, 20)
 
@@ -50,7 +46,5 @@ export function frontRamp() {
       .all_()
       .rotate_(0, 0.6)
       .translate_(-55, 29, 113)
-      .done_()
-
-    , materials.brickWall);
+      .done_();
 }

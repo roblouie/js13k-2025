@@ -1,15 +1,14 @@
 import {MoldableCubeGeometry} from "@/engine/moldable-cube-geometry";
 import {Mesh} from "@/engine/renderer/mesh";
 import {materials} from "@/textures";
-import {cylinderSelector2} from "@/modeling/building-blocks";
-import {rampSection} from "@/modeling/hedge-maze-and-tube";
-import {platformMaker} from "@/modeling/floating-platforms";
+import {cylinderSelector2} from "./building-blocks";
+import {rampSection} from "./hedge-maze-and-tube";
+import {platformMaker} from "./floating-platforms";
+import {geoTexPerSide} from "./world-geography";
 
 export function mountain() {
-  return new Mesh(
-
-    // Bottom Section
-    new MoldableCubeGeometry(200, 80, 200, 6, 1, 6)
+  return new MoldableCubeGeometry(200, 80, 200, 6, 1, 6)
+      .texturePerSide(...geoTexPerSide())
       .spreadTextureCoords(60, 30)
 
       // Mountain main bottom portion
@@ -25,11 +24,14 @@ export function mountain() {
       .translate_(0, 40)
 
       // Ramp and platform for bottom portion
-      .merge(rampSection(0, 1.5, 80, 120).spreadTextureCoords(30, 30))
-      .merge(platformMaker(20).translate_(-10, 60, 80).spreadTextureCoords(30, 30))
+      .merge(rampSection(0, 1.5, 80, 120).texturePerSide(materials.cartoonRockWall).spreadTextureCoords(30, 30))
+      .merge(platformMaker(20).translate_(-10, 60, 80).texturePerSide(materials.cartoonRockWall).spreadTextureCoords(30, 30))
+      .merge(platformMaker(20). translate_(35, 62, 70).texturePerSide(materials.cartoonRockWall).spreadTextureCoords(30, 30))
+      .merge(platformMaker(25). translate_(-60, 50, -65).texturePerSide(materials.cartoonRockWall).spreadTextureCoords(30, 30))
 
       // Top Section
       .merge(new MoldableCubeGeometry(100, 90, 100, 6, 1, 6)
+        .texturePerSide(...geoTexPerSide())
         .selectBy(cylinderSelector2(50))
         .cylindrify(50)
         .invertSelection()
@@ -42,13 +44,15 @@ export function mountain() {
         .all_()
 
       // Ramp and platform for top portion
-      .merge(rampSection(0, 1, 40, 60).spreadTextureCoords(30, 30).rotate_(0, 5).translate_(0, -20))
-        .merge(platformMaker(15).translate_(-35, 23, 12).spreadTextureCoords(30, 30))
-        .merge(platformMaker(15).translate_(-30, 35, -20).spreadTextureCoords(30, 30))
+      .merge(rampSection(0, 1, 40, 60).texturePerSide(materials.cartoonRockWall).spreadTextureCoords(30, 30).rotate_(0, 4).translate_(0, -20))
+        .merge(platformMaker(15).translate_(-35, 18, -20).texturePerSide(materials.cartoonRockWall).spreadTextureCoords(30, 30))
+        .merge(platformMaker(15).translate_(-35, 25, 10).texturePerSide(materials.cartoonRockWall).spreadTextureCoords(30, 30))
+        .merge(platformMaker(10).translate_(-30, 35, 25).texturePerSide(materials.cartoonRockWall).spreadTextureCoords(30, 30))
         .translate_(-16, 100))
 
       // side blocking ramp
       .merge(new MoldableCubeGeometry(40, 60, 30)
+        .texturePerSide(materials.cartoonRockWall)
         .selectBy(vert => vert.y < 0 && vert.z < 0)
         .translate_(0, 0, -50)
         .all_()
@@ -64,5 +68,5 @@ export function mountain() {
     // End world location
 
     .computeNormals()
-    .done_(), materials.cartoonRockWall)
+    .done_();
 }

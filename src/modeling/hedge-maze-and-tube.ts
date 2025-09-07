@@ -32,29 +32,28 @@ export function rampSection(startingPoint: number, steepnessModifier: number, in
 }
 
 export function hedgeMazeAndTube() {
-  return new Mesh(tubify(20, 25, 20, materials.shrubs)
+  return tubify(20, 25, 20, materials.shrubs)
     .merge(tubify(50, 55, 20, materials.shrubs).rotate_(0, Math.PI / 2))
     .merge(new MoldableCubeGeometry(6, 20, 26).texturePerSide(materials.shrubs).spreadTextureCoords().rotate_(0, Math.PI / -4).translate_(27, 0, -26))
     // World placement
     .rotate_(0, Math.PI/-4)
-    .translate_(-200, 10, 200)
+    .translate_(-190, 10, 190)
     // End world placement
 
 
 
     .computeNormals()
-    .done_(), materials.shrubs);
+    .done_();
 }
 
 export function tunnel() {
-  return new Mesh(
-    tubify(25, 35, 140, materials.cartoonGrass).rotate_(Math.PI / 2, 0, Math.PI / -2)
+  return tubify(25, 35, 140, materials.cartoonGrass).rotate_(Math.PI / 2, 0, Math.PI / -2)
+
+
       // World placement
       .rotate_(0, Math.PI / 1.9)
       .translate_(190, 50, -84)
       // End world placement
 
-      .computeNormals().done_()
-
-    , materials.cartoonGrass);
+      .computeNormals().done_();
 }
