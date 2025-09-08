@@ -12,6 +12,7 @@ import {
 import { EnhancedDOMPoint } from '@/engine/enhanced-dom-point';
 import {createOrtho, Object3d} from "@/engine/renderer/object-3d";
 import {wireParticles} from "@/engine/particles";
+import {Mesh} from "@/engine/renderer/mesh";
 
 // IMPORTANT! The index of a given buffer in the buffer array must match it's respective data location in the shader.
 // This allows us to use the index while looping through buffers to bind the attributes. So setting a buffer
@@ -84,6 +85,24 @@ const [particleVao, drawParticles] = wireParticles();
 const particleViewProjectionMatrixLocation = gl.getUniformLocation(lilgl.particleProgram, uViewProj);
 // end particle setup
 
+function renderMesh(mesh: Mesh, viewProjectionMatrix: DOMMatrix) {
+  const modelViewProjectionMatrix = viewProjectionMatrix.multiply(mesh.worldMatrix);
+  gl.uniformMatrix4fv(lightPovMvpRenderLocation, false, textureSpaceMvp.multiply(mesh.worldMatrix).toFloat32Array());
+
+  gl.uniform1i(frameALocation, mesh.frameA);
+  gl.uniform1i(frameBLocation, mesh.frameB);
+  gl.uniform1f(alphaLocation, mesh.alpha);
+
+  gl.vertexAttrib1f(AttributeLocation.TextureDepth, mesh.material?.texture?.id ?? -1.0);
+  gl.bindVertexArray(mesh.geometry.vao!);
+
+  // @ts-ignore
+  gl.uniformMatrix4fv(normalMatrixLocation, true, mesh.worldMatrix.inverse().toFloat32Array());
+  gl.uniformMatrix4fv(modelviewProjectionLocation, false, modelViewProjectionMatrix.toFloat32Array());
+
+  gl.drawElements(gl.TRIANGLES, mesh.geometry.getIndices()!.length, gl.UNSIGNED_SHORT, 0);
+}
+
 export function render(camera: Camera, scene: Scene) {
   const viewMatrix = camera.worldMatrix.inverse();
   const viewMatrixCopy = viewMatrix.scale(1, 1, 1);
@@ -97,6 +116,7 @@ export function render(camera: Camera, scene: Scene) {
   gl.bindFramebuffer(gl.FRAMEBUFFER, depthFramebuffer);
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
   gl.viewport(0, 0, depthTextureSize.x, depthTextureSize.y);
+  gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 
   scene.solidMeshes.forEach((mesh, index) => {
       gl.bindVertexArray(mesh.geometry.vao!);
@@ -104,8 +124,6 @@ export function render(camera: Camera, scene: Scene) {
       gl.drawElements(gl.TRIANGLES, mesh.geometry.getIndices()!.length, gl.UNSIGNED_SHORT, 0);
   });
   // End render shadow map
-
-
 
 
   gl.useProgram(lilgl.program);
@@ -119,23 +137,7 @@ export function render(camera: Camera, scene: Scene) {
   gl.clearColor(0.0, 0.0, 0.0, 0.0);
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-  scene.solidMeshes.forEach(mesh => {
-    const modelViewProjectionMatrix = viewProjectionMatrix.multiply(mesh.worldMatrix);
-    gl.uniformMatrix4fv(lightPovMvpRenderLocation, false, textureSpaceMvp.multiply(mesh.worldMatrix).toFloat32Array());
-
-    gl.uniform1i(frameALocation, mesh.frameA);
-    gl.uniform1i(frameBLocation, mesh.frameB);
-    gl.uniform1f(alphaLocation, mesh.alpha);
-
-    gl.vertexAttrib1f(AttributeLocation.TextureDepth, mesh.material?.texture?.id ?? -1.0);
-    gl.bindVertexArray(mesh.geometry.vao!);
-
-    // @ts-ignore
-    gl.uniformMatrix4fv(normalMatrixLocation, true, mesh.worldMatrix.inverse().toFloat32Array());
-    gl.uniformMatrix4fv(modelviewProjectionLocation, false, modelViewProjectionMatrix.toFloat32Array());
-
-    gl.drawElements(gl.TRIANGLES, mesh.geometry.getIndices()!.length, gl.UNSIGNED_SHORT, 0);
-  });
+  scene.solidMeshes.forEach(mesh => renderMesh(mesh, viewProjectionMatrix));
 
   gl.depthFunc(gl.LEQUAL);
   gl.useProgram(lilgl.skyboxProgram);
@@ -160,6 +162,14 @@ export function render(camera: Camera, scene: Scene) {
 // draw
   gl.drawArrays(gl.POINTS, 0, drawParticles());
   //------------- Particle test end
+
+  gl.useProgram(lilgl.program);
+  gl.activeTexture(gl.TEXTURE0);
+  gl.blendFunc(gl.SRC_ALPHA, gl.ONE + 1);
+  scene.transparentMeshes.forEach(mesh => {
+    mesh.updateWorldMatrix();
+    renderMesh(mesh, viewProjectionMatrix);
+  });
 
 
   // Unbinding the vertex array being used to make sure the last item drawn isn't still bound on the next draw call.

@@ -14,9 +14,7 @@ import {
   particles,
   particleSpreadRadius,
   randomNegativeOneOne,
-  spawnParticles
 } from "@/engine/particles";
-import {alpha} from "@/engine/shaders/shaders";
 import {playWitchEscapeSound} from "@/sounds/witch-magic";
 
 export class Witch {
@@ -79,7 +77,17 @@ export class WitchManager {
     // 11 - caged witch
     this.witches.push(new Witch(makeWitch(new EnhancedDOMPoint(20, 10, 235), new EnhancedDOMPoint(0, 180))))
 
-    this.sceneRef.add_(...this.witches.flatMap(witch => [witch.mesh, witch.orb]));
+    // 12 - jump to plinth from hedge maze witch
+    this.witches.push(new Witch(makeWitch(new EnhancedDOMPoint(-107, 26, 222), new EnhancedDOMPoint(0, -125))))
+
+    // 13 - inside cave witch
+    this.witches.push(new Witch(makeWitch(new EnhancedDOMPoint(235, 12, 8), new EnhancedDOMPoint(0, 180))))
+
+    this.sceneRef.add_(...this.witches.flatMap(witch => [witch.mesh]));
+    this.sceneRef.transparentMeshes.push(...this.witches.map(witch => {
+      witch.orb.geometry.bindGeometry();
+      return witch.orb;
+    }));
 
     this.witches.forEach(witch => {
       querySphere(octree, witch.collisionSphere, node => {
@@ -91,7 +99,7 @@ export class WitchManager {
       });
     });
 
-    wico.textContent = `🧙‍♀️ 0 / 11`;
+    wico.textContent = `🧙‍♀️ 0 / 13`;
   }
 
   witchSavingTimer = 0;
@@ -99,6 +107,8 @@ export class WitchManager {
   originalPlayerCameraPosition = new EnhancedDOMPoint();
   cameraPositionTarget = new EnhancedDOMPoint();
   starParticlePosition = new EnhancedDOMPoint();
+
+  gameOverDarknessValue = 0.0;
 
   update(player: ThirdPersonPlayer) {
     this.witches.forEach(witch => {
@@ -138,7 +148,7 @@ export class WitchManager {
             textureId: materials.bubbles.texture.id,
           });
         }
-        this.sceneRef.remove_(this.activeSavingWitch.orb);
+        this.sceneRef.transparentMeshes = this.sceneRef.transparentMeshes.filter(orb => orb !== this.activeSavingWitch!.orb);
       }
 
       // HEARTS
@@ -210,9 +220,7 @@ export class WitchManager {
     } else {
       player.witchesToCheck.forEach(witch => {
         if (areSpheresOverlapping(witch.collisionSphere, player.collisionSphere)) {
-          wico.textContent = `🧙‍♀️ ${12 - this.witches.length} / 11${this.witches.length === 1 ? '! You Win!' : ''}`;
-          console.log(this.witches.length)
-          // for testing, just remove the witch from the nodes, scene, and the witch manager itself
+          wico.textContent = `🧙‍♀️ ${14 - this.witches.length} / 13`;
           this.originalPlayerCameraPosition = player.camera.position.clone_();
           this.cameraPositionTarget = new EnhancedDOMPoint().set(witch.mesh.worldMatrix.transformPoint(new EnhancedDOMPoint(0,0,15)));
           this.starParticlePosition = new EnhancedDOMPoint().set(witch.mesh.position);
@@ -220,6 +228,16 @@ export class WitchManager {
           this.activeSavingWitch = witch;
         }
       });
+
+      if (this.witches.length === 0) {
+        tmpl.innerHTML = `<h1 style="text-align: center">You Win!</h1>`
+        tmpl.style.backgroundColor = `rgba(0, 0, 0, ${this.gameOverDarknessValue})`;
+        this.gameOverDarknessValue += 0.003;
+
+        if (this.gameOverDarknessValue > 0.9) {
+          player.isFrozen = true;
+        }
+      }
     }
   }
 }

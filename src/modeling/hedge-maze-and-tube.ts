@@ -3,6 +3,7 @@ import {Mesh} from "@/engine/renderer/mesh";
 import {materials} from "@/textures";
 import {Texture} from "@/engine/renderer/texture";
 import {Material} from "@/engine/renderer/material";
+import {makePlinth} from "@/modeling/world-geography";
 
 export function tubify(innerRadius: number, outerRadius: number, height: number, texture: Material) {
   return new MoldableCubeGeometry(4, height, 40, 1, 1, 6).texturePerSide(texture).translate_(-20).spreadTextureCoords(20, 20)
@@ -37,6 +38,7 @@ export function hedgeMazeAndTube() {
     .merge(new MoldableCubeGeometry(6, 20, 26).texturePerSide(materials.shrubs).spreadTextureCoords().rotate_(0, Math.PI / -4).translate_(27, 0, -26))
     // World placement
     .rotate_(0, Math.PI/-4)
+    .merge(makePlinth(20, 20, materials.brickWall).translate_(80, -10, 30))
     .translate_(-190, 10, 190)
     // End world placement
 

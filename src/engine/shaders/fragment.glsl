@@ -73,7 +73,7 @@ void main() {
     // === Final output ===
     outColor = vec4(foggedColor, baseColor.a);
 
-    if (outColor.a < 0.5) {
+    if (outColor.a < 0.2) {
         discard;
     }
 }

@@ -133,7 +133,7 @@ export function makeCat() {
 
   const mesh = new Mesh(
     body
-    , materials.parquetFloor
+    , materials.iron
   );
   mesh.frameA = 0;
   mesh.frameB = 1;

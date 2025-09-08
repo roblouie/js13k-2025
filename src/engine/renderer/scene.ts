@@ -5,6 +5,7 @@ import {MoldableCubeGeometry} from "@/engine/moldable-cube-geometry";
 export class Scene extends Object3d {
   skybox = new MoldableCubeGeometry();
   solidMeshes: Mesh[] = [];
+  transparentMeshes: Mesh[] = [];
 
   constructor() {
     super();

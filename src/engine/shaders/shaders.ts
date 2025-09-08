@@ -29,7 +29,7 @@ export const v_position = 'y';
 
 export const depth_fragment_glsl = `#version 300 es
 precision highp float;
-out float v;in float f;void main(){if(f>=10.f)discard;v=gl_FragCoord.z;}`;
+out float v;in float f;void main(){if(f>11.f)discard;v=gl_FragCoord.z;}`;
 
 export const depth_vertex_glsl = `#version 300 es
 precision highp float;
@@ -37,7 +37,7 @@ layout(location=2) in float m;layout(location=3) in vec4 i;uniform mat4 t;out fl
 
 export const fragment_glsl = `#version 300 es
 precision highp float;
-in vec2 l;in float f;in vec3 n;in mat4 o;in vec4 e;uniform mediump sampler2DArray s;uniform mediump sampler2DShadow d;vec3 h=normalize(vec3(.3,.3,.2));vec4 x=vec4(.2,.2,.2,1);out vec4 u;float p(mediump sampler2DShadow f,vec4 v){float i=0.,n=1./4096.;for(int l=-1;l<=1;l++)for(int m=-1;m<=1;m++){vec2 e=vec2(l,m)*n;i+=texture(f,vec3(v.xy+e,v.z-.002));}return i/9.;}float p(float f,float i,float m){return 2.*i/(m+i-f*(m-i));}void main(){float v=p(d,e);vec3 m=normalize(mat3(o)*n);float i=max(dot(h,m),0.),t=f>14.?1.:mix(.2*i,i,v);vec3 a=t*vec3(1),z=a+x.xyz,y=clamp(z,x.xyz,vec3(1));vec4 g=texture(s,vec3(l,f));float w=p(gl_FragCoord.z,1.,7e2),A=clamp(smoothstep(.4,1.,w),0.,.5);vec3 C=vec3(.3,.3,.5),c=mix(g.xyz*y,C,A);u=vec4(c,g.w);if(u.w<.5)discard;}`;
+in vec2 l;in float f;in vec3 n;in mat4 o;in vec4 e;uniform mediump sampler2DArray s;uniform mediump sampler2DShadow d;vec3 h=normalize(vec3(.3,.3,.2));vec4 x=vec4(.2,.2,.2,1);out vec4 u;float p(mediump sampler2DShadow f,vec4 v){float i=0.,n=1./4096.;for(int l=-1;l<=1;l++)for(int m=-1;m<=1;m++){vec2 e=vec2(l,m)*n;i+=texture(f,vec3(v.xy+e,v.z-.002));}return i/9.;}float p(float f,float i,float m){return 2.*i/(m+i-f*(m-i));}void main(){float v=p(d,e);vec3 m=normalize(mat3(o)*n);float i=max(dot(h,m),0.),t=f>14.?1.:mix(.2*i,i,v);vec3 a=t*vec3(1),z=a+x.xyz,y=clamp(z,x.xyz,vec3(1));vec4 g=texture(s,vec3(l,f));float w=p(gl_FragCoord.z,1.,7e2),A=clamp(smoothstep(.4,1.,w),0.,.5);vec3 C=vec3(.3,.3,.5),c=mix(g.xyz*y,C,A);u=vec4(c,g.w);if(u.w<.2)discard;}`;
 
 export const particle_fragment_glsl = `#version 300 es
 precision highp float;

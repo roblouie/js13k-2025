@@ -6,10 +6,12 @@ import {render} from '@/engine/renderer/renderer';
 import {computeSceneBounds, OctreeNode} from "@/engine/physics/octree";
 import {ThirdPersonPlayer} from "@/core/third-person-player";
 
-import {WitchManager} from "@/engine/witch-manager";
+import {WitchManager} from "@/witch-manager";
 import {playSong} from "@/sounds/song";
 import {makeWorld} from "@/modeling/full-world";
 import {makeFloor} from "@/modeling/world-geography";
+import {makeJackOLantern} from "@/modeling/jack-o-lantern";
+import {EnemyManager} from "@/enemy-manager";
 
 export class GameState implements State {
   player: ThirdPersonPlayer;
@@ -17,6 +19,7 @@ export class GameState implements State {
 
 
   witchManager: WitchManager;
+  enemyManager: EnemyManager;
 
   constructor() {
     this.scene = new Scene();
@@ -34,6 +37,7 @@ export class GameState implements State {
     faces.forEach(face => this.octree.insert(face));
 
     this.witchManager = new WitchManager(this.scene, this.octree);
+    this.enemyManager = new EnemyManager(this.scene);
 
     playSong();
     setInterval(playSong, 14_200);
@@ -50,6 +54,7 @@ export class GameState implements State {
     // tmpl.innerHTML = '';
 
     this.player.update(this.octree);
+    this.enemyManager.update(this.player);
     this.witchManager.update(this.player);
     this.scene.updateWorldMatrix();
     render(this.player.camera, this.scene);

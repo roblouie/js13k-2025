@@ -10,11 +10,12 @@ import {makeCat} from "@/modeling/cat";
 import {Sphere} from "@/engine/physics/aabb";
 import {Mesh} from "@/engine/renderer/mesh";
 import {jumpSound} from "@/sounds/jump-sound";
-import {Witch} from "@/engine/witch-manager";
+import {Witch} from "@/witch-manager";
 import {audioContext} from "@/engine/audio/audio-helpers";
 import {playCatFootstepSound} from "@/sounds/cat-footstep";
 
 export class ThirdPersonPlayer {
+  health = 9;
   isJumping = false;
   isGroundedThisFrame = false;
   isGrounded = false;
@@ -23,6 +24,7 @@ export class ThirdPersonPlayer {
   smoothedNormal = new EnhancedDOMPoint(0, 1, 0);
   velocity = new EnhancedDOMPoint(0, 0, 0);
   lookatTarget = new EnhancedDOMPoint();
+  isTakingHit = false;
 
   mesh: Object3d;
   camera: Camera;
@@ -52,7 +54,7 @@ export class ThirdPersonPlayer {
   pitch = 0;
   cameraSpeed = 0.04;
   maxPitch = 1.2;
-  minPitch = -0.08;
+  minPitch = -0.07;
   isFrozen = false;
 
 
@@ -74,7 +76,7 @@ export class ThirdPersonPlayer {
     this.mesh.position.set(this.collisionSphere.center); // at this point, feetCenter is in the correct spot, so draw the mesh there
     this.mesh.position.y -= 0.5; // move up by half height so mesh ends at feet position
 
-    // tmpl.innerHTML += `${this.mesh.position.x}, ${this.mesh.position.y}, ${this.mesh.position.z}<br>`;
+    // tmpl.innerHTML = `${this.mesh.position.x}, ${this.mesh.position.y}, ${this.mesh.position.z}<br>`;
     // tmpl.innerHTML += `${this.mesh.children_[0].rotation_.x}, ${this.mesh.children_[0].rotation_.y}, ${this.mesh.children_[0].rotation_.z}<br>`;
 
     // STOP HERE IF FROZEN
@@ -123,10 +125,10 @@ export class ThirdPersonPlayer {
     this.camera.position.lerp(desiredPosition, 0.7);
 
     const toLookAt = this.mesh.position.clone_();
-    toLookAt.y += 2;
+    toLookAt.y += 3;
 
     this.lookatTarget.lerp(toLookAt, 0.7);
-    this.lookatTarget.y += 2;
+    // this.lookatTarget.y += 2;
     this.camera.lookAt(this.lookatTarget);
     this.camera.updateWorldMatrix();
 
@@ -198,8 +200,10 @@ export class ThirdPersonPlayer {
     this.velocity.z += (this.targetVelocity.z - this.velocity.z) * 0.25;
 
       // Face direction of movement
-    this.angle = Math.atan2(this.velocity.x, this.velocity.z);
-    this.mesh.children_[0].setRotation_(0, this.angle, 0);
+    if (!this.isTakingHit) {
+      this.angle = Math.atan2(this.velocity.x, this.velocity.z);
+      this.mesh.children_[0].setRotation_(0, this.angle, 0);
+    }
 
     if (controls.isJump && !controls.isPrevJump) {
       this.jumpBuffer.isBuffered = true;

@@ -24,7 +24,13 @@ export async function initTextures() {
   materials.witchFace = new Material({ texture: textureLoader.load_(await witchFace())});
   materials.witchSkin = new Material({ texture: textureLoader.load_(await solidColor('#63C328'))});
   materials.witchClothes = new Material({ texture: textureLoader.load_(await solidColor('#902EBB'))});
+
+  materials.jackolanternFace = new Material({ texture: textureLoader.load_(await jackolantern())});
+  materials.pumpkin = new Material({ texture: textureLoader.load_(await solidColor('#f71'))});
+
   materials.witchHat = new Material({ texture: textureLoader.load_(await solidColor('#902EBB'))});
+
+
 
   // NOTE: Right now in the fragment shader the texture depth is checked to determine
   // shadows, so that these don't cast shadows. That is currently set to depth >= 10.0f.
@@ -33,6 +39,7 @@ export async function initTextures() {
   materials.catMouth = new Material({ texture: textureLoader.load_(await catMouth())});
   materials.sparkle = new Material({ texture: textureLoader.load_(await emojiParticle('✨', 'filter: hue-rotate(160deg)'))});
   materials.heart = new Material({ texture: textureLoader.load_(await emojiParticle('❤️'))});
+  materials.splat = new Material({ texture: textureLoader.load_(await emojiParticle('💥'))})
   materials.bubbles = new Material({ texture: textureLoader.load_(await emojiParticle('🫧'))});
   materials.witchBubble = new Material({ texture: textureLoader.load_(await witchBubble())});
   materials.catEye = new Material({ texture: textureLoader.load_(await catEye())});
@@ -40,6 +47,13 @@ export async function initTextures() {
   textureLoader.loadSkybox(await drawSkyboxHor());
 
   textureLoader.bindTextures();
+}
+
+export function jackolantern() {
+  return toImage(`<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="20 15 72 72">
+    <circle r="300"/>
+        <path id="p" d="M156 9q10 0 10 30T10 999 6 49 56 9M48 45l-17 -15l-5 15h60l-5 -15l-17 15M20 50l12 25l8 -4l8 9l8 -7l8 7l8 -9l8 4l12 -25l-12 12l-8 -5l-8 9l-8 -7l-8 7l-8 -9l-8 5" fill="#f71"/>
+</svg>`);
 }
 
 function brickWall() {
@@ -58,10 +72,10 @@ function witchBubble() {
   return toImage(`${filterTag('b')}
       <feTurbulence baseFrequency="0.005" numOctaves="2" seed="23"  stitchTiles="stitch" />
 <feColorMatrix values="
+      0 1 0 0 0
       0 0 0 0 0
-      0 0 0 0 0
-      0 0 0 0 2
-      -1 -1 -1 -1 1.4
+      1 1 1 1 1
+      0 -1 -1 0 1
       "/>     </filter>
       <rect x="0" y="0" width="100%" height="100%" filter="url(#b)"/>`)
 }
