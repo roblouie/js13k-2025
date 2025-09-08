@@ -30,6 +30,8 @@ export function makeWitch(pos: EnhancedDOMPoint, rot: EnhancedDOMPoint) {
       // Flatten eye area
       .selectBy(vert => vert.z > 1 && vert.y > 0)
       .translate_(0, 0.3, -0.2)
+      .computeNormals(true)
+
 
       // hat
       .merge(
@@ -50,6 +52,8 @@ export function makeWitch(pos: EnhancedDOMPoint, rot: EnhancedDOMPoint) {
           })
           .translate_(0, 1.5)
           .texturePerSide(materials.witchHat)
+          .computeNormals()
+
       )
 
       // hair
@@ -62,6 +66,8 @@ export function makeWitch(pos: EnhancedDOMPoint, rot: EnhancedDOMPoint) {
           .all_()
           .translate_(0, -1, 0)
           .texturePerSide(materials.iron)
+          .computeNormals(true)
+
       )
 
       // body
@@ -81,6 +87,8 @@ export function makeWitch(pos: EnhancedDOMPoint, rot: EnhancedDOMPoint) {
           })
           .translate_(0, -4.5)
           .texturePerSide(materials.witchClothes)
+          .computeNormals()
+
       )
 
       // arms
@@ -91,13 +99,14 @@ export function makeWitch(pos: EnhancedDOMPoint, rot: EnhancedDOMPoint) {
           .merge(witchLimb(true).rotate_(0, 0, 0.3).translate_(1.5, -2))
           .selectBy(vert => Math.abs(vert.x) > 2)
           .translate_(0, (frame - 0.5))
+          .computeNormals(true)
+
       )
 
 
       .selectBy(vert => vert.y > -4)
       .rotate_(0,0,(frame - 0.5) * 0.3)
       // .all_()
-      .computeNormals(true)
       .done_();
   }
 

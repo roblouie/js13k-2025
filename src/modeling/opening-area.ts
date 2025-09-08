@@ -25,7 +25,7 @@ export function makeTreeline() {
       .all_()
       .translate_(10, 15, 135)
       .spreadTextureCoords()
-      .computeNormals(true)
+      .computeNormals()
     )
 
     // cage wall
@@ -41,7 +41,7 @@ export function makeTreeline() {
       new MoldableCubeGeometry(30, 33, 40).texturePerSide(materials.shrubs)
         .translate_(-155, 14, 125)
         .spreadTextureCoords()
-        .computeNormals(true)
+        .computeNormals()
     )
 
 

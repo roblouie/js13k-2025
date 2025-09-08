@@ -90,6 +90,8 @@ export class WitchManager {
         witch.octreeNodes.push(node);
       });
     });
+
+    wico.textContent = `🧙‍♀️ 0 / 11`;
   }
 
   witchSavingTimer = 0;
@@ -192,7 +194,7 @@ export class WitchManager {
       }
 
       if (this.witchSavingTimer === 250) {
-        this.witches.filter(w => w !== this.activeSavingWitch);
+        this.witches = this.witches.filter(w => w !== this.activeSavingWitch);
         this.sceneRef.remove_(this.activeSavingWitch.mesh);
         this.activeSavingWitch.octreeNodes.forEach(node => node.witches = node.witches?.filter(w => w !== this.activeSavingWitch));
       }
@@ -208,6 +210,8 @@ export class WitchManager {
     } else {
       player.witchesToCheck.forEach(witch => {
         if (areSpheresOverlapping(witch.collisionSphere, player.collisionSphere)) {
+          wico.textContent = `🧙‍♀️ ${12 - this.witches.length} / 11${this.witches.length === 1 ? '! You Win!' : ''}`;
+          console.log(this.witches.length)
           // for testing, just remove the witch from the nodes, scene, and the witch manager itself
           this.originalPlayerCameraPosition = player.camera.position.clone_();
           this.cameraPositionTarget = new EnhancedDOMPoint().set(witch.mesh.worldMatrix.transformPoint(new EnhancedDOMPoint(0,0,15)));

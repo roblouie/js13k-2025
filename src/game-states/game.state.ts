@@ -47,7 +47,7 @@ export class GameState implements State {
   }, 0);
 
   onUpdate() {
-    tmpl.innerHTML = '';
+    // tmpl.innerHTML = '';
 
     this.player.update(this.octree);
     this.witchManager.update(this.player);

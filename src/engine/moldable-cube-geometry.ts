@@ -255,42 +255,36 @@ export class MoldableCubeGeometry {
    * You can optionally pass the shouldCrossPlanes boolean to tell it to use faces from other sides of the cube to
    * compute the normals. Use this for shapes that should appear continuous, like spheres.
    */
-  computeNormals(shouldCrossPlanes = false) {
+  computeNormals(shouldCrossPlanes?: boolean) {
+    const duplicateIndexMap: Map<number, number[]> = new Map();
+    const newIndices = new Uint16Array(this.indices.length);
+
+    if (shouldCrossPlanes) {
+      this.indices.forEach((vertIndex, i) => {
+        const firstIndex = this.vertices.findIndex(vert => this.vertices[vertIndex].isEqualTo(vert));
+        newIndices[i] = firstIndex;
+
+        const dupeList = duplicateIndexMap.get(firstIndex);
+
+        dupeList ? dupeList.push(vertIndex) : duplicateIndexMap.set(vertIndex, []);
+      });
+    }
+
     const vertexNormals = this.vertices.map(_ => new EnhancedDOMPoint());
-    const indices = shouldCrossPlanes ? this.getIndicesWithUniquePositions() : this.indices;
+    const indices = shouldCrossPlanes ? newIndices : this.indices;
+
     for (let i = 0; i < indices.length; i+= 3) {
       const faceNormal = unormalizedNormal([this.vertices[indices[i]], this.vertices[indices[i + 1]], this.vertices[indices[i + 2]]]);
       vertexNormals[indices[i]].add_(faceNormal);
       vertexNormals[indices[i + 1]].add_(faceNormal);
       vertexNormals[indices[i + 2]].add_(faceNormal);
+      duplicateIndexMap.get(indices[i])?.forEach(dupe => vertexNormals[dupe].set(vertexNormals[indices[i]]));
+      duplicateIndexMap.get(indices[i + 1])?.forEach(dupe => vertexNormals[dupe].set(vertexNormals[indices[i + 1]]));
+      duplicateIndexMap.get(indices[i + 2])?.forEach(dupe => vertexNormals[dupe].set(vertexNormals[indices[i + 2]]));
     }
 
     this.setAttribute_(AttributeLocation.Normals, new Float32Array( vertexNormals.flatMap(vector => vector.normalize_().toArray())), 3);
     return this;
-  }
-
-  getIndicesWithUniquePositions() {
-    const checkedPositions: EnhancedDOMPoint[] = [];
-    const indexCopy = this.indices.slice();
-
-    this.verticesToActOn.forEach(selectedVertex => {
-      if (checkedPositions.find(compareVertex => selectedVertex.isEqualTo(compareVertex))) {
-        return;
-      }
-
-      checkedPositions.push(selectedVertex);
-
-      const originalIndex = this.vertices.findIndex(compareVertex => selectedVertex.isEqualTo(compareVertex));
-
-      this.vertices.forEach((compareVertex, vertexIndex) => {
-        if (selectedVertex.isEqualTo(compareVertex)) {
-          const indicesIndex = indexCopy.indexOf(vertexIndex);
-          indexCopy[indicesIndex] = originalIndex;
-        }
-      })
-    });
-
-    return indexCopy;
   }
 
   done_() {

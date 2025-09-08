@@ -121,7 +121,7 @@ export function makeCat() {
       .merge(catHead(frame === 0 ? 0.1 : -0.1).translate_(4, 2.9));
 
 
-    body.rotate_(0, -Math.PI / 2).scale_(0.5, 0.5, 0.5).computeNormals(true);
+    body.rotate_(0, -Math.PI / 2).scale_(0.5, 0.5, 0.5).computeNormals();
 
     return body.done_();
   }
