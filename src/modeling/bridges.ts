@@ -1,6 +1,7 @@
 import { Mesh } from '@/engine/renderer/mesh';
 import { MoldableCubeGeometry } from '@/engine/moldable-cube-geometry';
 import { materials } from '@/textures';
+import {makePlinth} from "@/modeling/world-geography";
 
 export const makeBridgePiece = (depth: number, scaleY: number, scaleZ: number) => {
   return new MoldableCubeGeometry(depth, 40, 50, 1, 1, 8)
@@ -21,12 +22,10 @@ export function bridge() {
 
       // platform behind bridge
       .merge(
-        new MoldableCubeGeometry(4, 26, 4, 4, 1, 4)
-          .texturePerSide(materials.cartoonGrass)
-          .cylindrify(10)
-          .merge(new MoldableCubeGeometry(4, 16, 4, 4, 1, 4).texturePerSide(materials.cartoonGrass).cylindrify(10).translate_(0, -3, -20))
+        makePlinth(26, 10, materials.brickWall, 4)
+          .merge(makePlinth(14, 10, materials.brickWall, 4).translate_(0,0,-20))
           .all_()
-          .translate_(-54, -11, 25)
+          .translate_(-54, -20, 25)
           .done_()
       )
 

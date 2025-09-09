@@ -56,7 +56,7 @@ void main() {
     vec3 litColor = diffuseColor + ambientLight.rgb;
 
     // Clamp to [ambient .. 1] range
-    vec3 finalLighting = clamp(litColor, ambientLight.rgb, vec3(1.0));
+    vec3 finalLighting = clamp(litColor, vec3(0.3, 0.3, 0.3), vec3(1.0));
 
     // === Texture sample ===
     vec4 baseColor = texture(uSampler, vec3(vTexCoord, vDepth));

@@ -7,6 +7,8 @@ import {Scene} from "@/engine/renderer/scene";
 import {EnhancedDOMPoint} from "@/engine/enhanced-dom-point";
 import { particles } from "@/engine/particles";
 import { materials } from "@/textures";
+import {playPumpkinSquashSound} from "@/sounds/pumpkin-squash.sound";
+import {theBestDamnCatHolyShit2} from "@/sounds/cat-sounds";
 
 export class Enemy {
   mesh = makeJackOLantern();
@@ -128,7 +130,7 @@ export class EnemyManager {
     ];
     this.sceneRef = sceneRef;
     this.sceneRef.add_(...this.enemies.flatMap(enemy => enemy.mesh));
-    plhe.textContent = '🐈‍⬛ ' + 9;
+    plhe.textContent = new Array(9).fill('🖤').join('')
   }
 
   update(player: ThirdPersonPlayer) {
@@ -136,27 +138,33 @@ export class EnemyManager {
       enemy.update();
       enemy.collisionDistance.subtractVectors(player.collisionSphere.center, enemy.collisionSphere.center);
       if (enemy.collisionDistance.dot(enemy.collisionDistance) < 36) { // enemy radius + player radius squared
+        playPumpkinSquashSound();
         this.sceneRef.remove_(enemy.mesh);
         this.enemies = this.enemies.filter(toRemove => toRemove !== enemy);
-        for (let i = 0; i < 10; i++) {
+        for (let i = 0; i < 20; i++) {
           particles.push({
             position: enemy.collisionSphere.center.clone_(),
-            size: 70 + Math.random() * 30,
-            life: 2.0,
-            velocity: new EnhancedDOMPoint(Math.sin(i) * 0.3, 0.5 + Math.random() * 0.5, Math.cos(i) * 0.3),
-            sizeModifier: 1,
+            size: Math.random() * 40,
+            life: 3.0,
+            velocity: new EnhancedDOMPoint(Math.sin(i) * 0.2, 0.5 + Math.random() * 0.5, Math.cos(i) * 0.2),
+            sizeModifier: 0.5,
             lifeModifier: 0.03,
             isAffectedByGravity: true,
             textureId: materials.splat.texture.id,
           });
         }
-        if (enemy.collisionSphere.center.y + 1 >= player.collisionSphere.center.y) {
+        if (enemy.collisionSphere.center.y + 2 >= player.collisionSphere.center.y) {
           player.health--;
           player.isTakingHit = true;
-          setTimeout(() => player.isTakingHit = false, 60); // This is sketch, but small, test it well
-          player.velocity.x *= -1.5;
-          player.velocity.z *= -1.5;
-          plhe.textContent = '🐈‍⬛ ' + player.health;
+          theBestDamnCatHolyShit2(true);
+          plhe.classList.add('chn');
+          setTimeout(() => {
+            player.isTakingHit = false;
+            plhe.classList.remove('chn');
+          }, 80);
+          player.velocity.x *= -2;
+          player.velocity.z *= -2;
+          plhe.textContent = new Array(player.health).fill('🖤').join('');
         } else {
           player.velocity.y = 0.5;
         }

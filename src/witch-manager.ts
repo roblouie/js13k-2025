@@ -81,7 +81,7 @@ export class WitchManager {
     this.witches.push(new Witch(makeWitch(new EnhancedDOMPoint(-107, 26, 222), new EnhancedDOMPoint(0, -125))))
 
     // 13 - inside cave witch
-    this.witches.push(new Witch(makeWitch(new EnhancedDOMPoint(235, 12, 8), new EnhancedDOMPoint(0, 180))))
+    this.witches.push(new Witch(makeWitch(new EnhancedDOMPoint(235, 12, 13), new EnhancedDOMPoint(0, 180))))
 
     this.sceneRef.add_(...this.witches.flatMap(witch => [witch.mesh]));
     this.sceneRef.transparentMeshes.push(...this.witches.map(witch => {
@@ -220,6 +220,8 @@ export class WitchManager {
     } else {
       player.witchesToCheck.forEach(witch => {
         if (areSpheresOverlapping(witch.collisionSphere, player.collisionSphere)) {
+          wico.classList.add('chn');
+          setTimeout(() => wico.classList.remove('chn'), 250);
           wico.textContent = `🧙‍♀️ ${14 - this.witches.length} / 13`;
           this.originalPlayerCameraPosition = player.camera.position.clone_();
           this.cameraPositionTarget = new EnhancedDOMPoint().set(witch.mesh.worldMatrix.transformPoint(new EnhancedDOMPoint(0,0,15)));
@@ -230,7 +232,7 @@ export class WitchManager {
       });
 
       if (this.witches.length === 0) {
-        tmpl.innerHTML = `<h1 style="text-align: center">You Win!</h1>`
+        msg.innerHTML = 'You Win!'
         tmpl.style.backgroundColor = `rgba(0, 0, 0, ${this.gameOverDarknessValue})`;
         this.gameOverDarknessValue += 0.003;
 

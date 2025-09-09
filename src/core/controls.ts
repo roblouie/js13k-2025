@@ -28,6 +28,8 @@ class Controls {
 
   keyMap: Map<string, boolean> = new Map();
 
+  isEnabled = false;
+
   constructor() {
     document.addEventListener('keydown', event => this.toggleKey(event, true));
     document.addEventListener('keyup', event => this.toggleKey(event, false));
@@ -38,7 +40,16 @@ class Controls {
     });
   }
 
+  enableControls() {
+    this.isEnabled = true;
+    this.mouseMovement.set(0,0,0);
+  }
+
   queryController() {
+    if (!this.isEnabled) {
+      return;
+    }
+
     this.isPrevJump = this.isJump;
     const gamepad = navigator.getGamepads()[0];
     const isButtonPressed = (button: XboxControllerButton) => gamepad?.buttons[button].pressed;
@@ -57,6 +68,8 @@ class Controls {
     if (this.inputDirection.magnitude < deadzone) {
       this.inputDirection.x = 0;
       this.inputDirection.y = 0;
+    } else {
+      this.inputDirection.normalize_();
     }
 
     if (this.cameraDirection.magnitude < deadzone) {

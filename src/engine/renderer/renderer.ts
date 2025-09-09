@@ -165,7 +165,7 @@ export function render(camera: Camera, scene: Scene) {
 
   gl.useProgram(lilgl.program);
   gl.activeTexture(gl.TEXTURE0);
-  gl.blendFunc(gl.SRC_ALPHA, gl.ONE + 1);
+  gl.blendFunc(gl.SRC_ALPHA, gl.SRC_ALPHA);
   scene.transparentMeshes.forEach(mesh => {
     mesh.updateWorldMatrix();
     renderMesh(mesh, viewProjectionMatrix);

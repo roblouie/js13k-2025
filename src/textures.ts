@@ -9,8 +9,10 @@ export const materials: {[key: string]: Material} = {};
 export const skyboxes: {[key: string]: TexImageSource[]} = {};
 export const heightmap = { data: [] };
 
+const isChrome = () => audioContext.listener.positionX;
 // ultra hack firefox detection. If there's room, do this in a less insane way, like checking user agent for firefox
-const filterTag = (id: string) => `<filter id="${id}" ${audioContext.listener.positionX ? 'width="100%" height="100%" x="0" y="0"' : ''} >`
+const filterTag = (id: string) => `<filter id="${id}" ${isChrome() ? 'width="100%" height="100%" x="0" y="0"' : 'width="514px" height="514px" x="-1" y="-1"'} >`
+const rectTag = (extraTags = '') => `<rect ${isChrome() ? 'width="100%" height="100%" x="0" y="0"' : 'width="514px" height="514px" x="-1" y="-1"'} ${extraTags} />`
 
 export async function initTextures() {
   materials.bars = new Material({ texture: textureLoader.load_(await bars())});
@@ -39,7 +41,7 @@ export async function initTextures() {
   materials.catMouth = new Material({ texture: textureLoader.load_(await catMouth())});
   materials.sparkle = new Material({ texture: textureLoader.load_(await emojiParticle('✨', 'filter: hue-rotate(160deg)'))});
   materials.heart = new Material({ texture: textureLoader.load_(await emojiParticle('❤️'))});
-  materials.splat = new Material({ texture: textureLoader.load_(await emojiParticle('💥'))})
+  materials.splat = new Material({ texture: textureLoader.load_(await jackolanternSplat())})
   materials.bubbles = new Material({ texture: textureLoader.load_(await emojiParticle('🫧'))});
   materials.witchBubble = new Material({ texture: textureLoader.load_(await witchBubble())});
   materials.catEye = new Material({ texture: textureLoader.load_(await catEye())});
@@ -47,6 +49,14 @@ export async function initTextures() {
   textureLoader.loadSkybox(await drawSkyboxHor());
 
   textureLoader.bindTextures();
+}
+
+function jackolanternSplat() {
+  return toImage(`<filter id="f">
+        <feTurbulence baseFrequency="0.02" numOctaves="5" seed="2" type="fractalNoise" />
+        <feDisplacementMap in="SourceGraphic" scale="400" xChannelSelector="R" yChannelSelector="G"/>
+    </filter>
+    <circle filter="url(#f)" cx="50%" cy="50%" r="40%" fill="#f71"/>`)
 }
 
 export function jackolantern() {
@@ -65,7 +75,7 @@ function brickWall() {
             <feDistantLight azimuth="115" elevation="40"/>
         </feDiffuseLighting>
     </filter>
-    <rect width="100%" height="100%"  filter="url(#filter)"/>`)
+    ${rectTag('filter="url(#filter)"')}`)
 }
 
 function witchBubble() {
@@ -75,7 +85,7 @@ function witchBubble() {
       0 1 0 0 0
       0 0 0 0 0
       1 1 1 1 1
-      0 -1 -1 0 1
+      0 -1 -1 -1 1.2
       "/>     </filter>
       <rect x="0" y="0" width="100%" height="100%" filter="url(#b)"/>`)
 }
@@ -91,7 +101,7 @@ function bars() {
 export function cartoonRockWall() {
   return toImage(`${filterTag('m')}
         <feTurbulence type="fractalNoise" baseFrequency=".005" numOctaves="7" stitchTiles="stitch"/>
-        <feDiffuseLighting diffuseConstant="6" surfaceScale="4" lighting-color="#7B3F00" color-interpolation="sRGB">
+        <feDiffuseLighting diffuseConstant="${isChrome() ? 3 : 6}" surfaceScale="${isChrome() ? 5 : 4}" lighting-color="#7B3F00" color-interpolation="sRGB">
             <feDistantLight elevation="4" azimuth="170"/>
         </feDiffuseLighting>
     </filter>
@@ -196,7 +206,7 @@ export function flora(color: string, baseFrequency: number) {
   return toImage(`${filterTag('filter')}
         <feTurbulence type="fractalNoise" baseFrequency="${baseFrequency}" numOctaves="8" stitchTiles="stitch"/>
         
-        <feDiffuseLighting color-interpolation-filters="sRGB" lighting-color="${color}" surfaceScale="-3" result="d">
+        <feDiffuseLighting color-interpolation-filters="sRGB" lighting-color="${color}" surfaceScale="-2" result="d" diffuseConstant="1">
             <feDistantLight azimuth="0" elevation="40"/>
         </feDiffuseLighting>
        

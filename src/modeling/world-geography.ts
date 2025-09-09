@@ -68,6 +68,9 @@ export function tubeCliffAndCave() {
       .selectBy(vert => vert.x < 30)
       .translate_(0, 0, 10)
 
+    .selectBy(vert => vert.y > 10 && vert.x < -40 && vert.z < 0)
+    .translate_(-6, 6)
+
       .selectBy(vert => vert.y > 10)
       .scale_(1.2, 1, 1.2)
 
@@ -173,12 +176,12 @@ export function worldWall() {
       )
 
       .merge(
-        new MoldableCubeGeometry(512, 24, 2, 4)
+        new MoldableCubeGeometry(512, 32, 2, 4)
           .texturePerSide(materials.shrubs)
           .selectBy(vert => vert.y > 0 && vert.x < 256)
           .translate_(0, 40)
           .all_()
-          .translate_(0, 12, -256)
+          .translate_(0, 16, -256)
           .spreadTextureCoords(20, 20)
       )
 

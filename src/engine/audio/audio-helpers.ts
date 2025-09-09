@@ -41,13 +41,13 @@ function createReverbImpulse(duration = 2, decay = 2) {
   return impulse;
 }
 
-const reverb = audioContext.createConvolver();
-reverb.buffer = createReverbImpulse(1.5, 3);
+export const reverb = audioContext.createConvolver();
+reverb.buffer = createReverbImpulse(2, 0.5);
 
 export const musicDryGain = audioContext.createGain();
 export const musicWetGain = audioContext.createGain();
 musicDryGain.gain.value = 0.15;
-musicWetGain.gain.value = 0.15;
+musicWetGain.gain.value = 0.12;
 
 musicDryGain.connect(audioContext.destination);
 musicWetGain.connect(reverb).connect(audioContext.destination);

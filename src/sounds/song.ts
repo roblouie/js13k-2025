@@ -1,4 +1,4 @@
-import {accousticGuitar, pizzicatoStrings, shake} from "@/sounds/instruments";
+import {accousticGuitar, pizzicatoStrings} from "@/sounds/instruments";
 import {audioContext, frequencyFromMidiNote} from "@/engine/audio/audio-helpers";
 
 const melody = '(v(vGRv`R_Rv_wj^RFAvFSqx(ARv`R_jvpxjx_Vvw)ARv`R_Rv_wj^RFAvFSqw)AS`R^vjvqwkwsy';
@@ -30,7 +30,7 @@ const song = [
 
 export function playSong() {
   const playbackSpeed = 9;
-  const instruments = [pizzicatoStrings, accousticGuitar, shake];
+  const instruments = [pizzicatoStrings, accousticGuitar];
 
     song.forEach((instrument, i) => {
       let startTime = 0;

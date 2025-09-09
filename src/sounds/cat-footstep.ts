@@ -15,7 +15,7 @@ export function playCatFootstepSound() {
   noise.connect(noiseFilter);
 
   const gain = audioContext.createGain();
-  const stopTime = envelopeMe(0.05, 0.01, 0, 0.03, clamp(Math.random(), 0.07, 0.2), audioContext.currentTime, 0.07, gain.gain)
+  const stopTime = envelopeMe(0.05, 0.01, 0, 0.03, clamp(Math.random(), 0.1, 0.3), audioContext.currentTime, 0.07, gain.gain)
 
   noiseFilter.connect(gain);
   gain.connect(audioContext.destination);

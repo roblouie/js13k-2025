@@ -11,7 +11,7 @@ export function floatingPlatforms() {
   return platformMaker(8).texturePerSide(...geoTexPerSide()).spreadTextureCoords()
       .merge(platformMaker(20).texturePerSide(...geoTexPerSide()).translate_(30, 8, 18).spreadTextureCoords())
       .merge(platformMaker(12).texturePerSide(...geoTexPerSide()).translate_(68, 19, 40).spreadTextureCoords())
-      .merge(platformMaker(10).texturePerSide(...geoTexPerSide()).translate_(90, 32, 30).spreadTextureCoords())
+      .merge(platformMaker(10).texturePerSide(...geoTexPerSide()).translate_(95, 30, 32).spreadTextureCoords())
       .merge(platformMaker(28).texturePerSide(...geoTexPerSide()).translate_(140, 35, 50).spreadTextureCoords())
       .all_()
 
