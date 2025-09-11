@@ -16,6 +16,7 @@ import {
   randomNegativeOneOne,
 } from "@/engine/particles";
 import {playWitchEscapeSound} from "@/sounds/witch-magic";
+import {controls} from "@/core/controls";
 
 export class Witch {
   mesh: Mesh;
@@ -75,7 +76,7 @@ export class WitchManager {
     this.witches.push(new Witch(makeWitch(new EnhancedDOMPoint(-71, 103, -44), new EnhancedDOMPoint(0, 30))))
 
     // 11 - caged witch
-    this.witches.push(new Witch(makeWitch(new EnhancedDOMPoint(20, 10, 235), new EnhancedDOMPoint(0, 180))))
+    this.witches.push(new Witch(makeWitch(new EnhancedDOMPoint(20, 11, 235), new EnhancedDOMPoint(0, 180))))
 
     // 12 - jump to plinth from hedge maze witch
     this.witches.push(new Witch(makeWitch(new EnhancedDOMPoint(-107, 26, 222), new EnhancedDOMPoint(0, -125))))
@@ -136,6 +137,12 @@ export class WitchManager {
       // BUBBLE POP
       if (this.witchSavingTimer === 80) {
         playPop();
+        controls.gamepad?.vibrationActuator?.playEffect("dual-rumble", {
+          startDelay: 0,
+          duration: 80,
+          weakMagnitude: 1,
+          strongMagnitude: 1,
+        });
         for (let i = 0; i < 30; i++) {
           particles.push({
             position: particleSpreadRadius(this.activeSavingWitch.mesh.position, 4),
@@ -173,10 +180,17 @@ export class WitchManager {
         playWitchEscapeSound();
       }
 
+      if (this.witchSavingTimer > 160) {
+        controls.gamepad?.vibrationActuator?.playEffect("dual-rumble", {
+          startDelay: 0,
+          duration: 20,
+          weakMagnitude: (this.witchSavingTimer - 160) / 130,
+          strongMagnitude: 0,
+        });
+      }
+
       // SPARKLES
       if (this.witchSavingTimer > 160 && this.witchSavingTimer < 200) {
-        // playPop(); // TODO: Replace with sparkle effect
-        // for (let i = 0; i < 50; i++) {
           particles.push({
             position: this.starParticlePosition.clone_(),
             size: 40 + Math.random() * 10,
@@ -194,7 +208,6 @@ export class WitchManager {
               particle.size += this.lifeModifier;
             }
           });
-        // }
       }
 
       if (this.witchSavingTimer > 220) {

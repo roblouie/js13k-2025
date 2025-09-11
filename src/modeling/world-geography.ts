@@ -8,10 +8,9 @@ import { Material } from '@/engine/renderer/material';
 export const geoTexPerSide = () => [materials.cartoonRockWall, materials.cartoonRockWall, materials.cartoonGrass, materials.cartoonRockWall, materials.cartoonRockWall, materials.cartoonRockWall];
 
 export function makeFloor() {
-  const floorGeo = new MoldableCubeGeometry(512, 1, 512, 31, 1, 31, 1)
+  const floorGeo = new MoldableCubeGeometry(512, 1, 512, 1, 1, 1, 1)
   return new Mesh(floorGeo
       .texturePerSide(materials.cartoonGrass)
-      // .modifyEachVertex((vert, index) => vert.y = heightmap.data[index])
       .spreadTextureCoords(40, 40).computeNormals().done_(), materials.cartoonGrass);
 }
 
@@ -240,7 +239,13 @@ export function nightCave() {
       // rooftop cave opening
       .merge(makeBridgePiece(120, 1, 1.).texturePerSide(materials.cartoonRockWall).scale_(1, 1, 1.3).all_().scale_(1, 1.3, 2).translate_(40, 50))
 
-      // wall behind pipe
+    .merge(new MoldableCubeGeometry(145, 1, 187)
+      .texturePerSide(materials.cartoonRockWall)
+      .selectBy(vert => vert.x < 0 && vert.z > 0)
+      .translate_(3, 0, -2)
+      .all_()
+      .translate_(27, -24.8, -36)
+    )
 
     .all_()
       // world positioniong

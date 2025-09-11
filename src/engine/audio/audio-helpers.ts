@@ -47,7 +47,7 @@ reverb.buffer = createReverbImpulse(2, 0.5);
 export const musicDryGain = audioContext.createGain();
 export const musicWetGain = audioContext.createGain();
 musicDryGain.gain.value = 0.15;
-musicWetGain.gain.value = 0.12;
+musicWetGain.gain.value = 0.15;
 
 musicDryGain.connect(audioContext.destination);
 musicWetGain.connect(reverb).connect(audioContext.destination);

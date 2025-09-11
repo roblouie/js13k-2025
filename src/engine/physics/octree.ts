@@ -3,25 +3,6 @@ import {AABB, isAABBOverlapping, isSphereOverlappingAABB, Sphere} from "@/engine
 import {EnhancedDOMPoint} from "@/engine/enhanced-dom-point";
 import {Witch} from "@/engine/witch-manager";
 
-// TODO: In full js13k release, precomupte this and just put in the hard bounds in the base
-// octree, and delete th is function
-export function computeSceneBounds(triangles: Face[]): AABB {
-  const min = new EnhancedDOMPoint(Infinity, Infinity, Infinity);
-  const max = new EnhancedDOMPoint(-Infinity, -Infinity, -Infinity);
-
-  triangles.forEach(triangle => {
-    min.x = Math.min(min.x, triangle.aabb.min.x);
-    min.y = Math.min(min.y, triangle.aabb.min.y);
-    min.z = Math.min(min.z, triangle.aabb.min.z);
-
-    max.x = Math.max(max.x, triangle.aabb.max.x);
-    max.y = Math.max(max.y, triangle.aabb.max.y);
-    max.z = Math.max(max.z, triangle.aabb.max.z);
-  });
-
-  return { min, max };
-}
-
 export function querySphere(node: OctreeNode, sphere: Sphere, onLeaf: (node: OctreeNode) => void) {
   if (!isSphereOverlappingAABB(sphere, node.bounds)) {
     return;

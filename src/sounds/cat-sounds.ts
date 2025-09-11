@@ -12,10 +12,10 @@ export function theBestDamnCatHolyShit2(isTakingDamage?: boolean) {
   // Source: sawtooth or triangle works best
   osc.type = "sawtooth";
 
-  osc.frequency.value = isTakingDamage ? 800 : 700; // 600 - 700 works
-  osc.frequency.setValueAtTime(isTakingDamage ? 900 : 700, audioContext.currentTime + 0.15);
-  osc.frequency.linearRampToValueAtTime(500, audioContext.currentTime + 0.7);
-  osc.frequency.linearRampToValueAtTime(isTakingDamage ? 500 : 900, audioContext.currentTime + 0.9);
+  osc.frequency.value = 700; // 600 - 700 works
+  osc.frequency.setValueAtTime(isTakingDamage ? 800 : 700, audioContext.currentTime + 0.15);
+  osc.frequency.linearRampToValueAtTime(isTakingDamage ? 900 : 500, audioContext.currentTime + 0.7);
+  osc.frequency.linearRampToValueAtTime(900, audioContext.currentTime + 0.9);
 
   // Amp envelope
   gain.gain.setValueAtTime(0, audioContext.currentTime);

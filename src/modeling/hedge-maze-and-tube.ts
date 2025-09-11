@@ -49,7 +49,7 @@ export function hedgeMazeAndTube() {
 }
 
 export function tunnel() {
-  return tubify(25, 35, 140, materials.cartoonGrass).rotate_(Math.PI / 2, 0, Math.PI / -2)
+  return tubify(25, 35, 140, materials.shrubs).rotate_(Math.PI / 2, 0, Math.PI / -2)
 
 
       // World placement

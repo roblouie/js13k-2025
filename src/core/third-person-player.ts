@@ -29,17 +29,13 @@ export class ThirdPersonPlayer {
   mesh: Object3d;
   camera: Camera;
 
-  listener: AudioListener;
-
   constructor(camera: Camera) {
     this.mesh = new Object3d(makeCat());
     this.mesh.isUsingLookAt = true;
     this.camera = camera;
     this.camera.position.set(194, 5.5, 220);
-    this.listener = audioContext.listener;
     this.lookatTarget.set(this.mesh.position);
     this.collisionSphere = new Sphere(new EnhancedDOMPoint(181, 2, 211), 2);
-
   }
 
   speed = 1;
@@ -82,7 +78,7 @@ export class ThirdPersonPlayer {
       return;
     }
 
-    if (this.groundedTimer < 10 && !this.isJumping && controls.inputDirection.magnitude > 0) {
+    if (this.groundedTimer < 10 && !this.isJumping && controls.leftStickMagnitude > 0) {
       const mesh = this.mesh.children_[0] as Mesh;
       mesh.alpha += this.velocity.magnitude * 0.4;
 
@@ -132,9 +128,13 @@ export class ThirdPersonPlayer {
 
     if (!this.wasGrounded && this.isGrounded) {
       jumpSound(true);
+      controls.gamepad?.vibrationActuator?.playEffect("dual-rumble", {
+        startDelay: 0,
+        duration: 40,
+        weakMagnitude: 0,
+        strongMagnitude: 0.01,
+      });
     }
-
-    this.updateAudio();
   }
 
   collideWithLevel(octreeNode: OctreeNode) {
@@ -144,7 +144,6 @@ export class ThirdPersonPlayer {
       node.faces.forEach(face => this.nearbyFaces.add(face));
       node.witches?.forEach(witch => this.witchesToCheck.add(witch));
     });
-    // tmpl.innerHTML += this.nearbyFaces.size;
 
     findWallCollisionsFromList(this.nearbyFaces, this);
 
@@ -181,10 +180,9 @@ export class ThirdPersonPlayer {
   protected updateVelocityFromControls() {
     const speedMultiplier = 0.24;
 
-    const mag = controls.inputDirection.magnitude;
     this.targetVelocity.set(0,0,0);
 
-    if (mag > 0.01) {
+    if (controls.leftStickMagnitude > 0.01) {
       const camDir = new EnhancedDOMPoint().set(this.camera.rotationMatrix.transformPoint(new EnhancedDOMPoint(0, 0, -1)));
       camDir.y = 0;
       camDir.normalize_();
@@ -221,23 +219,6 @@ export class ThirdPersonPlayer {
       jumpSound();
       this.jumpBuffer.isBuffered = false;
       this.jumpBuffer.frameCount = 0;
-    }
-  }
-
-  private updateAudio() {
-    if (this.listener.positionX) {
-      this.listener.positionX.value = this.mesh.position.x;
-      this.listener.positionY.value = this.mesh.position.y;
-      this.listener.positionZ.value = this.mesh.position.z;
-    }
-
-    const cameraPlayerDirection = this.mesh.position.clone_()
-      .subtract(this.camera.position) // distance from camera to player
-      .normalize_() // direction of camera to player
-
-    if (this.listener.forwardX) {
-      this.listener.forwardX.value = cameraPlayerDirection.x;
-      this.listener.forwardZ.value = cameraPlayerDirection.z;
     }
   }
 }

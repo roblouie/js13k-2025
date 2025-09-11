@@ -271,6 +271,13 @@ export const defaultTerserOptions: Terser.MinifyOptions = {
       //  'strict': Advanced, all unquoted property names are mangled unless explicitly reserved.
       keep_quoted: true,
 
+      reserved: [
+        'duration',
+        'weakMagnitude',
+        'strongMagnitude',
+        'startDelay'
+      ],
+
       // Pass a RegExp literal or pattern string to only mangle property matching the regular expression.
       // regex: /^[$_]/,
     },

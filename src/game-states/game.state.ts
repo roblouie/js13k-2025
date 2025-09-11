@@ -3,14 +3,13 @@ import {Scene} from '@/engine/renderer/scene';
 import {Camera} from '@/engine/renderer/camera';
 import {meshToFaces} from '@/engine/physics/parse-faces';
 import {render} from '@/engine/renderer/renderer';
-import {computeSceneBounds, OctreeNode} from "@/engine/physics/octree";
+import {OctreeNode} from "@/engine/physics/octree";
 import {ThirdPersonPlayer} from "@/core/third-person-player";
 
 import {WitchManager} from "@/witch-manager";
 import {playSong} from "@/sounds/song";
 import {makeWorld} from "@/modeling/full-world";
 import {makeFloor} from "@/modeling/world-geography";
-import {makeJackOLantern} from "@/modeling/jack-o-lantern";
 import {EnemyManager} from "@/enemy-manager";
 
 export class GameState implements State {
@@ -28,12 +27,9 @@ export class GameState implements State {
     this.player = new ThirdPersonPlayer(new Camera(Math.PI / 2.5, 16 / 9, 1, 700));
 
 
-    this.scene.add_(makeFloor(), makeWorld(), this.player.mesh);
+    this.scene.add_(this.player.mesh, makeFloor(), makeWorld());
     const faces = meshToFaces([makeFloor(), makeWorld()]);
 
-    // precomputed world bounds, so not needed at runtime
-    const worldBounds = computeSceneBounds(faces);
-    this.octree = new OctreeNode(worldBounds, 0);
     faces.forEach(face => this.octree.insert(face));
 
     this.witchManager = new WitchManager(this.scene, this.octree);
@@ -46,13 +42,11 @@ export class GameState implements State {
 
   // TODO: remember to update this from the computed octree when level design finished
   octree = new OctreeNode({
-    max: {x: 512, y: 12, z: 512, w: 1},
-    min: { x: -512, y: -3, z: -512 }
+    max: {x: 276, y: 190.31, z: 257, w: 1},
+    min: { x: -260, y: -7, z: -267 }
   }, 0);
 
   onUpdate() {
-    // tmpl.innerHTML = '';
-
     this.player.update(this.octree);
     this.enemyManager.update(this.player);
     this.witchManager.update(this.player);

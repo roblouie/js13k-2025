@@ -1,7 +1,6 @@
 import {audioContext, envelopeMe, musicDryGain, musicWetGain, reverb} from "@/engine/audio/audio-helpers";
 
 export function playPumpkinSquashSound() {
-  console.log('playing')
     const startTime = audioContext.currentTime;
     const duration = 0.5;
     const sineGain = audioContext.createGain();
